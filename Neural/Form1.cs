@@ -304,20 +304,20 @@ namespace Neural
 
             // prepare learning data
             //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
-            double[][] input = new double[samples*4/5][];
-            double[][] output = new double[samples*4/5][];
-            double[][] validateInput = new double[samples / 5][];
-            double[][] validateOutput = new double[samples / 5][];
+            double[][] input = new double[samples][];
+            double[][] output = new double[samples][];
+            //double[][] validateInput = new double[samples / 5][];
+            //double[][] validateOutput = new double[samples / 5][];
 
             // create multi-layer neural network
             
-            int K = 0;
-            int J = 0;
+            //int K = 0;
+            //int J = 0;
 
             for (int i = 0; i < samples; i++)
             {
                 //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
-                if ((i % 5) == 0) // validate input 20 %
+                /*if ((i % 5) == 0) // validate input 20 %
                 {                               
                     validateInput[K] = new double[colCountData-1];
 
@@ -326,26 +326,26 @@ namespace Neural
                         validateInput[K][c] = data[i, c];
                     }
 
-                    validateOutput[J] = new double[classesCount];
-                    validateOutput[J][classes[J]] = 1;
+                    validateOutput[K] = new double[classesCount];
+                    validateOutput[K][classes[K]] = 1;
                     K++;
                 }
                 else //forward input 80 %
-                {
+                {*/
                     // input data
-                    input[J] = new double[colCountData-1];
+                    input[i] = new double[colCountData-1];
 
                     for (int c = 0; c < colCountData - 1; c++)
                     {
-                        input[J][c] = data[i, c];
+                        input[i][c] = data[i, c];
                     }
 
                     //output data
-                    output[J] = new double[classesCount];
-                    output[J][classes[J]] = 1;
+                    output[i] = new double[classesCount];
+                    output[i][classes[i]] = 1;
                     
-                    J++;
-                }
+                   // J++;
+                //}
             }
 
             network = new ActivationNetwork(activationFunc,
@@ -353,7 +353,7 @@ namespace Neural
             ActivationLayer layer = network.Layers[0] as ActivationLayer;
             // create teacher
             teacherPerc = new PerceptronLearning(network);
-            // set learning rate and momentum
+            // set learning rate
             teacherPerc.LearningRate = learningRate;
 
             // iterations
@@ -378,9 +378,9 @@ namespace Neural
                         errorsList.Add(error);
                         
                     validateError[0] = 0.0;
-                    for (int count = 0; count < validateInput.GetLength(0)-1; count++)
+                    for (int count = 0; count < input.GetLength(0)-1; count++)
                     {
-                        validateError[0] += network.Compute(validateInput[count])[0] - validateOutput[count][0];
+                        validateError[0] += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
                     }
                     if (validateList.Count - 1 >= 100)
                     {
@@ -392,7 +392,7 @@ namespace Neural
                         // set current iteration's info
                     currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), iteration.ToString());
                     errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
-                    //validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError[0]/1000).ToString("F14"));
+                    validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError[0]/samples).ToString("F14"));
                     // show error's dynamics
                     double[,] errors = new double[errorsList.Count, 2];
                     double[,] valid = new double[validateList.Count, 2];
@@ -453,12 +453,18 @@ namespace Neural
         private void TestNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             String[] lines = new String[1];
-            double[] res = new double[1];
+            double[] res = new double[classesCount];
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetTest.csv"))
                 for (int i = 0; i < data.GetLength(0); i++)
                 {
-                    res[0] = network.Compute(new double[2] { data[i, 0], data[i, 1] })[0];
-                    lines[0] = data[i, 2].ToString() + ";" + res[0].ToString("F8");
+                    res = network.Compute(new double[2] { data[i, 0], data[i, 1] });
+                    int j = 0;
+                    for (j = 0; j < classesCount; j++)
+                    {
+                        if (res[j] == 1)
+                            break;
+                    }
+                    lines[0] = classes[i].ToString() + ";" + j.ToString("F8");
                     file.WriteLine(lines[0].ToString());
                 }
             MessageBox.Show("Тестирование пройдено");

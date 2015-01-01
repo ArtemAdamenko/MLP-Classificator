@@ -23,6 +23,11 @@ namespace Neural
         private HiddenLayer[] _hiddenLayers;
         private OutputLayer _output;
         private double[][][][] tempWeights;
+        int rowCountData = 0;
+        int colCountData = 0;
+        private int[] classes;
+        private int classesCount;
+        private int[] samplesPerClass;
 
         //draw options
         private SolidBrush _myBrush = new SolidBrush(Color.Blue);
@@ -94,7 +99,10 @@ namespace Neural
          * слоев нейронов и весов соответственно
          */
         private void setNeuronsDataGrid() 
-        { 
+        {
+            // remove all current records
+            this.dataGridView1.Rows.Clear();
+            
             for (int i = 0; i < network.Layers.Length; i++)
             {
                 for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
@@ -189,7 +197,7 @@ namespace Neural
         {
             this.setNeuronsDataGrid();
             //input
-            InputLayer input = new InputLayer(new double[1] { 1.0 });
+            InputLayer input = new InputLayer(new double[network.InputsCount]);
             this._inputLayer = input;
 
             //hidden layers
@@ -217,7 +225,7 @@ namespace Neural
                 }
             }
 
-            this._output = new OutputLayer(1);
+            this._output = new OutputLayer(network.Layers[0].Neurons.Length);
         }
 
         /**
@@ -230,46 +238,88 @@ namespace Neural
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
             {
                 StreamReader reader = null;
+                // min and max X values
+                float minX = float.MaxValue;
+                float maxX = float.MinValue;
 
                 try
                 {
                     // open selected file
                     reader = File.OpenText(openFileDialog2.FileName);
 
-                    //get count values
+                    //get row count values
                     String line;
-                    int rowCount = 0;
+                    rowCountData = 0;
+                    colCountData = 0;
+
+                    //get input and output count
+                    line = reader.ReadLine();
+                    rowCountData++;
+                    colCountData = line.Split(';').Length;
+
+                    //must be > 1 column in training data
+                    if (colCountData == 1)
+                        throw new Exception();
 
                     while ((line = reader.ReadLine()) != null)
                     {
-                        rowCount++;
+                        rowCountData++;
                     }
-                    double[,] tempData = new double[rowCount, 3];
+
+                    double[,] tempData = new double[rowCountData, colCountData];
+                    int[] tempClasses = new int[rowCountData];
 
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     line = "";
                     int i = 0;
-
+                    // classes count
+                    classesCount = 0;
+                    samplesPerClass = new int[10];
 
                     // read the data
-                    while ((i < rowCount) && ((line = reader.ReadLine()) != null))
+                    while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
                         string[] strs = line.Split(';');
                         // parse input and output values for learning
-                        tempData[i, 0] = double.Parse(strs[0]);
-                        tempData[i, 1] = double.Parse(strs[1]);
-                        tempData[i, 2] = double.Parse(strs[2]);
+                        //gather all input by cols
+                        for (int j = 0; j < colCountData - 1; j++)
+                        {
+                            tempData[i, j] = double.Parse(strs[j]);
+                        }
+
+                        tempClasses[i] = int.Parse(strs[colCountData - 1]);
+
+                        // skip classes over 10, except only first 10 classes
+                        if (tempClasses[i] >= 10)
+                            continue;
+
+                        // count the amount of different classes
+                        if (tempClasses[i] >= classesCount)
+                            classesCount = tempClasses[i] + 1;
+                        // count samples per class
+                        samplesPerClass[tempClasses[i]]++;
+
+                        // search for min value
+                        if (tempData[i, 0] < minX)
+                            minX = (float)tempData[i, 0];
+                        // search for max value
+                        if (tempData[i, 0] > maxX)
+                            maxX = (float)tempData[i, 0];
 
                         i++;
                     }
 
                     // allocate and set data
-                    data = new double[i, 3];
-                    Array.Copy(tempData, 0, data, 0, i * 3);
+                    data = new double[i, colCountData];
+                    Array.Copy(tempData, 0, data, 0, i * colCountData);
+                    classes = new int[i];
+                    Array.Copy(tempClasses, 0, classes, 0, i);
+                    this.testNetButton.Invoke(new Action(() => this.testNetButton.Enabled = true));
+
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Failed reading the file", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Ошибка чтения файла", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 finally
@@ -277,7 +327,6 @@ namespace Neural
                     // close file
                     if (reader != null)
                         reader.Close();
-                    Worker.Abort();
                 }
             }
         }
@@ -298,12 +347,21 @@ namespace Neural
         private void testNetButton_Click(object sender, EventArgs e)
         {
             this.CheckNeurons();
-            double testError = 0.0;
-            for (int i = 0; i < data.GetLength(0); i++)
+            double[] validateError = new double[classesCount];
+            double error = 0.0;
+            for (int count = 0; count < data.GetLength(0) - 1; count++)
             {
-                testError += Math.Abs(network.Compute(new double[2] { data[i, 0], data[i, 1] })[0] - data[i,2]);
+                validateError = network.Compute(new double[] { data[count, 0], data[count, 1] });
+                int j = 0;
+                for (j = 0; j < classesCount; j++)
+                {
+                    if (validateError[j] == 1)
+                        break;
+                }
+
+                error += Math.Abs(j - classes[count]);
             }
-            this.testErrorLabel.Text = (testError/data.GetLength(0)).ToString("F10");
+            this.testErrorLabel.Text = (error / data.GetLength(0)).ToString("F10");
         }
 
 
