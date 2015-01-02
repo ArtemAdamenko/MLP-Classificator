@@ -349,19 +349,27 @@ namespace Neural
             this.CheckNeurons();
             double[] validateError = new double[classesCount];
             double error = 0.0;
-            for (int count = 0; count < data.GetLength(0) - 1; count++)
+            try
             {
-                validateError = network.Compute(new double[] { data[count, 0], data[count, 1] });
-                int j = 0;
-                for (j = 0; j < classesCount; j++)
+                for (int count = 0; count < data.GetLength(0) - 1; count++)
                 {
-                    if (validateError[j] == 1)
-                        break;
-                }
+                    validateError = network.Compute(new double[] { data[count, 0], data[count, 1] });
+                    int j = 0;
+                    for (j = 0; j < classesCount; j++)
+                    {
+                        if (validateError[j] == 1)
+                            break;
+                    }
 
-                error += Math.Abs(j - classes[count]);
+                    error += Math.Abs(j - classes[count]);
+                }
+                this.testErrorLabel.Text = (error / data.GetLength(0)).ToString("F10");
             }
-            this.testErrorLabel.Text = (error / data.GetLength(0)).ToString("F10");
+            catch(Exception)
+                {
+                    MessageBox.Show("Ошибка тестирования сети.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
         }
 
 

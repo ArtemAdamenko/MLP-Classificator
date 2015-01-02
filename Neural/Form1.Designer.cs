@@ -87,6 +87,8 @@ namespace Neural
             this.SaveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TestNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ViewTopologyNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.classesBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox3.SuspendLayout();
@@ -118,6 +120,8 @@ namespace Neural
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.classesBox);
             this.groupBox1.Controls.Add(this.dataGridView1);
             this.groupBox1.Controls.Add(this.loadDataButton);
             this.groupBox1.Location = new System.Drawing.Point(3, 24);
@@ -305,6 +309,23 @@ namespace Neural
             this.ViewTopologyNetToolStripMenuItem.Text = "Топология";
             this.ViewTopologyNetToolStripMenuItem.Click += new System.EventHandler(this.ViewTopologyNetToolStripMenuItem_Click);
             // 
+            // classesBox
+            // 
+            this.classesBox.Enabled = false;
+            this.classesBox.Location = new System.Drawing.Point(328, 433);
+            this.classesBox.Name = "classesBox";
+            this.classesBox.Size = new System.Drawing.Size(48, 20);
+            this.classesBox.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(275, 437);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(49, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Классы:";
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -320,9 +341,10 @@ namespace Neural
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "Обучение многослойной нейронной сети";
+            this.Text = "Learning Neuro Classificator";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.Form1_Closing);
             this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -347,6 +369,8 @@ namespace Neural
         private ToolStripMenuItem TestNetToolStripMenuItem;
         private ToolStripMenuItem ViewTopologyNetToolStripMenuItem;
         private DataGridView dataGridView1;
+        private Label label2;
+        private TextBox classesBox;
 
     }
 }

@@ -156,6 +156,7 @@ namespace Neural
                     data = new double[i, colCountData];
                     Array.Copy(tempData, 0, data, 0, i * colCountData);
                     classes = new int[i];
+                    this.classesBox.Text = classesCount.ToString();
                     Array.Copy(tempClasses, 0, classes, 0, i);
 
                 }
@@ -370,7 +371,7 @@ namespace Neural
 
                     // run epoch of learning procedure
                         error = teacherPerc.RunEpoch(input, output);
-                        if (errorsList.Count - 1 >= 100)
+                        if (errorsList.Count - 1 >= 1000)
                         {
                             errorsList.RemoveAt(0);
                             
@@ -382,7 +383,7 @@ namespace Neural
                     {
                         validateError[0] += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
                     }
-                    if (validateList.Count - 1 >= 100)
+                    if (validateList.Count - 1 >= 1000)
                     {
                         validateList.RemoveAt(0);
 
