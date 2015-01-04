@@ -363,7 +363,7 @@ namespace Neural
 
                     error += Math.Abs(j - classes[count]);
                 }
-                this.testErrorLabel.Text = (error / data.GetLength(0)).ToString("F10");
+                this.errorTextBox.Text = (error / data.GetLength(0)).ToString("F10");
             }
             catch(Exception)
                 {

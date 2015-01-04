@@ -44,6 +44,7 @@
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
             this.testNetButton = new System.Windows.Forms.Button();
             this.testErrorLabel = new System.Windows.Forms.Label();
+            this.errorTextBox = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -180,11 +181,20 @@
             // testErrorLabel
             // 
             this.testErrorLabel.AutoSize = true;
-            this.testErrorLabel.Location = new System.Drawing.Point(197, 532);
+            this.testErrorLabel.Location = new System.Drawing.Point(173, 533);
             this.testErrorLabel.Name = "testErrorLabel";
             this.testErrorLabel.Size = new System.Drawing.Size(62, 13);
             this.testErrorLabel.TabIndex = 7;
             this.testErrorLabel.Text = "% ошибки: ";
+            // 
+            // errorTextBox
+            // 
+            this.errorTextBox.Enabled = false;
+            this.errorTextBox.Location = new System.Drawing.Point(232, 530);
+            this.errorTextBox.Name = "errorTextBox";
+            this.errorTextBox.ReadOnly = true;
+            this.errorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.errorTextBox.TabIndex = 8;
             // 
             // FormDrawNeurons
             // 
@@ -192,6 +202,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1062, 562);
+            this.Controls.Add(this.errorTextBox);
             this.Controls.Add(this.testErrorLabel);
             this.Controls.Add(this.testNetButton);
             this.Controls.Add(this.groupBox1);
@@ -230,5 +241,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Weight;
         private System.Windows.Forms.DataGridViewTextBoxColumn weightValue;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Check;
+        private System.Windows.Forms.TextBox errorTextBox;
     }
 }
