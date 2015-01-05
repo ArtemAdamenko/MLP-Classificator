@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -162,7 +162,7 @@ namespace Neural
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("ÐžÑˆÐ¸Ð±ÐºÐ° Ñ‡Ñ‚ÐµÐ½Ð¸Ñ Ñ„Ð°Ð¹Ð»Ð°", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Îøèáêà ÷òåíèÿ ôàéëà", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 finally
@@ -177,7 +177,9 @@ namespace Neural
                 // enable "Start" button
                 startButton.Enabled = true;
                 chart.RangeX = new Range(minX, maxX);
-                ShowTrainingData();
+                //input > 3 = 3d graph
+                if (colCountData-1 <= 2)
+                    ShowTrainingData();
             }
         }
 
@@ -414,18 +416,21 @@ namespace Neural
                     errorChart.UpdateDataSeries("error", errors);
                     errorChart.UpdateDataSeries("validate", valid);
                     // show classifiers
-                    for (int j = 0; j < classesCount; j++)
+                    if (colCountData-1 <= 2)
                     {
-                        double k = (layer.Neurons[j].Weights[1] != 0) ? (-layer.Neurons[j].Weights[0] / layer.Neurons[j].Weights[1]) : 0;
-                        double b = (layer.Neurons[j].Weights[1] != 0) ? (-((ActivationNeuron)layer.Neurons[j]).Threshold / layer.Neurons[j].Weights[1]) : 0;
+                        for (int j = 0; j < classesCount; j++)
+                        {
+                            double k = (layer.Neurons[j].Weights[1] != 0) ? (-layer.Neurons[j].Weights[0] / layer.Neurons[j].Weights[1]) : 0;
+                            double b = (layer.Neurons[j].Weights[1] != 0) ? (-((ActivationNeuron)layer.Neurons[j]).Threshold / layer.Neurons[j].Weights[1]) : 0;
 
-                        double[,] classifier = new double[2, 2] {
+                            double[,] classifier = new double[2, 2] {
 							{ chart.RangeX.Min, chart.RangeX.Min * k + b },
 							{ chart.RangeX.Max, chart.RangeX.Max * k + b }
 																};
 
-                        // update chart
-                        chart.UpdateDataSeries(string.Format("classifier" + j), classifier);
+                            // update chart
+                            chart.UpdateDataSeries(string.Format("classifier" + j), classifier);
+                        }
                     }
     
                 // increase current iteration
@@ -436,7 +441,7 @@ namespace Neural
         }
 
         /**
-        * Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð½ÐµÐ¹Ñ€Ð¾Ð½Ð½Ð¾Ð¹ ÑÐµÑ‚Ð¸ Ð¿Ð¾ ÑƒÐºÐ°Ð·Ð°Ð½Ð½Ð¾Ð¼Ñƒ Ð¿ÑƒÑ‚Ð¸
+        * Ñîõðàíåíèå íåéðîííîé ñåòè ïî óêàçàííîìó ïóòè
         * */
         private void SaveNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -446,7 +451,7 @@ namespace Neural
             {
 
                 network.Save(saveFileDialog1.FileName);
-                MessageBox.Show("Ð¡ÐµÑ‚ÑŒ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð°");
+                MessageBox.Show("Ñåòü ñîõðàíåíà");
             }
         
         }
@@ -455,10 +460,18 @@ namespace Neural
         {
             String[] lines = new String[1];
             double[] res = new double[classesCount];
+		    double[] input = new double[colCountData - 1];
+
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetTest.csv"))
                 for (int i = 0; i < data.GetLength(0); i++)
                 {
-                    res = network.Compute(new double[2] { data[i, 0], data[i, 1] });
+                    //gather inputs for compute, n-1 inputs
+                    for (int k = 0; k < colCountData - 1; k++)
+                    {
+                        input[k] = data[i, k];
+                    }
+
+                    res = network.Compute(input);
                     int j = 0;
                     for (j = 0; j < classesCount; j++)
                     {
@@ -468,7 +481,7 @@ namespace Neural
                     lines[0] = classes[i].ToString() + ";" + j.ToString("F8");
                     file.WriteLine(lines[0].ToString());
                 }
-            MessageBox.Show("Ð¢ÐµÑÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ñ€Ð¾Ð¹Ð´ÐµÐ½Ð¾");
+            MessageBox.Show("Òåñòèðîâàíèå ïðîéäåíî");
         }
 
         private void ViewTopologyNetToolStripMenuItem_Click(object sender, EventArgs e)

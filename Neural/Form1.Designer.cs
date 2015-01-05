@@ -66,6 +66,8 @@ namespace Neural
             this.chart = new AForge.Controls.Chart();
             this.errorChart = new AForge.Controls.Chart();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.classesBox = new System.Windows.Forms.TextBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.loadDataButton = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -87,34 +89,34 @@ namespace Neural
             this.SaveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TestNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ViewTopologyNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.classesBox = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // chart
             // 
             this.chart.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.chart.Location = new System.Drawing.Point(391, 212);
+            this.chart.Location = new System.Drawing.Point(6, 197);
             this.chart.Name = "chart";
             this.chart.RangeX = ((AForge.Range)(resources.GetObject("chart.RangeX")));
             this.chart.RangeY = ((AForge.Range)(resources.GetObject("chart.RangeY")));
-            this.chart.Size = new System.Drawing.Size(326, 265);
+            this.chart.Size = new System.Drawing.Size(314, 253);
             this.chart.TabIndex = 0;
             // 
             // errorChart
             // 
             this.errorChart.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.errorChart.Location = new System.Drawing.Point(391, 27);
+            this.errorChart.Location = new System.Drawing.Point(6, 16);
             this.errorChart.Name = "errorChart";
             this.errorChart.RangeX = ((AForge.Range)(resources.GetObject("errorChart.RangeX")));
             this.errorChart.RangeY = ((AForge.Range)(resources.GetObject("errorChart.RangeY")));
-            this.errorChart.Size = new System.Drawing.Size(326, 179);
+            this.errorChart.Size = new System.Drawing.Size(314, 175);
             this.errorChart.TabIndex = 3;
             this.errorChart.Text = "chart1";
             // 
@@ -130,6 +132,23 @@ namespace Neural
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Выборка";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(275, 437);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(49, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Классы:";
+            // 
+            // classesBox
+            // 
+            this.classesBox.Enabled = false;
+            this.classesBox.Location = new System.Drawing.Point(328, 433);
+            this.classesBox.Name = "classesBox";
+            this.classesBox.Size = new System.Drawing.Size(48, 20);
+            this.classesBox.TabIndex = 3;
             // 
             // dataGridView1
             // 
@@ -309,29 +328,22 @@ namespace Neural
             this.ViewTopologyNetToolStripMenuItem.Text = "Топология";
             this.ViewTopologyNetToolStripMenuItem.Click += new System.EventHandler(this.ViewTopologyNetToolStripMenuItem_Click);
             // 
-            // classesBox
+            // groupBox2
             // 
-            this.classesBox.Enabled = false;
-            this.classesBox.Location = new System.Drawing.Point(328, 433);
-            this.classesBox.Name = "classesBox";
-            this.classesBox.Size = new System.Drawing.Size(48, 20);
-            this.classesBox.TabIndex = 3;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(275, 437);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(49, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Классы:";
+            this.groupBox2.Controls.Add(this.errorChart);
+            this.groupBox2.Controls.Add(this.chart);
+            this.groupBox2.Location = new System.Drawing.Point(391, 27);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(326, 456);
+            this.groupBox2.TabIndex = 20;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Изменение ошибки обучения";
             // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(918, 483);
-            this.Controls.Add(this.errorChart);
-            this.Controls.Add(this.chart);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -353,6 +365,7 @@ namespace Neural
             this.groupBox5.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -371,6 +384,7 @@ namespace Neural
         private DataGridView dataGridView1;
         private Label label2;
         private TextBox classesBox;
+        private GroupBox groupBox2;
 
     }
 }
