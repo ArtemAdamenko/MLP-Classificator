@@ -64,6 +64,11 @@ namespace Neural
                 Rectangle ellipse = new Rectangle(x, 50 * k, 100, 50);
                 formGraphics.FillEllipse(this._myBrush, ellipse);
                 formGraphics.DrawEllipse(this._myPen, ellipse);
+                //draw string in ellipse
+                formGraphics.DrawString("Input[" + k.ToString() + "]",
+                                    new Font("Arial", 11, FontStyle.Bold),
+                                    new SolidBrush(Color.Gray),
+                                    new System.Drawing.Point(x + 20, 50 * k + 10));
                 fisrtPoints[k].X = x + 100;
                 fisrtPoints[k].Y = 50 * k + (50 / 2);
             }
@@ -84,6 +89,11 @@ namespace Neural
                     Rectangle ellipse = new Rectangle(x, 50 * j, 100, 50);
                     formGraphics.FillEllipse(this._myBrush, ellipse);
                     formGraphics.DrawEllipse(this._myPen, ellipse);
+                    //draw string in ellipse
+                    formGraphics.DrawString("L[" + i.ToString() + "]N[" + j.ToString() + "]",
+                                    new Font("Arial", 11, FontStyle.Bold),
+                                    new SolidBrush(Color.Black),
+                                    new System.Drawing.Point(x + 20, 50 * j + 10));
 
                     hiddenLeftPoints[j].X = x;
                     hiddenLeftPoints[j].Y = 50 * j + (50 / 2);

@@ -90,6 +90,9 @@ namespace Neural
             this.TestNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ViewTopologyNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.fileTextBox = new System.Windows.Forms.TextBox();
+            this.inputCountBox = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox3.SuspendLayout();
@@ -122,6 +125,9 @@ namespace Neural
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.inputCountBox);
+            this.groupBox1.Controls.Add(this.fileTextBox);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.classesBox);
             this.groupBox1.Controls.Add(this.dataGridView1);
@@ -136,7 +142,7 @@ namespace Neural
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(275, 437);
+            this.label2.Location = new System.Drawing.Point(295, 436);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 13);
             this.label2.TabIndex = 4;
@@ -145,9 +151,10 @@ namespace Neural
             // classesBox
             // 
             this.classesBox.Enabled = false;
-            this.classesBox.Location = new System.Drawing.Point(328, 433);
+            this.classesBox.Location = new System.Drawing.Point(350, 433);
             this.classesBox.Name = "classesBox";
-            this.classesBox.Size = new System.Drawing.Size(48, 20);
+            this.classesBox.ReadOnly = true;
+            this.classesBox.Size = new System.Drawing.Size(26, 20);
             this.classesBox.TabIndex = 3;
             // 
             // dataGridView1
@@ -162,7 +169,7 @@ namespace Neural
             // 
             // loadDataButton
             // 
-            this.loadDataButton.Location = new System.Drawing.Point(128, 430);
+            this.loadDataButton.Location = new System.Drawing.Point(6, 430);
             this.loadDataButton.Name = "loadDataButton";
             this.loadDataButton.Size = new System.Drawing.Size(124, 23);
             this.loadDataButton.TabIndex = 1;
@@ -339,6 +346,33 @@ namespace Neural
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Изменение ошибки обучения";
             // 
+            // fileTextBox
+            // 
+            this.fileTextBox.Enabled = false;
+            this.fileTextBox.Location = new System.Drawing.Point(136, 433);
+            this.fileTextBox.Name = "fileTextBox";
+            this.fileTextBox.ReadOnly = true;
+            this.fileTextBox.Size = new System.Drawing.Size(68, 20);
+            this.fileTextBox.TabIndex = 5;
+            // 
+            // inputCountBox
+            // 
+            this.inputCountBox.Enabled = false;
+            this.inputCountBox.Location = new System.Drawing.Point(246, 433);
+            this.inputCountBox.Name = "inputCountBox";
+            this.inputCountBox.ReadOnly = true;
+            this.inputCountBox.Size = new System.Drawing.Size(43, 20);
+            this.inputCountBox.TabIndex = 6;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(215, 437);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(25, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Вх.:";
+            // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -385,6 +419,9 @@ namespace Neural
         private Label label2;
         private TextBox classesBox;
         private GroupBox groupBox2;
+        private Label label4;
+        private TextBox inputCountBox;
+        private TextBox fileTextBox;
 
     }
 }

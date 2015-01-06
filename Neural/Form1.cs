@@ -159,6 +159,9 @@ namespace Neural
                     this.classesBox.Text = classesCount.ToString();
                     Array.Copy(tempClasses, 0, classes, 0, i);
 
+                    inputCountBox.Invoke(new Action(() => inputCountBox.Text = (colCountData - 1).ToString()));
+                    fileTextBox.Invoke(new Action(() => fileTextBox.Text = openFileDialog.SafeFileName.ToString()));
+
                 }
                 catch (Exception)
                 {
@@ -177,6 +180,9 @@ namespace Neural
                 // enable "Start" button
                 startButton.Enabled = true;
                 chart.RangeX = new Range(minX, maxX);
+                
+                // remove all previous data series from chart control
+                chart.RemoveAllDataSeries();
                 //input > 3 = 3d graph
                 if (colCountData-1 <= 2)
                     ShowTrainingData();
