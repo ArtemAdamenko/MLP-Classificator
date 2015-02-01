@@ -13,6 +13,11 @@ using System.Collections;
 using AForge.Controls;
 using AForge.Neuro;
 using AForge.Neuro.Learning;
+using Accord.Neuro;
+using Accord.Math;
+using Accord.Neuro.Learning;
+using Accord;
+using ZedGraph;
 
 
 namespace Neural
@@ -23,6 +28,9 @@ namespace Neural
         int rowCountData = 0;
         int colCountData = 0;
 
+        string[] sourceColumns;
+        double[,] sourceMatrix;
+
         private double learningRate = 0.1;
         private int[] classes;
         private int classesCount;
@@ -32,7 +40,7 @@ namespace Neural
         private bool needToStop = false;
         ActivationNetwork network;
         IActivationFunction activationFunc = new ThresholdFunction();
-        PerceptronLearning teacherPerc = null;
+        ParallelResilientBackpropagationLearning teacherPerc = null;
 
         // color for data series
         private static Color[] dataSereisColors = new Color[10] {
@@ -53,8 +61,8 @@ namespace Neural
 
             // init controls
             UpdateSettings();
-            errorChart.AddDataSeries("error", Color.Red, Chart.SeriesType.ConnectedDots, 3);
-            errorChart.AddDataSeries("validate", Color.Blue, Chart.SeriesType.ConnectedDots, 2);
+
+
         }
 
         // On main form closing
@@ -221,10 +229,10 @@ namespace Neural
                 string className = string.Format("class" + i);
 
                 // add data series
-                chart.AddDataSeries(className, dataSereisColors[i], Chart.SeriesType.Dots, 5);
+                chart.AddDataSeries(className, dataSereisColors[i], AForge.Controls.Chart.SeriesType.Dots, 5);
                 chart.UpdateDataSeries(className, dataSeries[i]);
                 // add classifier
-                chart.AddDataSeries(string.Format("classifier" + i), Color.Gray, Chart.SeriesType.Line, 1, false);
+                chart.AddDataSeries(string.Format("classifier" + i), Color.Gray, AForge.Controls.Chart.SeriesType.Line, 1, false);
             }
         }
 
@@ -357,70 +365,177 @@ namespace Neural
                 //}
             }
 
-            network = new ActivationNetwork(activationFunc,
-            colCountData-1, classesCount);
+            network = new ActivationNetwork(new SigmoidFunction(),
+            colCountData-1, 7, 3, classesCount);
             ActivationLayer layer = network.Layers[0] as ActivationLayer;
             // create teacher
-            teacherPerc = new PerceptronLearning(network);
-            // set learning rate
-            teacherPerc.LearningRate = learningRate;
+            NguyenWidrow initializer = new NguyenWidrow(network);
+            initializer.Randomize();
 
+            teacherPerc = new ParallelResilientBackpropagationLearning(network);
+            //set weights grid
+            this.dataGridViewWeights.Invoke(new Action(() => dataGridViewWeights.Rows.Clear()));
+            //TO DO incapsulate to function
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                for (int neurons = 0; neurons < network.Layers[i].Neurons.Length; neurons++)
+                {
+                    for (int weights = 0; weights < network.Layers[i].Neurons[neurons].Weights.Length; weights++)
+                    {
+                        this.dataGridViewWeights.Invoke(
+                            new Action<int, int, int>((i1, i2, i3) =>
+                                dataGridViewWeights.Rows.Add(i1.ToString(), i2.ToString(), i3.ToString(), network.Layers[i1].Neurons[i2].Weights[i3].ToString())), i, neurons, weights);
+                    }
+                }
+            }
+            // set learning rate
+            //teacherPerc.LearningRate = learningRate;
+           // teacherPerc.Momentum = 0.7;
             // iterations
             int iteration = 1;
             double error = 0.0;
             double[] validateError = new double[1]{0.0};
             //int j = 0;
             // erros list
-            ArrayList errorsList = new ArrayList();
-            ArrayList validateList = new ArrayList();
+            //ArrayList errorsList = new ArrayList();
+            RollingPointPairList listError = new RollingPointPairList(250);
+            RollingPointPairList listValidate = new RollingPointPairList(250);
+
+            zedGraphControl1.GraphPane.CurveList.Clear();
+            GraphPane myPane = zedGraphControl1.GraphPane;
+            myPane.Title.Text = "Test of Dynamic Data Update with ZedGraph\n" +
+                  "(After 25 seconds the graph scrolls)";
+            myPane.XAxis.Title.Text = "Iterations";
+            myPane.YAxis.Title.Text = "Error Learning Dynamics";
+            // Initially, a curve is added with no data points (list is empty)
+            // Color is blue, and there will be no symbols
+            LineItem curve = myPane.AddCurve("Sum of Squares Errors", listError, Color.Blue, SymbolType.None);
+            LineItem curve2 = myPane.AddCurve("Validate", listValidate, Color.Red, SymbolType.None);
+
+            // Just manually control the X axis range so it scrolls continuously
+            // instead of discrete step-sized jumps
+            //myPane.XAxis.Scale.Min = 0;
+            //myPane.XAxis.Scale.Max = 200;
+            //myPane.XAxis.Scale.MinorStep = 1;
+            myPane.XAxis.Scale.MajorStep = 5;
+
+            // Scale the axes
+            zedGraphControl1.AxisChange();
+
+            //ArrayList validateList = new ArrayList();
             // loop
             while (!needToStop)
             {
 
                     // run epoch of learning procedure
                         error = teacherPerc.RunEpoch(input, output);
-                        if (errorsList.Count - 1 >= 1000)
+                        int Rows = 0; 
+                        for (int i = 0; i < network.Layers.Length; i++)
+                        {
+                            for (int neurons = 0; neurons < network.Layers[i].Neurons.Length; neurons++)
+                            {
+                                for (int weights = 0; weights < network.Layers[i].Neurons[neurons].Weights.Length; weights++)
+                                {
+
+                                   /* if (Math.Abs(network.Layers[i].Neurons[neurons].Weights[weights]) >= 50.0 * learningRate)
+                                    {
+                                        network.Layers[i].Neurons[neurons].Weights[weights] = network.Layers[i].Neurons[neurons].Weights[weights] / network.Layers[i].Neurons.Length;
+                                        // RowsRisk[Rows]++;
+
+                                        this.dataGridViewWeights.Invoke(
+                                        new Action<int>((row) =>
+                                            dataGridViewWeights.Rows[row].Cells[3].Style.BackColor = Color.Red), Rows);
+                                    }*/
+
+                                    this.dataGridViewWeights.Invoke(
+                                        new Action<double>((weight) =>
+                                            dataGridViewWeights.Rows[Rows].Cells[3].Value = weight), network.Layers[i].Neurons[neurons].Weights[weights]);
+
+
+
+                                    Rows++;
+                                }
+                            }
+                        }
+
+                        // Make sure that the curvelist has at least one curve
+                        if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
+                            return;
+
+                        // Get the first CurveItem in the graph
+                        curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
+                        curve2 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
+                        if (curve == null)
+                            return;
+                        if (curve2 == null)
+                            return;
+
+                        // Get the PointPairList
+                        IPointListEdit listErrors = curve.Points as IPointListEdit;
+                        IPointListEdit listValidates = curve2.Points as IPointListEdit;
+                        // If this is null, it means the reference at curve.Points does not
+                        // support IPointListEdit, so we won't be able to modify it
+                        if (listErrors == null)
+                            return;
+                        if (listValidates == null)
+                            return;
+                        // 3 seconds per cycle
+                        listErrors.Add(iteration, error);
+                        listValidates.Add(iteration, validateError[0]);
+
+                        // Keep the X scale at a rolling 30 second interval, with one
+                        // major step between the max X value and the end of the axis
+                        /*Scale xScale = zedGraphControl1.GraphPane.XAxis.Scale;
+                        if (time > xScale.Max - xScale.MajorStep)
+                        {
+                            xScale.Max = time + xScale.MajorStep;
+                            xScale.Min = xScale.Max - 30.0;
+                        }*/
+
+                        // Make sure the Y axis is rescaled to accommodate actual data
+                        zedGraphControl1.AxisChange();
+                        // Force a redraw
+                        zedGraphControl1.Invalidate();
+                        
+                        /*if (errorsList.Count - 1 >= 1000)
                         {
                             errorsList.RemoveAt(0);
                             
                         }
-                        errorsList.Add(error);
+                        errorsList.Add(error);*/
                         
                     validateError[0] = 0.0;
                     for (int count = 0; count < input.GetLength(0)-1; count++)
                     {
                         validateError[0] += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
                     }
-                    if (validateList.Count - 1 >= 1000)
+                    /*if (validateList.Count - 1 >= 1000)
                     {
                         validateList.RemoveAt(0);
 
                     }
-                    validateList.Add(validateError[0]);
+                    validateList.Add(validateError[0]);*/
 
                         // set current iteration's info
                     currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), iteration.ToString());
                     errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
                     validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError[0]/samples).ToString("F14"));
                     // show error's dynamics
-                    double[,] errors = new double[errorsList.Count, 2];
+                   /* double[,] errors = new double[errorsList.Count, 2];
                     double[,] valid = new double[validateList.Count, 2];
 
                     for (int i = 0, n = errorsList.Count; i < n; i++)
                     {
                         errors[i, 0] = i;
                         errors[i, 1] = (double)errorsList[i];
-                    }
+                    }*/
 
-                    for (int i = 0, n = validateList.Count; i < n; i++)
+                   /* for (int i = 0, n = validateList.Count; i < n; i++)
                     {
                         valid[i, 0] = i;
                         valid[i, 1] = (double)validateList[i];
-                    }
+                    }*/
 
-                    errorChart.RangeX = new Range(1, errorsList.Count - 1);
-                    errorChart.UpdateDataSeries("error", errors);
-                    errorChart.UpdateDataSeries("validate", valid);
                     // show classifiers
                     if (colCountData-1 <= 2)
                     {
@@ -451,15 +566,7 @@ namespace Neural
         * */
         private void SaveNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.Filter = "bin files (*.bin)|*.bin";
-            if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK
-                    && saveFileDialog1.FileName.Length > 0)
-            {
 
-                network.Save(saveFileDialog1.FileName);
-                MessageBox.Show("Сеть сохранена");
-            }
-        
         }
 
         private void TestNetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -493,6 +600,24 @@ namespace Neural
         private void ViewTopologyNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new Thread(() => Application.Run(new FormDrawNeurons())).Start();
+        }
+
+        private void SaveWeightsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Weights.csv"))
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
+                {
+                    for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
+                    {
+                        
+                        file.WriteLine("L[" + i.ToString() + "]N[" + j.ToString() + "]W[" + k.ToString() + "] = " + network.Layers[i].Neurons[j].Weights[k]);
+                        
+                    }
+                }
+            }
+            MessageBox.Show("Веса сохранены");
         }
 
 
