@@ -32,11 +32,6 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Layer = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Neuron = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Weight = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.weightValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Check = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.LoadNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,6 +40,11 @@
             this.testNetButton = new System.Windows.Forms.Button();
             this.testErrorLabel = new System.Windows.Forms.Label();
             this.errorTextBox = new System.Windows.Forms.TextBox();
+            this.Layer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Neuron = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Weight = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.weightValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Check = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -87,6 +87,7 @@
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.ControlLight;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Layer,
@@ -96,44 +97,9 @@
             this.Check});
             this.dataGridView1.Location = new System.Drawing.Point(6, 19);
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.Size = new System.Drawing.Size(308, 472);
             this.dataGridView1.TabIndex = 8;
-            // 
-            // Layer
-            // 
-            this.Layer.HeaderText = "Слой";
-            this.Layer.Name = "Layer";
-            this.Layer.ReadOnly = true;
-            this.Layer.Width = 40;
-            // 
-            // Neuron
-            // 
-            this.Neuron.HeaderText = "Нейрон";
-            this.Neuron.Name = "Neuron";
-            this.Neuron.ReadOnly = true;
-            this.Neuron.Width = 40;
-            // 
-            // Weight
-            // 
-            this.Weight.HeaderText = "Вес";
-            this.Weight.Name = "Weight";
-            this.Weight.ReadOnly = true;
-            this.Weight.Width = 30;
-            // 
-            // weightValue
-            // 
-            this.weightValue.HeaderText = "Значение";
-            this.weightValue.Name = "weightValue";
-            this.weightValue.ReadOnly = true;
-            this.weightValue.Width = 90;
-            // 
-            // Check
-            // 
-            this.Check.FalseValue = "F";
-            this.Check.HeaderText = "Вкл/Выкл";
-            this.Check.Name = "Check";
-            this.Check.TrueValue = "T";
-            this.Check.Width = 70;
             // 
             // openFileDialog1
             // 
@@ -197,6 +163,42 @@
             this.errorTextBox.Size = new System.Drawing.Size(100, 20);
             this.errorTextBox.TabIndex = 8;
             // 
+            // Layer
+            // 
+            this.Layer.HeaderText = "Слой";
+            this.Layer.Name = "Layer";
+            this.Layer.ReadOnly = true;
+            this.Layer.Width = 40;
+            // 
+            // Neuron
+            // 
+            this.Neuron.HeaderText = "Нейрон";
+            this.Neuron.Name = "Neuron";
+            this.Neuron.ReadOnly = true;
+            this.Neuron.Width = 60;
+            // 
+            // Weight
+            // 
+            this.Weight.HeaderText = "Вес";
+            this.Weight.Name = "Weight";
+            this.Weight.ReadOnly = true;
+            this.Weight.Width = 30;
+            // 
+            // weightValue
+            // 
+            this.weightValue.HeaderText = "Значение";
+            this.weightValue.Name = "weightValue";
+            this.weightValue.ReadOnly = true;
+            this.weightValue.Width = 110;
+            // 
+            // Check
+            // 
+            this.Check.FalseValue = "F";
+            this.Check.HeaderText = "Вкл/Выкл";
+            this.Check.Name = "Check";
+            this.Check.TrueValue = "T";
+            this.Check.Width = 70;
+            // 
             // FormDrawNeurons
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -237,11 +239,11 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.Button testNetButton;
         private System.Windows.Forms.Label testErrorLabel;
+        private System.Windows.Forms.TextBox errorTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn Layer;
         private System.Windows.Forms.DataGridViewTextBoxColumn Neuron;
         private System.Windows.Forms.DataGridViewTextBoxColumn Weight;
         private System.Windows.Forms.DataGridViewTextBoxColumn weightValue;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Check;
-        private System.Windows.Forms.TextBox errorTextBox;
     }
 }

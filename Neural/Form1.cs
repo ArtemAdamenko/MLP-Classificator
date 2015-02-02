@@ -32,15 +32,26 @@ namespace Neural
         double[,] sourceMatrix;
 
         private double learningRate = 0.1;
+        private double alpha = 0.1;
+        private double moment = 0.3;
+        private int iterations = 0;
+        private double error = 0.0;
+        private double validateError = 0.0;
+        private String selectedAlgo = "";
+        private int[] neuronsAndLayers;
         private int[] classes;
         private int classesCount;
         private int[] samplesPerClass;
+        private ActivationNetwork[] allNetworks = null;
+        private double validLevel = 0.2;
+        private int maxIterations = 1000;
+        private int maxNeuronsInLayer = 10;
 
         private Thread workerThread = null;
         private bool needToStop = false;
         ActivationNetwork network;
-        IActivationFunction activationFunc = new ThresholdFunction();
-        ParallelResilientBackpropagationLearning teacherPerc = null;
+        IActivationFunction activationFunc = null;
+        ISupervisedLearning teacher = null;
 
         // color for data series
         private static Color[] dataSereisColors = new Color[10] {
@@ -79,7 +90,12 @@ namespace Neural
         // Update settings controls
         private void UpdateSettings()
         {
+            this.alphaBox.Text = alpha.ToString();
+            this.momentBox.Text = moment.ToString();
             this.learningRateBox.Text = learningRate.ToString();
+            this.validationLevelBox.Text = validLevel.ToString();
+            this.maxIterationsBox.Text = maxIterations.ToString();
+            this.maxNeuronsInLayerBox.Text = maxNeuronsInLayer.ToString();
         }
 
         // Load data
@@ -183,8 +199,6 @@ namespace Neural
                         reader.Close();
                 }
                 
-                // update list and chart
-                UpdateDataListView();
                 // enable "Start" button
                 startButton.Enabled = true;
                 chart.RangeX = new Range(minX, maxX);
@@ -237,47 +251,24 @@ namespace Neural
         }
 
         // Update data in list view
-        private void UpdateDataListView()
+        /*private void UpdateDataListView()
         {
-            // remove all current records
-            this.dataGridView1.Rows.Clear();
-            int colCountGrid = this.dataGridView1.Columns.Count;
-            for (int c = 0; c < colCountGrid; c++)
-            {
-                this.dataGridView1.Columns.Remove(c.ToString());
-            }
-
-            // add new records
-            //add columns to grid
-            int k = 0;
-            for (k = 0; k < colCountData-1; k++)
-            {
-                this.dataGridView1.Columns.Add(k.ToString(), "Input: " + k.ToString());
-            }
-            this.dataGridView1.Columns.Add(k.ToString(), "Class");
-
-            //add rows and values
-            for (int i = 0; i < rowCountData; i++)
-            {
-                dataGridView1.Rows.Add();
-                for (int j = 0; j < colCountData-1; j++)
-                {   
-                        this.dataGridView1.Rows[i].Cells[j].Value = data[i, j];
-                }
-                this.dataGridView1.Rows[i].Cells[colCountData-1].Value = classes[i];
-            }
-        }
+        }*/
 
         // Enable/disale controls
         private void EnableControls(bool enable)
         {
-            loadDataButton.Invoke(new Action(() => loadDataButton.Enabled = enable));
-            
-            learningRateBox.Invoke(new Action(() => learningRateBox.Enabled = enable));
+            alphaBox.Invoke(new Action(() => alphaBox.Enabled = enable));
 
             startButton.Invoke(new Action(() => startButton.Enabled = enable));
 
             stopButton.Invoke(new Action(() => stopButton.Enabled = !enable));
+
+            validationLevelBox.Invoke(new Action(() => validationLevelBox.Enabled = enable));
+
+            maxIterationsBox.Invoke(new Action(() => maxIterationsBox.Enabled = enable));
+
+            maxNeuronsInLayerBox.Invoke(new Action(() => maxNeuronsInLayerBox.Enabled = enable));
 
         }
 
@@ -287,13 +278,77 @@ namespace Neural
             // get learning rate
             try
             {
+                validLevel = Math.Max(0.00001, Math.Min(1, double.Parse(validationLevelBox.Text)));
+            }
+            catch
+            {
+                validLevel = 0.2;
+            }
+            // get learning rate
+            try
+            {
+                maxIterations = Math.Max(500, Math.Min(10000, int.Parse(maxIterationsBox.Text)));
+            }
+            catch
+            {
+                maxIterations = 1000;
+            }
+            // get learning rate
+            try
+            {
+                maxNeuronsInLayer = Math.Max(3, Math.Min(15, int.Parse(maxNeuronsInLayerBox.Text)));
+            }
+            catch
+            {
+                maxNeuronsInLayer = 5;
+            }
+            // get learning rate
+            try
+            {
                 learningRate = Math.Max(0.00001, Math.Min(1, double.Parse(learningRateBox.Text)));
             }
             catch
             {
                 learningRate = 0.1;
             }
+            // get momentum
+            try
+            {
+                moment = Math.Max(0, Math.Min(0.5, double.Parse(momentBox.Text)));
+            }
+            catch
+            {
+                moment = 0;
+            }
+            // get alpha
+            try
+            {
+                alpha = Math.Max(0, Math.Min(2.0, double.Parse(alphaBox.Text)));
+            }
+            catch
+            {
+                alpha = 1.0;
+            }
+            // get neurons count in first layer
+            try
+            {
+                String[] temp = neuronsBox.Text.Split(',');
+                if (temp.Length < 1)
+                    throw new Exception();
+                neuronsAndLayers = new int[temp.Length+1];
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    neuronsAndLayers[i] = Math.Max(1, Math.Min(50, int.Parse(temp[i])));
+                }
 
+                neuronsAndLayers[temp.Length] = classesCount;
+            }
+            catch
+            {
+                neuronsAndLayers = new int[1];
+                neuronsAndLayers[0] = classesCount;
+               // neuronsAndLayers[1] = classesCount;
+            }
             // update settings controls
             UpdateSettings();
 
@@ -311,6 +366,37 @@ namespace Neural
         {
             // stop worker thread
             needToStop = true;
+            recordNeuroNet();
+
+        }
+
+        private void recordNeuroNet()
+        {
+            String topology = network.InputsCount.ToString();
+
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                topology += "-" + network.Layers[i].Neurons.Length.ToString();
+            }
+            //String topology = network.InputsCount.ToString() + "-" + neuronsBox.Text + "-" + classesCount.ToString();
+            String moment = "-";
+            String learningRate = "-";
+
+            if (this.selectedAlgo == "Backpropagation")
+            {
+                moment = this.moment.ToString();
+                learningRate = this.learningRate.ToString();
+            }
+
+            this.lastRunsGridView.Invoke(
+                            new Action<String, String, String, String, String, String, String, String>((iter, error, validError, algoritm, topologyNet, alpha, learnRate, momentum) =>
+                                lastRunsGridView.Rows.Add(iter, error, validError, algoritm, topologyNet, alpha, learnRate, momentum)),
+                                this.iterations.ToString(), this.error.ToString(), (this.validateError / rowCountData).ToString(),
+                                this.selectedAlgo, topology, this.alpha.ToString(), learningRate, moment);
+
+           /* this.lastRunsGridView.Rows.Add(this.iterations.ToString(), this.error.ToString(), (this.validateError / rowCountData).ToString(),
+                algoritmBox.SelectedItem.ToString(), topology, this.alpha.ToString(), learningRate, moment
+                    );*/
         }
 
         // Worker thread
@@ -327,7 +413,7 @@ namespace Neural
             //double[][] validateOutput = new double[samples / 5][];
 
             // create multi-layer neural network
-            
+
             //int K = 0;
             //int J = 0;
 
@@ -349,30 +435,252 @@ namespace Neural
                 }
                 else //forward input 80 %
                 {*/
-                    // input data
-                    input[i] = new double[colCountData-1];
+                // input data
+                input[i] = new double[colCountData - 1];
 
-                    for (int c = 0; c < colCountData - 1; c++)
-                    {
-                        input[i][c] = data[i, c];
-                    }
+                for (int c = 0; c < colCountData - 1; c++)
+                {
+                    input[i][c] = data[i, c];
+                }
 
-                    //output data
-                    output[i] = new double[classesCount];
-                    output[i][classes[i]] = 1;
-                    
-                   // J++;
+                //output data
+                output[i] = new double[classesCount];
+                output[i][classes[i]] = 1;
+
+                // J++;
                 //}
             }
 
-            network = new ActivationNetwork(new SigmoidFunction(),
-            colCountData-1, 7, 3, classesCount);
+            if (this.alphaBox.Text != "")
+                activationFunc = new SigmoidFunction(Double.Parse(this.alphaBox.Text));
+            else
+                activationFunc = new SigmoidFunction();
+
+            network = new ActivationNetwork(activationFunc,
+            colCountData - 1, neuronsAndLayers);
             ActivationLayer layer = network.Layers[0] as ActivationLayer;
-            // create teacher
+
             NguyenWidrow initializer = new NguyenWidrow(network);
             initializer.Randomize();
+            // create teacher
+            if (this.selectedAlgo == "Parallel Resilient Backpropagation")
+                teacher = new ParallelResilientBackpropagationLearning(network);
+            else if (this.selectedAlgo == "Backpropagation")
+            {
+                BackPropagationLearning backProp = new BackPropagationLearning(network);
+                backProp.LearningRate = this.learningRate;
+                backProp.Momentum = this.moment;
+                teacher = backProp;
+            }
 
-            teacherPerc = new ParallelResilientBackpropagationLearning(network);
+            this.updateWeightsGrid();
+
+            // iterations
+            this.iterations = 1;
+            this.error = 0.0;
+            this.validateError = 0.0;
+            // erros list
+            RollingPointPairList listError = new RollingPointPairList(250);
+            RollingPointPairList listValidate = new RollingPointPairList(250);
+
+            zedGraphControl1.GraphPane.CurveList.Clear();
+            GraphPane myPane = zedGraphControl1.GraphPane;
+            myPane.Title.Text = "Обучение нейронной сети";
+            myPane.XAxis.Title.Text = "Итерации";
+            myPane.YAxis.Title.Text = "Изменение ошибки обучения";
+            // Initially, a curve is added with no data points (list is empty)
+            // Color is blue, and there will be no symbols
+            LineItem curve = myPane.AddCurve("Сумма квадратов ошибок", listError, Color.Blue, SymbolType.None);
+            LineItem curve2 = myPane.AddCurve("Валидация", listValidate, Color.Red, SymbolType.None);
+
+            myPane.XAxis.Scale.MajorStep = 10;
+
+            // Scale the axes
+            zedGraphControl1.AxisChange();
+
+            // loop
+            while (!needToStop)
+            {
+                if ((iterations >= maxIterations) && (validateError > validLevel))
+                {
+                    int potentialLayer = -1;
+
+                    //search free layer for add neuron
+                    for (int hiddenLayer = 0; hiddenLayer < network.Layers.Length-1; hiddenLayer++)
+                    {
+                        if (network.Layers[hiddenLayer].Neurons.Length < maxNeuronsInLayer)
+                        {
+                            potentialLayer = hiddenLayer;
+                            break;
+                        }
+                    }
+                    //layers full, add new free layer
+                    if (potentialLayer == -1)
+                    {
+                        int[] tempNet = new int[network.Layers.Length+1];
+                        int i = 0;
+                        for (i = 0; i < network.Layers.Length-1; i++)
+                        {
+                            tempNet[i] = network.Layers[i].Neurons.Length;
+                        }
+                        tempNet[i] = 1; // new layer before last layer
+                        tempNet[i+1] = network.Output.Length; // last layer in end
+
+                        network = new ActivationNetwork(activationFunc, colCountData - 1, tempNet);
+                        initializer = new NguyenWidrow(network);
+                        initializer.Randomize();
+                        if (this.selectedAlgo == "Parallel Resilient Backpropagation")
+                            teacher = new ParallelResilientBackpropagationLearning(network);
+                        else if (this.selectedAlgo == "Backpropagation")
+                        {
+                            BackPropagationLearning backProp = new BackPropagationLearning(network);
+                            backProp.LearningRate = this.learningRate;
+                            backProp.Momentum = this.moment;
+                            teacher = backProp;
+                        }
+                        updateWeightsGrid();
+
+                    }
+                    else if (potentialLayer != -1)
+                    {
+                        int[] tempNet = new int[network.Layers.Length];
+                        int i = 0;
+                        int newCntNeurons = 0;
+                        for (i = 0; i < network.Layers.Length; i++)
+                        {
+                            if (i == potentialLayer)
+                            {
+                                newCntNeurons = network.Layers[i].Neurons.Length + 1;
+                                tempNet[i] = newCntNeurons;
+                                //break;
+                            }
+                            else 
+                            {
+                                tempNet[i] = network.Layers[i].Neurons.Length;
+                            }
+                            
+                        }
+                        //tempNet[i] = network.Output.Length; // last layer in end
+                        network = new ActivationNetwork(activationFunc, colCountData - 1, tempNet);
+                        initializer = new NguyenWidrow(network);
+                        initializer.Randomize();
+                        if (this.selectedAlgo == "Parallel Resilient Backpropagation")
+                            teacher = new ParallelResilientBackpropagationLearning(network);
+                        else if (this.selectedAlgo == "Backpropagation")
+                        {
+                            BackPropagationLearning backProp = new BackPropagationLearning(network);
+                            backProp.LearningRate = this.learningRate;
+                            backProp.Momentum = this.moment;
+                            teacher = backProp;
+                        }
+                        updateWeightsGrid();
+                    }
+                    recordNeuroNet();
+                    iterations = 1;
+                }
+                // run epoch of learning procedure
+                error = teacher.RunEpoch(input, output);
+                validateError = 0.0;
+                for (int count = 0; count < input.GetLength(0) - 1; count++)
+                {
+                    validateError += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
+                }
+
+                int Rows = 0;
+                for (int i = 0; i < network.Layers.Length; i++)
+                {
+                    for (int neurons = 0; neurons < network.Layers[i].Neurons.Length; neurons++)
+                    {
+                        for (int weights = 0; weights < network.Layers[i].Neurons[neurons].Weights.Length; weights++)
+                        {
+
+                            /* if (Math.Abs(network.Layers[i].Neurons[neurons].Weights[weights]) >= 50.0 * learningRate)
+                             {
+                                 network.Layers[i].Neurons[neurons].Weights[weights] = network.Layers[i].Neurons[neurons].Weights[weights] / network.Layers[i].Neurons.Length;
+                                 // RowsRisk[Rows]++;
+
+                                 this.dataGridViewWeights.Invoke(
+                                 new Action<int>((row) =>
+                                     dataGridViewWeights.Rows[row].Cells[3].Style.BackColor = Color.Red), Rows);
+                             }*/
+
+                            this.dataGridViewWeights.Invoke(
+                                new Action<double>((weight) =>
+                                    dataGridViewWeights.Rows[Rows].Cells[3].Value = weight), network.Layers[i].Neurons[neurons].Weights[weights]);
+
+
+
+                            Rows++;
+                        }
+                    }
+                }
+
+                // Make sure that the curvelist has at least one curve
+                if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
+                    return;
+
+                // Get the first CurveItem in the graph
+                curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
+                curve2 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
+                if (curve == null)
+                    return;
+                if (curve2 == null)
+                    return;
+
+                // Get the PointPairList
+                IPointListEdit listErrors = curve.Points as IPointListEdit;
+                IPointListEdit listValidates = curve2.Points as IPointListEdit;
+                // If this is null, it means the reference at curve.Points does not
+                // support IPointListEdit, so we won't be able to modify it
+                if (listErrors == null)
+                    return;
+                if (listValidates == null)
+                    return;
+                listErrors.Add(this.iterations, error);
+                listValidates.Add(this.iterations, validateError / samples);
+
+                // Make sure the Y axis is rescaled to accommodate actual data
+                zedGraphControl1.AxisChange();
+                // Force a redraw
+                zedGraphControl1.Invalidate();
+
+
+                // set current iteration's info
+                currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), this.iterations.ToString());
+                errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
+                validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError / samples).ToString("F14"));
+
+                // show classifiers
+                /*if (colCountData - 1 <= 2)
+                {
+                    for (int j = 0; j < classesCount; j++)
+                    {
+                        double k = (layer.Neurons[j].Weights[1] != 0) ? (-layer.Neurons[j].Weights[0] / layer.Neurons[j].Weights[1]) : 0;
+                        double b = (layer.Neurons[j].Weights[1] != 0) ? (-((ActivationNeuron)layer.Neurons[j]).Threshold / layer.Neurons[j].Weights[1]) : 0;
+
+                        double[,] classifier = new double[2, 2] {
+							{ chart.RangeX.Min, chart.RangeX.Min * k + b },
+							{ chart.RangeX.Max, chart.RangeX.Max * k + b }
+																};
+
+                        // update chart
+                        chart.UpdateDataSeries(string.Format("classifier" + j), classifier);
+                    }
+                }*/
+
+                // increase current iteration
+                this.iterations++;
+            }
+            // enable settings controls
+            EnableControls(true);
+
+        }
+
+        /**
+         * init grid of weights
+         * */
+        private void updateWeightsGrid()
+        {
             //set weights grid
             this.dataGridViewWeights.Invoke(new Action(() => dataGridViewWeights.Rows.Clear()));
             //TO DO incapsulate to function
@@ -388,177 +696,6 @@ namespace Neural
                     }
                 }
             }
-            // set learning rate
-            //teacherPerc.LearningRate = learningRate;
-           // teacherPerc.Momentum = 0.7;
-            // iterations
-            int iteration = 1;
-            double error = 0.0;
-            double[] validateError = new double[1]{0.0};
-            //int j = 0;
-            // erros list
-            //ArrayList errorsList = new ArrayList();
-            RollingPointPairList listError = new RollingPointPairList(250);
-            RollingPointPairList listValidate = new RollingPointPairList(250);
-
-            zedGraphControl1.GraphPane.CurveList.Clear();
-            GraphPane myPane = zedGraphControl1.GraphPane;
-            myPane.Title.Text = "Test of Dynamic Data Update with ZedGraph\n" +
-                  "(After 25 seconds the graph scrolls)";
-            myPane.XAxis.Title.Text = "Iterations";
-            myPane.YAxis.Title.Text = "Error Learning Dynamics";
-            // Initially, a curve is added with no data points (list is empty)
-            // Color is blue, and there will be no symbols
-            LineItem curve = myPane.AddCurve("Sum of Squares Errors", listError, Color.Blue, SymbolType.None);
-            LineItem curve2 = myPane.AddCurve("Validate", listValidate, Color.Red, SymbolType.None);
-
-            // Just manually control the X axis range so it scrolls continuously
-            // instead of discrete step-sized jumps
-            //myPane.XAxis.Scale.Min = 0;
-            //myPane.XAxis.Scale.Max = 200;
-            //myPane.XAxis.Scale.MinorStep = 1;
-            myPane.XAxis.Scale.MajorStep = 5;
-
-            // Scale the axes
-            zedGraphControl1.AxisChange();
-
-            //ArrayList validateList = new ArrayList();
-            // loop
-            while (!needToStop)
-            {
-
-                    // run epoch of learning procedure
-                        error = teacherPerc.RunEpoch(input, output);
-                        int Rows = 0; 
-                        for (int i = 0; i < network.Layers.Length; i++)
-                        {
-                            for (int neurons = 0; neurons < network.Layers[i].Neurons.Length; neurons++)
-                            {
-                                for (int weights = 0; weights < network.Layers[i].Neurons[neurons].Weights.Length; weights++)
-                                {
-
-                                   /* if (Math.Abs(network.Layers[i].Neurons[neurons].Weights[weights]) >= 50.0 * learningRate)
-                                    {
-                                        network.Layers[i].Neurons[neurons].Weights[weights] = network.Layers[i].Neurons[neurons].Weights[weights] / network.Layers[i].Neurons.Length;
-                                        // RowsRisk[Rows]++;
-
-                                        this.dataGridViewWeights.Invoke(
-                                        new Action<int>((row) =>
-                                            dataGridViewWeights.Rows[row].Cells[3].Style.BackColor = Color.Red), Rows);
-                                    }*/
-
-                                    this.dataGridViewWeights.Invoke(
-                                        new Action<double>((weight) =>
-                                            dataGridViewWeights.Rows[Rows].Cells[3].Value = weight), network.Layers[i].Neurons[neurons].Weights[weights]);
-
-
-
-                                    Rows++;
-                                }
-                            }
-                        }
-
-                        // Make sure that the curvelist has at least one curve
-                        if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
-                            return;
-
-                        // Get the first CurveItem in the graph
-                        curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
-                        curve2 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
-                        if (curve == null)
-                            return;
-                        if (curve2 == null)
-                            return;
-
-                        // Get the PointPairList
-                        IPointListEdit listErrors = curve.Points as IPointListEdit;
-                        IPointListEdit listValidates = curve2.Points as IPointListEdit;
-                        // If this is null, it means the reference at curve.Points does not
-                        // support IPointListEdit, so we won't be able to modify it
-                        if (listErrors == null)
-                            return;
-                        if (listValidates == null)
-                            return;
-                        // 3 seconds per cycle
-                        listErrors.Add(iteration, error);
-                        listValidates.Add(iteration, validateError[0]);
-
-                        // Keep the X scale at a rolling 30 second interval, with one
-                        // major step between the max X value and the end of the axis
-                        /*Scale xScale = zedGraphControl1.GraphPane.XAxis.Scale;
-                        if (time > xScale.Max - xScale.MajorStep)
-                        {
-                            xScale.Max = time + xScale.MajorStep;
-                            xScale.Min = xScale.Max - 30.0;
-                        }*/
-
-                        // Make sure the Y axis is rescaled to accommodate actual data
-                        zedGraphControl1.AxisChange();
-                        // Force a redraw
-                        zedGraphControl1.Invalidate();
-                        
-                        /*if (errorsList.Count - 1 >= 1000)
-                        {
-                            errorsList.RemoveAt(0);
-                            
-                        }
-                        errorsList.Add(error);*/
-                        
-                    validateError[0] = 0.0;
-                    for (int count = 0; count < input.GetLength(0)-1; count++)
-                    {
-                        validateError[0] += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
-                    }
-                    /*if (validateList.Count - 1 >= 1000)
-                    {
-                        validateList.RemoveAt(0);
-
-                    }
-                    validateList.Add(validateError[0]);*/
-
-                        // set current iteration's info
-                    currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), iteration.ToString());
-                    errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
-                    validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError[0]/samples).ToString("F14"));
-                    // show error's dynamics
-                   /* double[,] errors = new double[errorsList.Count, 2];
-                    double[,] valid = new double[validateList.Count, 2];
-
-                    for (int i = 0, n = errorsList.Count; i < n; i++)
-                    {
-                        errors[i, 0] = i;
-                        errors[i, 1] = (double)errorsList[i];
-                    }*/
-
-                   /* for (int i = 0, n = validateList.Count; i < n; i++)
-                    {
-                        valid[i, 0] = i;
-                        valid[i, 1] = (double)validateList[i];
-                    }*/
-
-                    // show classifiers
-                    if (colCountData-1 <= 2)
-                    {
-                        for (int j = 0; j < classesCount; j++)
-                        {
-                            double k = (layer.Neurons[j].Weights[1] != 0) ? (-layer.Neurons[j].Weights[0] / layer.Neurons[j].Weights[1]) : 0;
-                            double b = (layer.Neurons[j].Weights[1] != 0) ? (-((ActivationNeuron)layer.Neurons[j]).Threshold / layer.Neurons[j].Weights[1]) : 0;
-
-                            double[,] classifier = new double[2, 2] {
-							{ chart.RangeX.Min, chart.RangeX.Min * k + b },
-							{ chart.RangeX.Max, chart.RangeX.Max * k + b }
-																};
-
-                            // update chart
-                            chart.UpdateDataSeries(string.Format("classifier" + j), classifier);
-                        }
-                    }
-    
-                // increase current iteration
-                    iteration++;
-            }
-            // enable settings controls
-            EnableControls( true );
         }
 
         /**
@@ -566,7 +703,14 @@ namespace Neural
         * */
         private void SaveNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            saveFileDialog1.Filter = "bin files (*.bin)|*.bin";
+            if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK
+                    && saveFileDialog1.FileName.Length > 0)
+            {
 
+                network.Save(saveFileDialog1.FileName);
+                MessageBox.Show("Сеть сохранена");
+            }
         }
 
         private void TestNetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -618,6 +762,26 @@ namespace Neural
                 }
             }
             MessageBox.Show("Веса сохранены");
+        }
+
+        private void algoritmBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            selectedAlgo = algoritmBox.SelectedItem.ToString();
+            if (this.selectedAlgo == "Parallel Resilient Backpropagation")
+            {
+                this.momentBox.Enabled = false;
+                this.momentBox.ReadOnly = true;
+                this.learningRateBox.Enabled = false;
+                this.learningRateBox.ReadOnly = true;
+            }
+            else if (this.selectedAlgo == "Backpropagation")
+            {
+                this.momentBox.Enabled = true;
+                this.momentBox.ReadOnly = false;
+                this.learningRateBox.Enabled = true;
+                this.learningRateBox.ReadOnly = false;
+            }
+            
         }
 
 
