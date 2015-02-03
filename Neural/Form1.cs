@@ -46,21 +46,13 @@ namespace Neural
         private double validLevel = 0.2;
         private int maxIterations = 1000;
         private int maxNeuronsInLayer = 10;
+        private double minWeight = 50;
 
         private Thread workerThread = null;
         private bool needToStop = false;
         ActivationNetwork network;
         IActivationFunction activationFunc = null;
         ISupervisedLearning teacher = null;
-
-        // color for data series
-        private static Color[] dataSereisColors = new Color[10] {
-																	 Color.Red,		Color.Blue,
-																	 Color.Green,	Color.DarkOrange,
-																	 Color.Violet,	Color.Brown,
-																	 Color.Black,	Color.Pink,
-																	 Color.Olive,	Color.Navy };
-
 
         // Constructor
         public Form1()
@@ -96,6 +88,7 @@ namespace Neural
             this.validationLevelBox.Text = validLevel.ToString();
             this.maxIterationsBox.Text = maxIterations.ToString();
             this.maxNeuronsInLayerBox.Text = maxNeuronsInLayer.ToString();
+            this.minWeightBox.Text = minWeight.ToString();
         }
 
         // Load data
@@ -201,59 +194,8 @@ namespace Neural
                 
                 // enable "Start" button
                 startButton.Enabled = true;
-                chart.RangeX = new Range(minX, maxX);
-                
-                // remove all previous data series from chart control
-                chart.RemoveAllDataSeries();
-                //input > 3 = 3d graph
-                if (colCountData-1 <= 2)
-                    ShowTrainingData();
             }
         }
-
-        // Show training data on chart
-        private void ShowTrainingData()
-        {
-            double[][,] dataSeries = new double[classesCount][,];
-            int[] indexes = new int[classesCount];
-
-            // allocate data arrays
-            for (int i = 0; i < classesCount; i++)
-            {
-                dataSeries[i] = new double[samplesPerClass[i], 2];
-            }
-
-            // fill data arrays
-            for (int i = 0; i < rowCountData; i++)
-            {
-                // get sample's class
-                int dataClass = classes[i];
-                // copy data into appropriate array
-                dataSeries[dataClass][indexes[dataClass], 0] = data[i, 0];
-                dataSeries[dataClass][indexes[dataClass], 1] = data[i, 1];
-                indexes[dataClass]++;
-            }
-
-            // remove all previous data series from chart control
-            chart.RemoveAllDataSeries();
-
-            // add new data series
-            for (int i = 0; i < classesCount; i++)
-            {
-                string className = string.Format("class" + i);
-
-                // add data series
-                chart.AddDataSeries(className, dataSereisColors[i], AForge.Controls.Chart.SeriesType.Dots, 5);
-                chart.UpdateDataSeries(className, dataSeries[i]);
-                // add classifier
-                chart.AddDataSeries(string.Format("classifier" + i), Color.Gray, AForge.Controls.Chart.SeriesType.Line, 1, false);
-            }
-        }
-
-        // Update data in list view
-        /*private void UpdateDataListView()
-        {
-        }*/
 
         // Enable/disale controls
         private void EnableControls(bool enable)
@@ -270,11 +212,23 @@ namespace Neural
 
             maxNeuronsInLayerBox.Invoke(new Action(() => maxNeuronsInLayerBox.Enabled = enable));
 
+            minWeightBox.Invoke(new Action(() => minWeightBox.Enabled = enable));
+
         }
 
         // On button "Start"
         private void startButton_Click(object sender, System.EventArgs e)
         {
+
+            // get learning rate
+            try
+            {
+                minWeight = Math.Max(50.0, Math.Min(10000, double.Parse(minWeightBox.Text)));
+            }
+            catch
+            {
+                minWeight = 50.0;
+            }
             // get learning rate
             try
             {
@@ -347,7 +301,6 @@ namespace Neural
             {
                 neuronsAndLayers = new int[1];
                 neuronsAndLayers[0] = classesCount;
-               // neuronsAndLayers[1] = classesCount;
             }
             // update settings controls
             UpdateSettings();
@@ -370,6 +323,20 @@ namespace Neural
 
         }
 
+        private int getCountOfRelations()
+        {
+            int count = 0;
+            count = network.InputsCount * network.Layers[0].Neurons.Length;
+            for (int i = 1; i < network.Layers.Length; i++)
+            {
+                count += network.Layers[i].Neurons.Length * network.Layers[i - 1].Neurons.Length;
+            }
+            return count;
+        }
+
+        /**
+         * Запись результата очередного обучения в таблицу
+         * */
         private void recordNeuroNet()
         {
             String topology = network.InputsCount.ToString();
@@ -378,7 +345,6 @@ namespace Neural
             {
                 topology += "-" + network.Layers[i].Neurons.Length.ToString();
             }
-            //String topology = network.InputsCount.ToString() + "-" + neuronsBox.Text + "-" + classesCount.ToString();
             String moment = "-";
             String learningRate = "-";
 
@@ -393,10 +359,59 @@ namespace Neural
                                 lastRunsGridView.Rows.Add(iter, error, validError, algoritm, topologyNet, alpha, learnRate, momentum)),
                                 this.iterations.ToString(), this.error.ToString(), (this.validateError / rowCountData).ToString(),
                                 this.selectedAlgo, topology, this.alpha.ToString(), learningRate, moment);
+        }
 
-           /* this.lastRunsGridView.Rows.Add(this.iterations.ToString(), this.error.ToString(), (this.validateError / rowCountData).ToString(),
-                algoritmBox.SelectedItem.ToString(), topology, this.alpha.ToString(), learningRate, moment
-                    );*/
+        private void WeightsChart(double[] y)
+        {
+            zedGraphControl2.GraphPane.CurveList.Clear();
+            // get a reference to the GraphPane
+            GraphPane myPane = zedGraphControl2.GraphPane;
+
+            // Generate a red bar with "Curve 1" in the legend
+            // Get the first CurveItem in the graph
+            CurveItem curve3 = myPane.AddCurve("Curve 1", null, y, Color.Blue);
+
+            // Draw the X tics between the labels instead of at the labels
+            myPane.XAxis.MajorTic.IsBetweenLabels = true;
+
+            // Set the XAxis to the ordinal type
+            myPane.XAxis.Type = AxisType.Ordinal;
+
+            //Add Labels to the curves
+
+            // Shift the text items up by 5 user scale units above the bars
+            const float shift = 5;
+
+           /* for (int i = 0; i < y.Length; i++)
+            {
+                // format the label string to have 1 decimal place
+                string lab = y[i].ToString("F14");
+                // create the text item (assumes the x axis is ordinal or text)
+                // for negative bars, the label appears just above the zero value
+                TextObj text = new TextObj(lab, (float)(i + 1), (float)(y[i] < 0 ? 0.0 : y[i]) + shift);
+                // tell Zedgraph to use user scale units for locating the TextItem
+                text.Location.CoordinateFrame = CoordType.AxisXYScale;
+                // AlignH the left-center of the text to the specified point
+                text.Location.AlignH = AlignH.Left;
+                text.Location.AlignV = AlignV.Center;
+                text.FontSpec.Border.IsVisible = false;
+                text.FontSpec.Fill.IsVisible = false;
+                // rotate the text 90 degrees
+                text.FontSpec.Angle = 90;
+                // add the TextItem to the list
+                myPane.GraphObjList.Add(text);
+            }*/
+
+            // Indicate that the bars are overlay type, which are drawn on top of eachother
+            myPane.BarSettings.Type = BarType.Overlay;
+
+            // Fill the axis background with a color gradient
+            myPane.Chart.Fill = new Fill(Color.White, Color.LightGoldenrodYellow, 45.0F);
+
+            // Calculate the Axis Scale Ranges
+            this.zedGraphControl2.AxisChange();
+            // Force a redraw
+            this.zedGraphControl2.Invalidate();
         }
 
         // Worker thread
@@ -498,6 +513,20 @@ namespace Neural
             // Scale the axes
             zedGraphControl1.AxisChange();
 
+            // erros list
+            double[] weights1 = new double[this.getCountOfRelations()];
+
+            zedGraphControl2.GraphPane.CurveList.Clear();
+            GraphPane myPane2 = zedGraphControl2.GraphPane;
+            myPane2.Title.Text = "Динамика весов при обучении";
+            myPane2.XAxis.Title.Text = "Порядковый номер";
+            myPane2.YAxis.Title.Text = "Показатель";
+            // Initially, a curve is added with no data points (list is empty)
+            // Color is blue, and there will be no symbols
+            CurveItem curve3 = myPane2.AddCurve("Curve 1", null,  weights1, Color.Blue);
+            myPane2.XAxis.Scale.MajorStep = 2;
+            zedGraphControl2.AxisChange();
+
             // loop
             while (!needToStop)
             {
@@ -552,7 +581,6 @@ namespace Neural
                             {
                                 newCntNeurons = network.Layers[i].Neurons.Length + 1;
                                 tempNet[i] = newCntNeurons;
-                                //break;
                             }
                             else 
                             {
@@ -560,7 +588,6 @@ namespace Neural
                             }
                             
                         }
-                        //tempNet[i] = network.Output.Length; // last layer in end
                         network = new ActivationNetwork(activationFunc, colCountData - 1, tempNet);
                         initializer = new NguyenWidrow(network);
                         initializer.Randomize();
@@ -576,6 +603,7 @@ namespace Neural
                         updateWeightsGrid();
                     }
                     recordNeuroNet();
+                    zedGraphControl1.GraphPane.CurveList.Clear();
                     iterations = 1;
                 }
                 // run epoch of learning procedure
@@ -587,22 +615,22 @@ namespace Neural
                 }
 
                 int Rows = 0;
+                double[] weightsBar = new double[this.getCountOfRelations()];
                 for (int i = 0; i < network.Layers.Length; i++)
                 {
                     for (int neurons = 0; neurons < network.Layers[i].Neurons.Length; neurons++)
                     {
                         for (int weights = 0; weights < network.Layers[i].Neurons[neurons].Weights.Length; weights++)
                         {
-
-                            /* if (Math.Abs(network.Layers[i].Neurons[neurons].Weights[weights]) >= 50.0 * learningRate)
+                            weightsBar[Rows] = network.Layers[i].Neurons[neurons].Weights[weights];
+                             if (Math.Abs(network.Layers[i].Neurons[neurons].Weights[weights]) >= this.minWeight)
                              {
                                  network.Layers[i].Neurons[neurons].Weights[weights] = network.Layers[i].Neurons[neurons].Weights[weights] / network.Layers[i].Neurons.Length;
-                                 // RowsRisk[Rows]++;
 
                                  this.dataGridViewWeights.Invoke(
                                  new Action<int>((row) =>
                                      dataGridViewWeights.Rows[row].Cells[3].Style.BackColor = Color.Red), Rows);
-                             }*/
+                             }
 
                             this.dataGridViewWeights.Invoke(
                                 new Action<double>((weight) =>
@@ -614,6 +642,7 @@ namespace Neural
                         }
                     }
                 }
+                this.WeightsChart(weightsBar);
 
                 // Make sure that the curvelist has at least one curve
                 if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
@@ -650,23 +679,6 @@ namespace Neural
                 errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
                 validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError / samples).ToString("F14"));
 
-                // show classifiers
-                /*if (colCountData - 1 <= 2)
-                {
-                    for (int j = 0; j < classesCount; j++)
-                    {
-                        double k = (layer.Neurons[j].Weights[1] != 0) ? (-layer.Neurons[j].Weights[0] / layer.Neurons[j].Weights[1]) : 0;
-                        double b = (layer.Neurons[j].Weights[1] != 0) ? (-((ActivationNeuron)layer.Neurons[j]).Threshold / layer.Neurons[j].Weights[1]) : 0;
-
-                        double[,] classifier = new double[2, 2] {
-							{ chart.RangeX.Min, chart.RangeX.Min * k + b },
-							{ chart.RangeX.Max, chart.RangeX.Max * k + b }
-																};
-
-                        // update chart
-                        chart.UpdateDataSeries(string.Format("classifier" + j), classifier);
-                    }
-                }*/
 
                 // increase current iteration
                 this.iterations++;
