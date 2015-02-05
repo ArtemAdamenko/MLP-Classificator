@@ -36,3 +36,9 @@ C:\Documents and Settings\артем\Мои документы\Visual Studio 201
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.xml
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\ZedGraph.dll
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\ZedGraph.xml
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.IO.dll
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.Statistics.dll
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.IO.pdb
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.IO.xml
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.Statistics.pdb
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\Accord.Statistics.xml

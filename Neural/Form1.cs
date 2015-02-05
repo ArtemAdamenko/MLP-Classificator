@@ -20,10 +20,20 @@ using Accord;
 using ZedGraph;
 
 
+using Accord.IO;
+
+using Accord.Statistics.Analysis;
+
+
 namespace Neural
 {
     public partial class Form1 : Form
     {
+        int samples = 0;
+        double[][] input;
+        double[][] output;
+        double[][] validateInput;
+        double[][] validateOutput;
         private double[,] data = null;
         int rowCountData = 0;
         int colCountData = 0;
@@ -38,6 +48,7 @@ namespace Neural
         private double error = 0.0;
         private double validateError = 0.0;
         private String selectedAlgo = "";
+        private String selectedTypeLearn = "";
         private int[] neuronsAndLayers;
         private int[] classes;
         private int classesCount;
@@ -91,8 +102,8 @@ namespace Neural
             this.minWeightBox.Text = minWeight.ToString();
         }
 
-        // Load data
-        private void loadDataButton_Click(object sender, System.EventArgs e)
+        //load data for classification
+        private void getDataForClass()
         {
             // show file selection dialog
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -191,10 +202,102 @@ namespace Neural
                     if (reader != null)
                         reader.Close();
                 }
-                
+
                 // enable "Start" button
                 startButton.Enabled = true;
             }
+        }
+
+        //load data for regression
+        private void getDataForRegression()
+        {
+            // show file selection dialog
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader reader = null;
+
+                try
+                {
+                    // open selected file
+                    reader = File.OpenText(openFileDialog.FileName);
+
+                    //get row count values
+                    String line;
+                    rowCountData = 0;
+                    colCountData = 0;
+
+                    //get input and output count
+                    line = reader.ReadLine();
+                    rowCountData++;
+                    colCountData = line.Split(';').Length;
+
+                    //must be > 1 column in training data
+                    if (colCountData == 1)
+                        throw new Exception();
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        rowCountData++;
+                    }
+
+                    double[,] tempData = new double[rowCountData, colCountData];
+
+                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    line = "";
+                    int i = 0;
+
+                    // read the data
+                    while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
+                    {
+                        string[] strs = line.Split(';');
+                        // parse input and output values for learning
+                        //gather all values by cols
+                        for (int j = 0; j < colCountData; j++)
+                        {
+                            tempData[i, j] = double.Parse(strs[j]);
+                        }
+
+                        i++;
+                    }
+
+                    // allocate and set data
+                    data = new double[i, colCountData];
+                    Array.Copy(tempData, 0, data, 0, i * colCountData);
+
+                    inputCountBox.Invoke(new Action(() => inputCountBox.Text = (colCountData - 1).ToString()));
+                    fileTextBox.Invoke(new Action(() => fileTextBox.Text = openFileDialog.SafeFileName.ToString()));
+
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Ошибка чтения файла", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                finally
+                {
+                    // close file
+                    if (reader != null)
+                        reader.Close();
+                }
+
+                // enable "Start" button
+                startButton.Enabled = true;
+            }
+
+        }
+
+        // Load data
+        private void loadDataButton_Click(object sender, System.EventArgs e)
+        {
+            if (this.selectedTypeLearn == "Классификация")
+            {
+                this.getDataForClass();
+            }
+            else if (this.selectedTypeLearn == "Регрессия")
+            {
+                this.getDataForRegression();
+            }
+            
         }
 
         // Enable/disale controls
@@ -294,8 +397,10 @@ namespace Neural
                 {
                     neuronsAndLayers[i] = Math.Max(1, Math.Min(50, int.Parse(temp[i])));
                 }
-
-                neuronsAndLayers[temp.Length] = classesCount;
+                if (this.selectedTypeLearn == "Классификация")
+                    neuronsAndLayers[temp.Length] = classesCount;
+                else if (this.selectedTypeLearn == "Регрессия")
+                    neuronsAndLayers[temp.Length] = 1;
             }
             catch
             {
@@ -417,53 +522,109 @@ namespace Neural
         // Worker thread
         void SearchSolution()
         {
-            // number of learning samples
-            int samples = data.GetLength(0);
-
-            // prepare learning data
-            //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
-            double[][] input = new double[samples][];
-            double[][] output = new double[samples][];
-            //double[][] validateInput = new double[samples / 5][];
-            //double[][] validateOutput = new double[samples / 5][];
-
-            // create multi-layer neural network
-
-            //int K = 0;
-            //int J = 0;
-
-            for (int i = 0; i < samples; i++)
+            if (this.selectedTypeLearn == "Классификация")
             {
+                // number of learning samples
+                samples = data.GetLength(0);
+
+                // prepare learning data
                 //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
-                /*if ((i % 5) == 0) // validate input 20 %
-                {                               
-                    validateInput[K] = new double[colCountData-1];
+                this.input = new double[samples][];
+                this.output = new double[samples][];
+                //double[][] validateInput = new double[samples / 5][];
+                //double[][] validateOutput = new double[samples / 5][];
+
+                // create multi-layer neural network
+
+                //int K = 0;
+                //int J = 0;
+
+                for (int i = 0; i < samples; i++)
+                {
+                    //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
+                    /*if ((i % 5) == 0) // validate input 20 %
+                    {                               
+                        validateInput[K] = new double[colCountData-1];
+
+                        for (int c = 0; c < colCountData - 1; c++)
+                        {
+                            validateInput[K][c] = data[i, c];
+                        }
+
+                        validateOutput[K] = new double[classesCount];
+                        validateOutput[K][classes[K]] = 1;
+                        K++;
+                    }
+                    else //forward input 80 %
+                    {*/
+                    // input data
+                    this.input[i] = new double[colCountData - 1];
 
                     for (int c = 0; c < colCountData - 1; c++)
                     {
-                        validateInput[K][c] = data[i, c];
+                        this.input[i][c] = data[i, c];
                     }
 
-                    validateOutput[K] = new double[classesCount];
-                    validateOutput[K][classes[K]] = 1;
-                    K++;
-                }
-                else //forward input 80 %
-                {*/
-                // input data
-                input[i] = new double[colCountData - 1];
+                    //output data
+                    this.output[i] = new double[classesCount];
+                    this.output[i][classes[i]] = 1;
 
-                for (int c = 0; c < colCountData - 1; c++)
+                    // J++;
+                    //}
+                }
+            }
+            else if (this.selectedTypeLearn == "Регрессия")
+            {
+                // number of learning samples
+                samples = data.GetLength(0);
+
+                // prepare learning data
+                //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
+                this.input = new double[samples * 4 / 5][];
+                this.output = new double[samples * 4 / 5][];
+                this.validateInput = new double[samples / 5][];
+                this.validateOutput = new double[samples / 5][];
+
+                // create multi-layer neural network
+
+                int k = 0;
+                int j = 0;
+
+                for (int i = 1; i < samples; i++)
                 {
-                    input[i][c] = data[i, c];
+                    //80% training, 20% for validate data(to do 70% lear., 20% validate, 10% test)
+                    if ((i % 5) == 0) // validate input 20 %
+                    {
+                        this.validateInput[k] = new double[colCountData - 1];
+                        this.validateOutput[k] = new double[1];
+
+                        for (int c = 0; c < colCountData - 1; c++)
+                        {
+                            this.validateInput[k][c] = data[i, c];
+                        }
+
+                        this.validateOutput[k][0] = data[i, colCountData - 1];
+                        k++;
+                    }
+                    else //forward input 80 %
+                    {
+                        // input data
+                        this.input[j] = new double[colCountData - 1];
+
+                        for (int c = 0; c < colCountData - 1; c++)
+                        {
+                            this.input[j][c] = data[i, c];
+                        }
+
+                        //output data
+
+                        this.output[j] = new double[1];
+                        this.output[j][0] = data[i, colCountData - 1];
+
+
+                        j++;
+                    }
                 }
-
-                //output data
-                output[i] = new double[classesCount];
-                output[i][classes[i]] = 1;
-
-                // J++;
-                //}
             }
 
             if (this.alphaBox.Text != "")
@@ -607,12 +768,23 @@ namespace Neural
                     iterations = 1;
                 }
                 // run epoch of learning procedure
-                error = teacher.RunEpoch(input, output);
+                error = teacher.RunEpoch(this.input, this.output);
                 validateError = 0.0;
-                for (int count = 0; count < input.GetLength(0) - 1; count++)
+                if (this.selectedTypeLearn == "Классификация")
                 {
-                    validateError += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
+                    for (int count = 0; count < input.GetLength(0) - 1; count++)
+                    {
+                        validateError += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
+                    }
                 }
+                else if (this.selectedTypeLearn == "Регрессия")
+                {
+                    for (int count = 0; count < input.GetLength(0) - 1; count++)
+                    {
+                        validateError += Math.Abs(network.Compute(input[count])[0] - output[count][0]);
+                    }
+                }
+                
 
                 int Rows = 0;
                 double[] weightsBar = new double[this.getCountOfRelations()];
@@ -795,6 +967,51 @@ namespace Neural
             }
             
         }
+
+        private void typeLearnBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            this.loadDataButton.Enabled = true;
+            this.selectedTypeLearn = typeLearnBox.SelectedItem.ToString();
+        }
+
+       /* private void MenuFileOpen_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                string filename = openFileDialog.FileName;
+                string extension = Path.GetExtension(filename);
+                if (extension == ".xls" || extension == ".xlsx")
+                {
+                    ExcelReader db = new ExcelReader(filename, true, false);
+                    TableSelectDialog t = new TableSelectDialog(db.GetWorksheetList());
+
+                    if (t.ShowDialog(this) == DialogResult.OK)
+                    {
+                        DataTable tableSource = db.GetWorksheet(t.Selection);
+
+                        double[,] sourceMatrix = tableSource.ToMatrix(out sourceColumns);
+
+                        // Detect the kind of problem loaded.
+                        if (sourceMatrix.GetLength(1) == 2)
+                        {
+                            MessageBox.Show("Missing class column.");
+                        }
+                        else
+                        {
+                            this.dgvLearningSource.DataSource = tableSource;
+                            this.dgvTestingSource.DataSource = tableSource.Copy();
+
+
+                            CreateScatterplot(graphInput, sourceMatrix);
+
+                            // enable "Start" button
+                            startButton.Enabled = true;
+                        }
+                    }
+                }
+            }
+        }*/
+
 
 
     }

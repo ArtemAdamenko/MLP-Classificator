@@ -63,6 +63,9 @@ namespace Neural
             this.fileTextBox = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.typeLearnBox = new System.Windows.Forms.ComboBox();
+            this.minWeightBox = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.neuronsBox = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.momentBox = new System.Windows.Forms.TextBox();
@@ -121,8 +124,6 @@ namespace Neural
             this.label13 = new System.Windows.Forms.Label();
             this.validationLevelBox = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.minWeightBox = new System.Windows.Forms.TextBox();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -137,7 +138,7 @@ namespace Neural
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 42);
+            this.label4.Location = new System.Drawing.Point(6, 67);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(82, 13);
             this.label4.TabIndex = 7;
@@ -146,7 +147,7 @@ namespace Neural
             // inputCountBox
             // 
             this.inputCountBox.Enabled = false;
-            this.inputCountBox.Location = new System.Drawing.Point(103, 39);
+            this.inputCountBox.Location = new System.Drawing.Point(103, 64);
             this.inputCountBox.Name = "inputCountBox";
             this.inputCountBox.ReadOnly = true;
             this.inputCountBox.Size = new System.Drawing.Size(86, 20);
@@ -155,7 +156,7 @@ namespace Neural
             // fileTextBox
             // 
             this.fileTextBox.Enabled = false;
-            this.fileTextBox.Location = new System.Drawing.Point(103, 13);
+            this.fileTextBox.Location = new System.Drawing.Point(103, 38);
             this.fileTextBox.Name = "fileTextBox";
             this.fileTextBox.ReadOnly = true;
             this.fileTextBox.Size = new System.Drawing.Size(86, 20);
@@ -168,6 +169,7 @@ namespace Neural
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.typeLearnBox);
             this.groupBox3.Controls.Add(this.minWeightBox);
             this.groupBox3.Controls.Add(this.label15);
             this.groupBox3.Controls.Add(this.neuronsBox);
@@ -188,14 +190,42 @@ namespace Neural
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Location = new System.Drawing.Point(767, 27);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(195, 266);
+            this.groupBox3.Size = new System.Drawing.Size(195, 282);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Настройки";
             // 
+            // typeLearnBox
+            // 
+            this.typeLearnBox.FormattingEnabled = true;
+            this.typeLearnBox.Items.AddRange(new object[] {
+            "Классификация",
+            "Регрессия"});
+            this.typeLearnBox.Location = new System.Drawing.Point(6, 11);
+            this.typeLearnBox.Name = "typeLearnBox";
+            this.typeLearnBox.Size = new System.Drawing.Size(183, 21);
+            this.typeLearnBox.TabIndex = 21;
+            this.typeLearnBox.SelectedValueChanged += new System.EventHandler(this.typeLearnBox_SelectedValueChanged);
+            // 
+            // minWeightBox
+            // 
+            this.minWeightBox.Location = new System.Drawing.Point(101, 259);
+            this.minWeightBox.Name = "minWeightBox";
+            this.minWeightBox.Size = new System.Drawing.Size(87, 20);
+            this.minWeightBox.TabIndex = 20;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(7, 262);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(69, 13);
+            this.label15.TabIndex = 19;
+            this.label15.Text = "Отжиг веса:";
+            // 
             // neuronsBox
             // 
-            this.neuronsBox.Location = new System.Drawing.Point(102, 116);
+            this.neuronsBox.Location = new System.Drawing.Point(102, 141);
             this.neuronsBox.Name = "neuronsBox";
             this.neuronsBox.Size = new System.Drawing.Size(87, 20);
             this.neuronsBox.TabIndex = 18;
@@ -203,7 +233,7 @@ namespace Neural
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(7, 119);
+            this.label11.Location = new System.Drawing.Point(7, 144);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(92, 13);
             this.label11.TabIndex = 17;
@@ -211,7 +241,7 @@ namespace Neural
             // 
             // momentBox
             // 
-            this.momentBox.Location = new System.Drawing.Point(102, 208);
+            this.momentBox.Location = new System.Drawing.Point(102, 233);
             this.momentBox.Name = "momentBox";
             this.momentBox.ReadOnly = true;
             this.momentBox.Size = new System.Drawing.Size(85, 20);
@@ -220,7 +250,7 @@ namespace Neural
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(6, 211);
+            this.label10.Location = new System.Drawing.Point(6, 236);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(50, 13);
             this.label10.TabIndex = 15;
@@ -232,7 +262,7 @@ namespace Neural
             this.algoritmBox.Items.AddRange(new object[] {
             "Backpropagation",
             "Parallel Resilient Backpropagation"});
-            this.algoritmBox.Location = new System.Drawing.Point(5, 155);
+            this.algoritmBox.Location = new System.Drawing.Point(5, 180);
             this.algoritmBox.Name = "algoritmBox";
             this.algoritmBox.Size = new System.Drawing.Size(183, 21);
             this.algoritmBox.TabIndex = 14;
@@ -241,7 +271,7 @@ namespace Neural
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 139);
+            this.label9.Location = new System.Drawing.Point(6, 164);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(108, 13);
             this.label9.TabIndex = 13;
@@ -249,7 +279,7 @@ namespace Neural
             // 
             // alphaBox
             // 
-            this.alphaBox.Location = new System.Drawing.Point(103, 91);
+            this.alphaBox.Location = new System.Drawing.Point(103, 116);
             this.alphaBox.Name = "alphaBox";
             this.alphaBox.Size = new System.Drawing.Size(86, 20);
             this.alphaBox.TabIndex = 12;
@@ -257,7 +287,7 @@ namespace Neural
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(7, 94);
+            this.label8.Location = new System.Drawing.Point(7, 119);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(43, 13);
             this.label8.TabIndex = 11;
@@ -266,7 +296,7 @@ namespace Neural
             // classesBox
             // 
             this.classesBox.Enabled = false;
-            this.classesBox.Location = new System.Drawing.Point(103, 65);
+            this.classesBox.Location = new System.Drawing.Point(103, 90);
             this.classesBox.Name = "classesBox";
             this.classesBox.ReadOnly = true;
             this.classesBox.Size = new System.Drawing.Size(86, 20);
@@ -275,7 +305,7 @@ namespace Neural
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 68);
+            this.label6.Location = new System.Drawing.Point(7, 93);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(89, 13);
             this.label6.TabIndex = 9;
@@ -284,7 +314,7 @@ namespace Neural
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 16);
+            this.label2.Location = new System.Drawing.Point(6, 41);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(67, 13);
             this.label2.TabIndex = 8;
@@ -292,7 +322,7 @@ namespace Neural
             // 
             // learningRateBox
             // 
-            this.learningRateBox.Location = new System.Drawing.Point(101, 182);
+            this.learningRateBox.Location = new System.Drawing.Point(101, 207);
             this.learningRateBox.Name = "learningRateBox";
             this.learningRateBox.ReadOnly = true;
             this.learningRateBox.Size = new System.Drawing.Size(86, 20);
@@ -300,7 +330,7 @@ namespace Neural
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(6, 185);
+            this.label1.Location = new System.Drawing.Point(6, 210);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(89, 19);
             this.label1.TabIndex = 0;
@@ -469,6 +499,7 @@ namespace Neural
             // 
             // loadDataButton
             // 
+            this.loadDataButton.Enabled = false;
             this.loadDataButton.Name = "loadDataButton";
             this.loadDataButton.Size = new System.Drawing.Size(137, 22);
             this.loadDataButton.Text = "Загрузить";
@@ -490,7 +521,7 @@ namespace Neural
             // zedGraphControl2
             // 
             this.zedGraphControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.zedGraphControl2.Location = new System.Drawing.Point(453, 43);
+            this.zedGraphControl2.Location = new System.Drawing.Point(453, 13);
             this.zedGraphControl2.Name = "zedGraphControl2";
             this.zedGraphControl2.ScrollGrace = 0D;
             this.zedGraphControl2.ScrollMaxX = 0D;
@@ -499,7 +530,7 @@ namespace Neural
             this.zedGraphControl2.ScrollMinX = 0D;
             this.zedGraphControl2.ScrollMinY = 0D;
             this.zedGraphControl2.ScrollMinY2 = 0D;
-            this.zedGraphControl2.Size = new System.Drawing.Size(290, 280);
+            this.zedGraphControl2.Size = new System.Drawing.Size(290, 310);
             this.zedGraphControl2.TabIndex = 6;
             // 
             // groupBox1
@@ -582,7 +613,7 @@ namespace Neural
             // zedGraphControl1
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.zedGraphControl1.Location = new System.Drawing.Point(6, 43);
+            this.zedGraphControl1.Location = new System.Drawing.Point(6, 13);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
             this.zedGraphControl1.ScrollMaxX = 0D;
@@ -591,7 +622,7 @@ namespace Neural
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(441, 280);
+            this.zedGraphControl1.Size = new System.Drawing.Size(441, 310);
             this.zedGraphControl1.TabIndex = 1;
             // 
             // dataGridViewWeights
@@ -642,16 +673,16 @@ namespace Neural
             this.groupBox6.Controls.Add(this.label13);
             this.groupBox6.Controls.Add(this.validationLevelBox);
             this.groupBox6.Controls.Add(this.label12);
-            this.groupBox6.Location = new System.Drawing.Point(767, 299);
+            this.groupBox6.Location = new System.Drawing.Point(767, 312);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(195, 115);
+            this.groupBox6.Size = new System.Drawing.Size(195, 102);
             this.groupBox6.TabIndex = 21;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Добавление нейронов";
             // 
             // maxIterationsBox
             // 
-            this.maxIterationsBox.Location = new System.Drawing.Point(123, 74);
+            this.maxIterationsBox.Location = new System.Drawing.Point(122, 70);
             this.maxIterationsBox.Name = "maxIterationsBox";
             this.maxIterationsBox.Size = new System.Drawing.Size(66, 20);
             this.maxIterationsBox.TabIndex = 5;
@@ -659,7 +690,7 @@ namespace Neural
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(7, 80);
+            this.label14.Location = new System.Drawing.Point(6, 76);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(114, 13);
             this.label14.TabIndex = 4;
@@ -667,7 +698,7 @@ namespace Neural
             // 
             // maxNeuronsInLayerBox
             // 
-            this.maxNeuronsInLayerBox.Location = new System.Drawing.Point(123, 48);
+            this.maxNeuronsInLayerBox.Location = new System.Drawing.Point(122, 44);
             this.maxNeuronsInLayerBox.Name = "maxNeuronsInLayerBox";
             this.maxNeuronsInLayerBox.Size = new System.Drawing.Size(66, 20);
             this.maxNeuronsInLayerBox.TabIndex = 3;
@@ -675,7 +706,7 @@ namespace Neural
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(6, 51);
+            this.label13.Location = new System.Drawing.Point(5, 47);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(96, 13);
             this.label13.TabIndex = 2;
@@ -683,7 +714,7 @@ namespace Neural
             // 
             // validationLevelBox
             // 
-            this.validationLevelBox.Location = new System.Drawing.Point(123, 22);
+            this.validationLevelBox.Location = new System.Drawing.Point(122, 18);
             this.validationLevelBox.Name = "validationLevelBox";
             this.validationLevelBox.Size = new System.Drawing.Size(66, 20);
             this.validationLevelBox.TabIndex = 1;
@@ -691,27 +722,11 @@ namespace Neural
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 25);
+            this.label12.Location = new System.Drawing.Point(5, 21);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(111, 13);
             this.label12.TabIndex = 0;
             this.label12.Text = "Уровень валидации:";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(7, 237);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(69, 13);
-            this.label15.TabIndex = 19;
-            this.label15.Text = "Отжиг веса:";
-            // 
-            // minWeightBox
-            // 
-            this.minWeightBox.Location = new System.Drawing.Point(101, 234);
-            this.minWeightBox.Name = "minWeightBox";
-            this.minWeightBox.Size = new System.Drawing.Size(87, 20);
-            this.minWeightBox.TabIndex = 20;
             // 
             // Form1
             // 
@@ -727,7 +742,7 @@ namespace Neural
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "Learning Neuro Classificator";
+            this.Text = "Обучение многослойного персептрона Румельхарта";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.Form1_Closing);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -803,6 +818,7 @@ namespace Neural
         private ZedGraph.ZedGraphControl zedGraphControl2;
         private TextBox minWeightBox;
         private Label label15;
+        private ComboBox typeLearnBox;
 
     }
 }
