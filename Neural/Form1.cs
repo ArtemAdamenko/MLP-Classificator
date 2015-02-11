@@ -38,11 +38,8 @@ namespace Neural
         int rowCountData = 0;
         int colCountData = 0;
 
-        string[] sourceColumns;
-        double[,] sourceMatrix;
-
-        private double learningRate = 0.1;
-        private double alpha = 0.1;
+        private double learningRate = 0.5;
+        private double alpha = 2.0;
         private double moment = 0.3;
         private int iterations = 0;
         private double error = 0.0;
@@ -53,9 +50,8 @@ namespace Neural
         private int[] classes;
         private int classesCount;
         private int[] samplesPerClass;
-        private ActivationNetwork[] allNetworks = null;
         private double validLevel = 0.2;
-        private int maxIterations = 1000;
+        private int maxIterations = 500;
         private int maxNeuronsInLayer = 10;
         private double minWeight = 50;
 
@@ -366,7 +362,7 @@ namespace Neural
             }
             catch
             {
-                learningRate = 0.1;
+                learningRate = 0.5;
             }
             // get momentum
             try
@@ -375,16 +371,16 @@ namespace Neural
             }
             catch
             {
-                moment = 0;
+                moment = 0.3;
             }
             // get alpha
             try
             {
-                alpha = Math.Max(0, Math.Min(2.0, double.Parse(alphaBox.Text)));
+                alpha = Math.Max(0, Math.Min(10.0, double.Parse(alphaBox.Text)));
             }
             catch
             {
-                alpha = 1.0;
+                alpha = 2.0;
             }
             // get neurons count in first layer
             try
@@ -481,31 +477,6 @@ namespace Neural
 
             // Set the XAxis to the ordinal type
             myPane.XAxis.Type = AxisType.Ordinal;
-
-            //Add Labels to the curves
-
-            // Shift the text items up by 5 user scale units above the bars
-            const float shift = 5;
-
-           /* for (int i = 0; i < y.Length; i++)
-            {
-                // format the label string to have 1 decimal place
-                string lab = y[i].ToString("F14");
-                // create the text item (assumes the x axis is ordinal or text)
-                // for negative bars, the label appears just above the zero value
-                TextObj text = new TextObj(lab, (float)(i + 1), (float)(y[i] < 0 ? 0.0 : y[i]) + shift);
-                // tell Zedgraph to use user scale units for locating the TextItem
-                text.Location.CoordinateFrame = CoordType.AxisXYScale;
-                // AlignH the left-center of the text to the specified point
-                text.Location.AlignH = AlignH.Left;
-                text.Location.AlignV = AlignV.Center;
-                text.FontSpec.Border.IsVisible = false;
-                text.FontSpec.Fill.IsVisible = false;
-                // rotate the text 90 degrees
-                text.FontSpec.Angle = 90;
-                // add the TextItem to the list
-                myPane.GraphObjList.Add(text);
-            }*/
 
             // Indicate that the bars are overlay type, which are drawn on top of eachother
             myPane.BarSettings.Type = BarType.Overlay;
@@ -634,7 +605,7 @@ namespace Neural
 
             network = new ActivationNetwork(activationFunc,
             colCountData - 1, neuronsAndLayers);
-            ActivationLayer layer = network.Layers[0] as ActivationLayer;
+            //ActivationLayer layer = network.Layers[0] as ActivationLayer;
 
             NguyenWidrow initializer = new NguyenWidrow(network);
             initializer.Randomize();
@@ -693,6 +664,7 @@ namespace Neural
             {
                 if ((iterations >= maxIterations) && (validateError > validLevel))
                 {
+                    recordNeuroNet();
                     int potentialLayer = -1;
 
                     //search free layer for add neuron
@@ -763,8 +735,10 @@ namespace Neural
                         }
                         updateWeightsGrid();
                     }
-                    recordNeuroNet();
-                    zedGraphControl1.GraphPane.CurveList.Clear();
+
+
+                    zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[0].Clear()));
+                    zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[1].Clear()));
                     iterations = 1;
                 }
                 // run epoch of learning procedure
@@ -776,13 +750,15 @@ namespace Neural
                     {
                         validateError += Math.Abs(network.Compute(input[count])[classes[count]] - output[count][classes[count]]);
                     }
+                    validateError = validateError / samples;
                 }
                 else if (this.selectedTypeLearn == "Регрессия")
                 {
-                    for (int count = 0; count < input.GetLength(0) - 1; count++)
+                    for (int count = 0; count < validateInput.GetLength(0) - 1; count++)
                     {
-                        validateError += Math.Abs(network.Compute(input[count])[0] - output[count][0]);
+                        validateError += Math.Abs(network.Compute(validateInput[count])[0] - validateOutput[count][0]);
                     }
+                    validateError = validateError / samples;
                 }
                 
 
@@ -838,7 +814,7 @@ namespace Neural
                 if (listValidates == null)
                     return;
                 listErrors.Add(this.iterations, error);
-                listValidates.Add(this.iterations, validateError / samples);
+                listValidates.Add(this.iterations, validateError);
 
                 // Make sure the Y axis is rescaled to accommodate actual data
                 zedGraphControl1.AxisChange();
@@ -849,7 +825,7 @@ namespace Neural
                 // set current iteration's info
                 currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), this.iterations.ToString());
                 errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
-                validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError / samples).ToString("F14"));
+                validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), (validateError).ToString("F14"));
 
 
                 // increase current iteration
@@ -903,23 +879,31 @@ namespace Neural
             double[] res = new double[classesCount];
 		    double[] input = new double[colCountData - 1];
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetTest.csv"))
+            using(System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetTest.csv"))
+            //file.WriteLine("Желаемый ответ; Результат");
+                
                 for (int i = 0; i < data.GetLength(0); i++)
                 {
                     //gather inputs for compute, n-1 inputs
                     for (int k = 0; k < colCountData - 1; k++)
                     {
                         input[k] = data[i, k];
-                    }
+                    } 
 
                     res = network.Compute(input);
-                    int j = 0;
-                    for (j = 0; j < classesCount; j++)
+                    if (this.selectedTypeLearn == "Классификация")
                     {
-                        if (res[j] == 1)
-                            break;
+                        int j = 0;
+                        for (j = 0; j < classesCount; j++)
+                        {
+                            if (Math.Abs(res[j] - 1) < 0.00001)
+                                break;
+                        }
+                        lines[0] = classes[i].ToString() + ";" + j.ToString("F8");
                     }
-                    lines[0] = classes[i].ToString() + ";" + j.ToString("F8");
+                    else if (this.selectedTypeLearn == "Регрессия")
+                        lines[0] = data[i,colCountData-1].ToString() + ";" + res.ToString("F8");
+
                     file.WriteLine(lines[0].ToString());
                 }
             MessageBox.Show("Тестирование пройдено");
@@ -973,46 +957,5 @@ namespace Neural
             this.loadDataButton.Enabled = true;
             this.selectedTypeLearn = typeLearnBox.SelectedItem.ToString();
         }
-
-       /* private void MenuFileOpen_Click(object sender, EventArgs e)
-        {
-            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                string filename = openFileDialog.FileName;
-                string extension = Path.GetExtension(filename);
-                if (extension == ".xls" || extension == ".xlsx")
-                {
-                    ExcelReader db = new ExcelReader(filename, true, false);
-                    TableSelectDialog t = new TableSelectDialog(db.GetWorksheetList());
-
-                    if (t.ShowDialog(this) == DialogResult.OK)
-                    {
-                        DataTable tableSource = db.GetWorksheet(t.Selection);
-
-                        double[,] sourceMatrix = tableSource.ToMatrix(out sourceColumns);
-
-                        // Detect the kind of problem loaded.
-                        if (sourceMatrix.GetLength(1) == 2)
-                        {
-                            MessageBox.Show("Missing class column.");
-                        }
-                        else
-                        {
-                            this.dgvLearningSource.DataSource = tableSource;
-                            this.dgvTestingSource.DataSource = tableSource.Copy();
-
-
-                            CreateScatterplot(graphInput, sourceMatrix);
-
-                            // enable "Start" button
-                            startButton.Enabled = true;
-                        }
-                    }
-                }
-            }
-        }*/
-
-
-
     }
 }
