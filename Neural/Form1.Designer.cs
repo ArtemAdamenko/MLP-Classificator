@@ -64,8 +64,6 @@ namespace Neural
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.typeLearnBox = new System.Windows.Forms.ComboBox();
-            this.minWeightBox = new System.Windows.Forms.TextBox();
-            this.label15 = new System.Windows.Forms.Label();
             this.neuronsBox = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.momentBox = new System.Windows.Forms.TextBox();
@@ -100,7 +98,6 @@ namespace Neural
             this.выборкаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadDataButton = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.zedGraphControl2 = new ZedGraph.ZedGraphControl();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lastRunsGridView = new System.Windows.Forms.DataGridView();
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -112,11 +109,6 @@ namespace Neural
             this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
-            this.dataGridViewWeights = new System.Windows.Forms.DataGridView();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.maxIterationsBox = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
@@ -131,7 +123,6 @@ namespace Neural
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.lastRunsGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewWeights)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -170,8 +161,6 @@ namespace Neural
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.typeLearnBox);
-            this.groupBox3.Controls.Add(this.minWeightBox);
-            this.groupBox3.Controls.Add(this.label15);
             this.groupBox3.Controls.Add(this.neuronsBox);
             this.groupBox3.Controls.Add(this.label11);
             this.groupBox3.Controls.Add(this.momentBox);
@@ -188,9 +177,9 @@ namespace Neural
             this.groupBox3.Controls.Add(this.fileTextBox);
             this.groupBox3.Controls.Add(this.learningRateBox);
             this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Location = new System.Drawing.Point(767, 27);
+            this.groupBox3.Location = new System.Drawing.Point(707, 27);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(195, 282);
+            this.groupBox3.Size = new System.Drawing.Size(195, 257);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Настройки";
@@ -206,22 +195,6 @@ namespace Neural
             this.typeLearnBox.Size = new System.Drawing.Size(183, 21);
             this.typeLearnBox.TabIndex = 21;
             this.typeLearnBox.SelectedValueChanged += new System.EventHandler(this.typeLearnBox_SelectedValueChanged);
-            // 
-            // minWeightBox
-            // 
-            this.minWeightBox.Location = new System.Drawing.Point(101, 259);
-            this.minWeightBox.Name = "minWeightBox";
-            this.minWeightBox.Size = new System.Drawing.Size(87, 20);
-            this.minWeightBox.TabIndex = 20;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(7, 262);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(69, 13);
-            this.label15.TabIndex = 19;
-            this.label15.Text = "Отжиг веса:";
             // 
             // neuronsBox
             // 
@@ -344,7 +317,7 @@ namespace Neural
             this.groupBox4.Controls.Add(this.label3);
             this.groupBox4.Controls.Add(this.currentIterationBox);
             this.groupBox4.Controls.Add(this.label5);
-            this.groupBox4.Location = new System.Drawing.Point(767, 420);
+            this.groupBox4.Location = new System.Drawing.Point(707, 395);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(195, 100);
             this.groupBox4.TabIndex = 6;
@@ -424,7 +397,7 @@ namespace Neural
             // 
             this.groupBox5.Controls.Add(this.startButton);
             this.groupBox5.Controls.Add(this.stopButton);
-            this.groupBox5.Location = new System.Drawing.Point(767, 526);
+            this.groupBox5.Location = new System.Drawing.Point(707, 501);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(195, 53);
             this.groupBox5.TabIndex = 11;
@@ -438,7 +411,7 @@ namespace Neural
             this.выборкаToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(967, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(906, 24);
             this.menuStrip1.TabIndex = 19;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -507,44 +480,28 @@ namespace Neural
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.zedGraphControl2);
             this.groupBox2.Controls.Add(this.groupBox1);
             this.groupBox2.Controls.Add(this.zedGraphControl1);
-            this.groupBox2.Controls.Add(this.dataGridViewWeights);
             this.groupBox2.Location = new System.Drawing.Point(12, 27);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(749, 552);
+            this.groupBox2.Size = new System.Drawing.Size(689, 552);
             this.groupBox2.TabIndex = 20;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Изменение ошибки обучения";
             // 
-            // zedGraphControl2
-            // 
-            this.zedGraphControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.zedGraphControl2.Location = new System.Drawing.Point(453, 13);
-            this.zedGraphControl2.Name = "zedGraphControl2";
-            this.zedGraphControl2.ScrollGrace = 0D;
-            this.zedGraphControl2.ScrollMaxX = 0D;
-            this.zedGraphControl2.ScrollMaxY = 0D;
-            this.zedGraphControl2.ScrollMaxY2 = 0D;
-            this.zedGraphControl2.ScrollMinX = 0D;
-            this.zedGraphControl2.ScrollMinY = 0D;
-            this.zedGraphControl2.ScrollMinY2 = 0D;
-            this.zedGraphControl2.Size = new System.Drawing.Size(290, 310);
-            this.zedGraphControl2.TabIndex = 6;
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.lastRunsGridView);
-            this.groupBox1.Location = new System.Drawing.Point(6, 329);
+            this.groupBox1.Location = new System.Drawing.Point(6, 332);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(441, 214);
+            this.groupBox1.Size = new System.Drawing.Size(677, 214);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Последние запуски";
             // 
             // lastRunsGridView
             // 
+            this.lastRunsGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.lastRunsGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.lastRunsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.lastRunsGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -559,61 +516,61 @@ namespace Neural
             this.lastRunsGridView.Location = new System.Drawing.Point(6, 16);
             this.lastRunsGridView.Name = "lastRunsGridView";
             this.lastRunsGridView.RowHeadersVisible = false;
-            this.lastRunsGridView.Size = new System.Drawing.Size(429, 192);
+            this.lastRunsGridView.Size = new System.Drawing.Size(658, 192);
             this.lastRunsGridView.TabIndex = 0;
             // 
             // Column5
             // 
             this.Column5.HeaderText = "Итерация";
             this.Column5.Name = "Column5";
-            this.Column5.Width = 50;
+            this.Column5.Width = 81;
             // 
             // Column6
             // 
             this.Column6.HeaderText = "Ошибка";
             this.Column6.Name = "Column6";
-            this.Column6.Width = 70;
+            this.Column6.Width = 72;
             // 
             // Column7
             // 
             this.Column7.HeaderText = "Валидация";
             this.Column7.Name = "Column7";
-            this.Column7.Width = 70;
+            this.Column7.Width = 87;
             // 
             // Column8
             // 
             this.Column8.HeaderText = "Алгоритм";
             this.Column8.Name = "Column8";
-            this.Column8.Width = 60;
+            this.Column8.Width = 81;
             // 
             // Column9
             // 
             this.Column9.HeaderText = "Топология";
             this.Column9.Name = "Column9";
-            this.Column9.Width = 50;
+            this.Column9.Width = 86;
             // 
             // Column10
             // 
             this.Column10.HeaderText = "Альфа";
             this.Column10.Name = "Column10";
-            this.Column10.Width = 40;
+            this.Column10.Width = 65;
             // 
             // Column11
             // 
             this.Column11.HeaderText = "Коэф.обучения";
             this.Column11.Name = "Column11";
-            this.Column11.Width = 50;
+            this.Column11.Width = 108;
             // 
             // Column12
             // 
             this.Column12.HeaderText = "Момент";
             this.Column12.Name = "Column12";
-            this.Column12.Width = 50;
+            this.Column12.Width = 72;
             // 
             // zedGraphControl1
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.zedGraphControl1.Location = new System.Drawing.Point(6, 13);
+            this.zedGraphControl1.Location = new System.Drawing.Point(6, 12);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
             this.zedGraphControl1.ScrollMaxX = 0D;
@@ -622,48 +579,8 @@ namespace Neural
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(441, 310);
+            this.zedGraphControl1.Size = new System.Drawing.Size(677, 310);
             this.zedGraphControl1.TabIndex = 1;
-            // 
-            // dataGridViewWeights
-            // 
-            this.dataGridViewWeights.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
-            this.dataGridViewWeights.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewWeights.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column1,
-            this.Column2,
-            this.Column3,
-            this.Column4});
-            this.dataGridViewWeights.Location = new System.Drawing.Point(453, 329);
-            this.dataGridViewWeights.Name = "dataGridViewWeights";
-            this.dataGridViewWeights.RowHeadersVisible = false;
-            this.dataGridViewWeights.Size = new System.Drawing.Size(290, 208);
-            this.dataGridViewWeights.TabIndex = 4;
-            // 
-            // Column1
-            // 
-            this.Column1.HeaderText = "Слой";
-            this.Column1.Name = "Column1";
-            this.Column1.Width = 60;
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "Нейрон";
-            this.Column2.Name = "Column2";
-            this.Column2.Width = 60;
-            // 
-            // Column3
-            // 
-            this.Column3.HeaderText = "Вес";
-            this.Column3.Name = "Column3";
-            this.Column3.ReadOnly = true;
-            this.Column3.Width = 60;
-            // 
-            // Column4
-            // 
-            this.Column4.HeaderText = "Значение";
-            this.Column4.Name = "Column4";
-            this.Column4.ReadOnly = true;
             // 
             // groupBox6
             // 
@@ -673,7 +590,7 @@ namespace Neural
             this.groupBox6.Controls.Add(this.label13);
             this.groupBox6.Controls.Add(this.validationLevelBox);
             this.groupBox6.Controls.Add(this.label12);
-            this.groupBox6.Location = new System.Drawing.Point(767, 312);
+            this.groupBox6.Location = new System.Drawing.Point(707, 290);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(195, 102);
             this.groupBox6.TabIndex = 21;
@@ -731,7 +648,7 @@ namespace Neural
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(967, 582);
+            this.ClientSize = new System.Drawing.Size(906, 582);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox5);
@@ -754,7 +671,6 @@ namespace Neural
             this.groupBox2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.lastRunsGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewWeights)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
@@ -772,11 +688,6 @@ namespace Neural
         private GroupBox groupBox2;
         private Label label4;
         private TextBox inputCountBox;
-        private DataGridView dataGridViewWeights;
-        private DataGridViewTextBoxColumn Column1;
-        private DataGridViewTextBoxColumn Column2;
-        private DataGridViewTextBoxColumn Column3;
-        private DataGridViewTextBoxColumn Column4;
         private ZedGraph.ZedGraphControl zedGraphControl1;
         private TextBox fileTextBox;
         private ToolStripMenuItem нейроннаяСетьToolStripMenuItem;
@@ -815,9 +726,6 @@ namespace Neural
         private Label label13;
         private TextBox validationLevelBox;
         private Label label12;
-        private ZedGraph.ZedGraphControl zedGraphControl2;
-        private TextBox minWeightBox;
-        private Label label15;
         private ComboBox typeLearnBox;
 
     }
