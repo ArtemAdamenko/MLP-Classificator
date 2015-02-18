@@ -274,11 +274,11 @@ namespace Neural
         private void loadTestData()
         {
 
-            if (this.selectedType== "Классификация")
+            if (this.selectedType== "classification")
             {
                 this.getDataForClass();
             }
-            else if (this.selectedType== "Регрессия")
+            else if (this.selectedType== "regression")
             {
                 this.getDataForRegression();
             }
@@ -302,7 +302,7 @@ namespace Neural
             this.CheckNeurons();
 
 
-            if (this.selectedType == "Классификация")
+            if (this.selectedType == "classification")
             {
                 double[] validateError = new double[classesCount];
                 double error = 0.0;
@@ -336,7 +336,7 @@ namespace Neural
                     }
             }
 
-            else if (this.selectedType == "Регрессия")
+            else if (this.selectedType == "regression")
             {
                 double testError = 0.0;
                 double[] input = new double[colCountData - 1];
@@ -531,11 +531,6 @@ namespace Neural
 
         }
 
-        private void typeLearnBox_SelectedValueChanged(object sender, EventArgs e)
-        {
-            selectedType = typeLearnBox.SelectedItem.ToString();
-        }
-
 
         /**
          * Запуск автоматическго отключения нейронов
@@ -698,6 +693,12 @@ namespace Neural
                 //TO DO save weights in temp
                 network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weights] = 0.0;
             }
+        }
+
+        private void FormDrawNeurons_Load(object sender, EventArgs e)
+        {
+            HelloForm form = this.Owner as HelloForm;
+            this.selectedType = form.typeLearn;
         }
 
     }
