@@ -8,10 +8,6 @@ using System.Data;
 using System.IO;
 using System.Threading;
 
-using AForge;
-using AForge.Neuro;
-using AForge.Neuro.Learning;
-using AForge.Controls;
 
 namespace Neural
 {
@@ -136,7 +132,6 @@ namespace Neural
             // 
             // inputCountBox
             // 
-            this.inputCountBox.Enabled = false;
             this.inputCountBox.Location = new System.Drawing.Point(100, 39);
             this.inputCountBox.Name = "inputCountBox";
             this.inputCountBox.ReadOnly = true;
@@ -145,7 +140,6 @@ namespace Neural
             // 
             // fileTextBox
             // 
-            this.fileTextBox.Enabled = false;
             this.fileTextBox.Location = new System.Drawing.Point(100, 13);
             this.fileTextBox.Name = "fileTextBox";
             this.fileTextBox.ReadOnly = true;
@@ -254,7 +248,6 @@ namespace Neural
             // 
             // classesBox
             // 
-            this.classesBox.Enabled = false;
             this.classesBox.Location = new System.Drawing.Point(100, 65);
             this.classesBox.Name = "classesBox";
             this.classesBox.ReadOnly = true;

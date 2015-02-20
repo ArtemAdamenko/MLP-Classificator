@@ -3,26 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
-using AForge;
 using System.Collections;
-using AForge.Controls;
 using AForge.Neuro;
+using AForge.Neuro.Learning;
 using Accord.Neuro;
 using Accord.Math;
 using Accord.Neuro.Learning;
-using AForge.Neuro.Learning;
-using Accord;
 using ZedGraph;
-
-
-using Accord.IO;
-
-using Accord.Statistics.Analysis;
 
 
 namespace Neural
@@ -661,7 +652,7 @@ namespace Neural
                     iterations = 1;
                 }
                 // run epoch of learning procedure
-                error = 1 - ( teacher.RunEpoch( this.input, this.output )/this.input.GetLength(0) );
+                error = ( 1 - ( teacher.RunEpoch( this.input, this.output )/this.input.GetLength(0) ) ) * 100;
                 validateError = 0.0;
 
                 if (this.selectedTypeLearn == "classification")
@@ -722,7 +713,6 @@ namespace Neural
 
         private void validation()
         {
-            int problems = 0;
             double[] res;
             for (int count = 0; count < validateInput.Length - 1; count++)
             {
@@ -731,10 +721,9 @@ namespace Neural
                 if (value > 0.0001)
                 {
                     validateError += value;
-                    problems++;
                 }
             }
-            validateError = 1 - ( validateError / validateInput.Length );
+            validateError = ( 1 - ( validateError / validateInput.Length ) ) * 100;
         }
 
         /**

@@ -34,26 +34,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accord.IO">
-      <HintPath>.\Accord.IO.dll</HintPath>
-    </Reference>
     <Reference Include="Accord.Math">
       <HintPath>.\Accord.Math.dll</HintPath>
     </Reference>
     <Reference Include="Accord.Neuro">
       <HintPath>.\Accord.Neuro.dll</HintPath>
     </Reference>
-    <Reference Include="Accord.Statistics">
-      <HintPath>.\Accord.Statistics.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge">
-      <HintPath>.\AForge.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Controls">
-      <HintPath>.\AForge.Controls.dll</HintPath>
-    </Reference>
     <Reference Include="AForge.Neuro">
       <HintPath>.\AForge.Neuro.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelLibrary">
+      <HintPath>.\ExcelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

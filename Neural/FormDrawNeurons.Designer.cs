@@ -51,6 +51,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -62,8 +63,6 @@
             // panel1
             // 
             this.panel1.AutoScroll = true;
-            this.panel1.AutoSize = true;
-            this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Location = new System.Drawing.Point(338, 27);
             this.panel1.Name = "panel1";
@@ -73,10 +72,11 @@
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(700, 531);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
@@ -171,11 +171,11 @@
             // testErrorLabel
             // 
             this.testErrorLabel.AutoSize = true;
-            this.testErrorLabel.Location = new System.Drawing.Point(157, 347);
+            this.testErrorLabel.Location = new System.Drawing.Point(123, 347);
             this.testErrorLabel.Name = "testErrorLabel";
-            this.testErrorLabel.Size = new System.Drawing.Size(62, 13);
+            this.testErrorLabel.Size = new System.Drawing.Size(87, 13);
             this.testErrorLabel.TabIndex = 7;
-            this.testErrorLabel.Text = "% ошибки: ";
+            this.testErrorLabel.Text = "% обученности: ";
             // 
             // openFileDialog1
             // 
@@ -267,12 +267,23 @@
             this.neuronsToOffBox.Size = new System.Drawing.Size(74, 20);
             this.neuronsToOffBox.TabIndex = 26;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(255, 30);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 27;
+            this.button1.Text = "Зум";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // FormDrawNeurons
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1062, 562);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.panel1);
@@ -282,6 +293,7 @@
             this.Text = "Изменение и проверка сети";
             this.Load += new System.EventHandler(this.FormDrawNeurons_Load);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -320,5 +332,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox neuronsToOffBox;
         private System.Windows.Forms.Button startOffNeuronsButton;
+        private System.Windows.Forms.Button button1;
     }
 }

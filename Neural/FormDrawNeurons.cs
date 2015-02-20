@@ -8,9 +8,8 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
-using AForge.Controls;
 using AForge.Neuro;
-using AForge;
+using ExcelLibrary.SpreadSheet;
 
 
 namespace Neural
@@ -23,9 +22,12 @@ namespace Neural
         int rowCountData = 0;
         int colCountData = 0;
         private int[] classes;
-        private int classesCount;
+        List<int> classesList = new List<int>();
+        private double validateError = 0.0;
         private int[] samplesPerClass;
         private String selectedType = "";
+        private double testQuality = 0.0;
+        private int offWeightsCount = 0;
 
         //draw options
         private SolidBrush _myBrush = new SolidBrush(Color.DarkSeaGreen);
@@ -35,6 +37,10 @@ namespace Neural
         //App options
         Network network = null;
         Thread Worker;
+
+        string fileXls = "C:\\newdoc3.xls";
+        Workbook workbook = new Workbook();
+        Worksheet worksheet = new Worksheet("First Sheet");
 
         public FormDrawNeurons()
         {
@@ -48,8 +54,16 @@ namespace Neural
 
             // Create a bitmap the size of the form.
             //first layer does not contains in network.Layers, because +1
-            bmp = new Bitmap(700, 530);
-
+            
+            int maxNeurons = 0;
+            for (int layer = 0; layer < network.Layers.Length; layer++)
+            {
+                if (maxNeurons < network.Layers[layer].Neurons.Length)
+                {
+                    maxNeurons = network.Layers[layer].Neurons.Length;
+                }
+            }
+            bmp = new Bitmap(200 * (network.Layers.Length+1), 50 * maxNeurons);
             formGraphics = Graphics.FromImage(bmp);
             int x = 0;
 
@@ -79,7 +93,7 @@ namespace Neural
             //draw other layers
             for (int i = 0; i < network.Layers.Length; i++)
             {
-                x = 120 * (i + 1);
+                x = 200 * (i + 1);
 
                 System.Drawing.Point[] hiddenLeftPoints = new System.Drawing.Point[network.Layers[i].Neurons.Length];
                 System.Drawing.Point[] hiddenRightPoints = new System.Drawing.Point[network.Layers[i].Neurons.Length];
@@ -292,24 +306,20 @@ namespace Neural
             Worker = new Thread(loadTestData);
             Worker.SetApartmentState(ApartmentState.STA);
             Worker.Start();
+            this.testNetButton.Enabled = true;
         }
 
-        /**
-         * Процент ошибки при тестировании на выбранной выборке
-         * */
-        private void testNetButton_Click(object sender, EventArgs e)
+
+        private void testing()
         {
-            this.CheckNeurons();
-
-
+  
             if (this.selectedType == "classification")
             {
-                double[] validateError = new double[classesCount];
-                double error = 0.0;
+                double[] res;
                 try
                 {
                     double[] input = new double[colCountData - 1];
-
+                    validateError = 0.0;
                     for (int count = 0; count < data.GetLength(0) - 1; count++)
                     {
                         //gather inputs for compute, n-1 inputs
@@ -317,23 +327,22 @@ namespace Neural
                         {
                             input[i] = data[count, i];
                         }
-                        validateError = network.Compute(input);
-                        int j = 0;
-                        for (j = 0; j < classesCount; j++)
+                        res = network.Compute(input);
+                        double value = Math.Abs(1 - res[classesList.IndexOf(classes[count])]);
+                        if (value > 0.0001)
                         {
-                            if (validateError[j] == 1)
-                                break;
+                            validateError += value;
                         }
 
-                        error += Math.Abs(j - classes[count]);
                     }
-                    this.errorTextBox.Text = (error / data.GetLength(0)).ToString("F10");
+                    this.testQuality = (1 - (validateError / data.GetLength(0))) * 100;
+                    this.errorTextBox.Text = this.testQuality.ToString("F10");
                 }
-                catch(Exception)
-                    {
-                        MessageBox.Show("Ошибка тестирования сети.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
+                catch (Exception)
+                {
+                    MessageBox.Show("Ошибка тестирования сети.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             }
 
             else if (this.selectedType == "regression")
@@ -354,7 +363,15 @@ namespace Neural
 
 
             }
-
+ 
+        }
+        /**
+         * Процент ошибки при тестировании на выбранной выборке
+         * */
+        private void testNetButton_Click(object sender, EventArgs e)
+        {
+            this.CheckNeurons();
+            this.testing();
                 
         }
         //load data for classification
@@ -364,10 +381,7 @@ namespace Neural
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
             {
                 StreamReader reader = null;
-                // min and max X values
-                float minX = float.MaxValue;
-                float maxX = float.MinValue;
-
+                int i = 0;
                 try
                 {
                     // open selected file
@@ -381,7 +395,11 @@ namespace Neural
                     //get input and output count
                     line = reader.ReadLine();
                     rowCountData++;
-                    colCountData = line.Split(';').Length;
+                    colCountData = line.Trim().Split(' ').Length;
+
+                    //mass for new normalization data
+                    double[] minData = new double[colCountData];
+                    double[] maxData = new double[colCountData];
 
                     //must be > 1 column in training data
                     if (colCountData == 1)
@@ -397,42 +415,49 @@ namespace Neural
 
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     line = "";
-                    int i = 0;
-                    // classes count
-                    classesCount = 0;
-                    samplesPerClass = new int[10];
+
+                    samplesPerClass = new int[2000];
 
                     // read the data
+                    classesList.Clear();
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
-                        string[] strs = line.Split(';');
+                        string[] strs = line.Trim().Split(' ');
                         // parse input and output values for learning
                         //gather all input by cols
                         for (int j = 0; j < colCountData - 1; j++)
                         {
                             tempData[i, j] = double.Parse(strs[j]);
+
+                            //search min/max values for each columnt
+                            if (tempData[i, j] < minData[j])
+                                minData[j] = tempData[i, j];
+                            if (tempData[i, j] > maxData[j])
+                                maxData[j] = tempData[i, j];
                         }
 
+                        if (strs.Length - 1 < colCountData - 1)
+                            continue;
                         tempClasses[i] = int.Parse(strs[colCountData - 1]);
 
-                        // skip classes over 10, except only first 10 classes
-                        if (tempClasses[i] >= 10)
-                            continue;
+                        //insert class in list of classes, if not find
+                        if (classesList.IndexOf(tempClasses[i]) == -1)
+                        {
+                            classesList.Add(tempClasses[i]);
+                        }
 
-                        // count the amount of different classes
-                        if (tempClasses[i] >= classesCount)
-                            classesCount = tempClasses[i] + 1;
-                        // count samples per class
                         samplesPerClass[tempClasses[i]]++;
 
-                        // search for min value
-                        if (tempData[i, 0] < minX)
-                            minX = (float)tempData[i, 0];
-                        // search for max value
-                        if (tempData[i, 0] > maxX)
-                            maxX = (float)tempData[i, 0];
-
                         i++;
+                    }
+
+                    for (int row = 0; row < rowCountData; row++)
+                    {
+                        for (int column = 0; column < colCountData; column++)
+                        {
+                            tempData[row, column] = (((tempData[row, column] - minData[column]) * 1 / (maxData[column] - minData[column])));
+
+                        }
                     }
 
                     // allocate and set data
@@ -442,9 +467,9 @@ namespace Neural
                     Array.Copy(tempClasses, 0, classes, 0, i);
 
                 }
-                catch (Exception)
+                catch (Exception exc)
                 {
-                    MessageBox.Show("Ошибка чтения файла", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(exc.Message, "Ошибка на  " + i.ToString() + " строке", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 finally
@@ -453,8 +478,8 @@ namespace Neural
                     if (reader != null)
                         reader.Close();
                 }
+
             }
-            this.testNetButton.Invoke(new Action(() => testNetButton.Enabled = true));
         }
 
         //load data for regression
@@ -582,7 +607,6 @@ namespace Neural
                     {
                         endLayer = layer;
                         endNeuron = neuron;
-                        MessageBox.Show(endLayer.ToString() + " " + endNeuron.ToString());
                     }
                     neuronsCount++;
                 }
@@ -594,12 +618,14 @@ namespace Neural
                 {
                     throw new Exception();
                 }
-                offNeurons(beginLayer, endLayer, beginNeuron, endNeuron, (end - begin)+1);
+                
             }
             catch
             {
                 MessageBox.Show("Начало диапазона не может быть больше конца диапазона.", "Ошибка!");
+                return;
             }
+            offNeurons(beginLayer, endLayer, beginNeuron, endNeuron, (end - begin) + 1);
 
         }
 
@@ -658,31 +684,121 @@ namespace Neural
                 }
             }
 
-            for (int currentNeuron = 0; currentNeuron < rangeNeurons.Length; currentNeuron++)
+
+            //write headers to xls
+            for (int header = 0; header < rangeNeurons.Length; header++)
             {
-                offWeights(network, rangeNeurons[currentNeuron]);
-                for (int j = 0; j < rangeNeurons.Length; j++)
-                {
-                    if (j == currentNeuron)
-                        continue;
-                    offWeights(network, rangeNeurons[j]);
-                    report();
-                    onWeights(network, rangeNeurons[j]);
-                }
-                onWeights(network, rangeNeurons[currentNeuron]);
+                worksheet.Cells[0, header + 1] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString());
             }
+            worksheet.Cells[0, rangeNeurons.Length + 1] = new Cell("ОЧН");
+            worksheet.Cells[0, rangeNeurons.Length + 2] = new Cell("ОЧН/Нейронов всего");
+            worksheet.Cells[0, rangeNeurons.Length + 3] = new Cell("Соотношение нейронов");
+            worksheet.Cells[0, rangeNeurons.Length + 4] = new Cell("Соотношение весов");
+
+            int combinations = 1;
+            String neuronsCell = "";
+            int fixedOffNeurons = 0;
+            int allWeightsOfNet = 0;
+            int currentWeightsOff = 0;
+            //TO Function
+            for (int layer = 0; layer < network.Layers.Length; layer++ )
+            {
+                for (int neuro = 0; neuro < network.Layers[layer].Neurons.Length; neuro++)
+                {
+                    for (int wei = 0; wei < network.Layers[layer].Neurons[neuro].Weights.Length; wei++)
+                    {
+                        allWeightsOfNet++;
+                    }
+                }
+            }
+
+            for (int k = 0; k < rangeNeurons.Length-2; k++)
+            {
+                for (int currentNeuron = 0; currentNeuron < rangeNeurons.Length; currentNeuron++)
+                {
+                    //batch neurons off
+                    for (int off = currentNeuron; off <= currentNeuron + k; off++)
+                    {
+                        if (off > rangeNeurons.Length - 1)
+                        {
+                            offWeights(network, rangeNeurons[off - rangeNeurons.Length]);
+                            neuronsCell += rangeNeurons[off - rangeNeurons.Length].numberLayer.ToString() + ":" + rangeNeurons[off - rangeNeurons.Length].numberNeuron.ToString();
+                        }
+                        else
+                        {
+                            offWeights(network, rangeNeurons[off]);
+                            neuronsCell += rangeNeurons[off].numberLayer.ToString() + ":" + rangeNeurons[off].numberNeuron.ToString();
+                        }
+                        neuronsCell += "|";
+                        fixedOffNeurons++;
+
+                    }
+                    
+                    worksheet.Cells[combinations,0] = new Cell(neuronsCell);
+                    
+                    for (int j = 0; j < rangeNeurons.Length; j++)
+                    {
+                        if ((j >= currentNeuron) && (j <= currentNeuron + k))
+                            continue;
+                        if ((j <= ((currentNeuron + k) - rangeNeurons.Length)) && (j >= (currentNeuron - rangeNeurons.Length)))
+                            continue;
+
+                        offWeights(network, rangeNeurons[j]);
+                        currentWeightsOff = this.offWeightsCount;
+                        this.testing();
+                        worksheet.Cells[combinations, j+1] = new Cell(this.testQuality);
+
+                        onWeights(network, rangeNeurons[j]);
+                    }
+                    //batch neurons to On
+                    for (int off = currentNeuron; off <= currentNeuron + k; off++)
+                    {
+                        if (off > rangeNeurons.Length - 1)
+                        {
+                            onWeights(network, rangeNeurons[off - rangeNeurons.Length ]);
+                            //break;
+                        }
+                        else
+                            onWeights(network, rangeNeurons[off]);
+                    }
+                    worksheet.Cells[combinations, rangeNeurons.Length + 1] = new Cell(fixedOffNeurons + 1);
+                    int count1 = getCountNeuronsOfNet();
+                    double res = (double)(fixedOffNeurons + 1) / (double)count1;
+                    worksheet.Cells[combinations, rangeNeurons.Length + 2] = new Cell(res.ToString());
+                    worksheet.Cells[combinations, rangeNeurons.Length + 3] = new Cell((fixedOffNeurons + 1).ToString() + "/" + count1 );
+                    worksheet.Cells[combinations, rangeNeurons.Length + 4] = new Cell(currentWeightsOff + "/" + allWeightsOfNet);
+                    combinations++;
+                    neuronsCell = "";
+                    fixedOffNeurons = 0;
+                }
+            }
+            workbook.Worksheets.Add(worksheet);
+            workbook.Save(fileXls);
+            MessageBox.Show("Перебор окончен.");
+        }
+
+        private int getCountNeuronsOfNet()
+        {
+            int count = 0;
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         //включение весов
-        private void onWeights(Network network, Record j)
+        private void onWeights(Network network, Record currentNeuron)
         {
-            
-        }
-
-        //запись результатов
-        private void report()
-        {
-
+            for (int weight = 0; weight < network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights.Length; weight++)
+            {
+                network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weight] = tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weight][0];
+                tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weight][0] = 0.0;
+                this.offWeightsCount--;
+            }
         }
 
         //отключение весов
@@ -690,8 +806,10 @@ namespace Neural
         {
             for (int weights = 0; weights < network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights.Length; weights++)
             {
-                //TO DO save weights in temp
+                
+                tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weights][0] = network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weights];
                 network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weights] = 0.0;
+                this.offWeightsCount++;
             }
         }
 
@@ -699,6 +817,11 @@ namespace Neural
         {
             HelloForm form = this.Owner as HelloForm;
             this.selectedType = form.typeLearn;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
         }
 
     }
