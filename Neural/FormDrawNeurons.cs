@@ -27,7 +27,10 @@ namespace Neural
         private int[] samplesPerClass;
         private String selectedType = "";
         private double testQuality = 0.0;
-        private int offWeightsCount = 0;
+        private double offWeightsSumInput = 0.0;
+        private double offWeightsSumAbsoluteInput = 0.0;
+        private double offWeightsSumOutput = 0.0;
+        private double offWeightsSumAbsoluteOutput = 0.0;
 
         //draw options
         private SolidBrush _myBrush = new SolidBrush(Color.DarkSeaGreen);
@@ -38,9 +41,15 @@ namespace Neural
         Network network = null;
         Thread Worker;
 
-        string fileXls = "C:\\newdoc3.xls";
+        string fileXls = "C:\\newdoc14.xls";
         Workbook workbook = new Workbook();
         Worksheet worksheet = new Worksheet("First Sheet");
+        string fileXls2 = "C:\\newdoc15.xls";
+        Workbook workbook2 = new Workbook();
+        Worksheet worksheet2 = new Worksheet("First Sheet");
+        string fileXls3 = "C:\\newdoc16.xls";
+        Workbook workbook3 = new Workbook();
+        Worksheet worksheet3 = new Worksheet("First Sheet");
 
         public FormDrawNeurons()
         {
@@ -689,17 +698,21 @@ namespace Neural
             for (int header = 0; header < rangeNeurons.Length; header++)
             {
                 worksheet.Cells[0, header + 1] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString());
+                worksheet2.Cells[0, header + 1] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString());
+                worksheet3.Cells[0, header + 1] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString());
             }
-            worksheet.Cells[0, rangeNeurons.Length + 1] = new Cell("ОЧН");
-            worksheet.Cells[0, rangeNeurons.Length + 2] = new Cell("ОЧН/Нейронов всего");
+            worksheet.Cells[0, rangeNeurons.Length + 1] = new Cell("Число отключенных нейронов");
+            worksheet.Cells[0, rangeNeurons.Length + 2] = new Cell("ЧОН/Нейронов всего");
             worksheet.Cells[0, rangeNeurons.Length + 3] = new Cell("Соотношение нейронов");
-            worksheet.Cells[0, rangeNeurons.Length + 4] = new Cell("Соотношение весов");
+
+            //worksheet2.Cells[0, rangeNeurons.Length + 1] = new Cell("Сумма отключенных весов");
+            //worksheet2.Cells[0, rangeNeurons.Length + 2] = new Cell("СОВ/Сумма весов сети");
+            //worksheet2.Cells[0, rangeNeurons.Length + 3] = new Cell("Соотношение весов");
 
             int combinations = 1;
             String neuronsCell = "";
             int fixedOffNeurons = 0;
-            int allWeightsOfNet = 0;
-            int currentWeightsOff = 0;
+            double allWeightsOfNet = 0;
             //TO Function
             for (int layer = 0; layer < network.Layers.Length; layer++ )
             {
@@ -707,7 +720,7 @@ namespace Neural
                 {
                     for (int wei = 0; wei < network.Layers[layer].Neurons[neuro].Weights.Length; wei++)
                     {
-                        allWeightsOfNet++;
+                        allWeightsOfNet += network.Layers[layer].Neurons[neuro].Weights[wei];
                     }
                 }
             }
@@ -735,6 +748,8 @@ namespace Neural
                     }
                     
                     worksheet.Cells[combinations,0] = new Cell(neuronsCell);
+                    worksheet2.Cells[combinations, 0] = new Cell(neuronsCell);
+                    worksheet3.Cells[combinations, 0] = new Cell(neuronsCell);
                     
                     for (int j = 0; j < rangeNeurons.Length; j++)
                     {
@@ -744,9 +759,10 @@ namespace Neural
                             continue;
 
                         offWeights(network, rangeNeurons[j]);
-                        currentWeightsOff = this.offWeightsCount;
                         this.testing();
                         worksheet.Cells[combinations, j+1] = new Cell(this.testQuality);
+                        worksheet2.Cells[combinations, j + 1] = new Cell(this.offWeightsSumInput.ToString("F2") + "|" + this.offWeightsSumOutput.ToString("F2"));
+                        worksheet3.Cells[combinations, j + 1] = new Cell(this.offWeightsSumAbsoluteInput.ToString("F2") + "|" + this.offWeightsSumAbsoluteOutput.ToString("F2"));
 
                         onWeights(network, rangeNeurons[j]);
                     }
@@ -766,7 +782,9 @@ namespace Neural
                     double res = (double)(fixedOffNeurons + 1) / (double)count1;
                     worksheet.Cells[combinations, rangeNeurons.Length + 2] = new Cell(res.ToString());
                     worksheet.Cells[combinations, rangeNeurons.Length + 3] = new Cell((fixedOffNeurons + 1).ToString() + "/" + count1 );
-                    worksheet.Cells[combinations, rangeNeurons.Length + 4] = new Cell(currentWeightsOff + "/" + allWeightsOfNet);
+                   // worksheet.Cells[combinations, rangeNeurons.Length + 4] = new Cell(currentWeightsOff);
+                   // worksheet.Cells[combinations, rangeNeurons.Length + 5] = new Cell((double)currentWeightsOff / (double)allWeightsOfNet);
+                   // worksheet.Cells[combinations, rangeNeurons.Length + 6] = new Cell(currentWeightsOff + "/" + allWeightsOfNet);
                     combinations++;
                     neuronsCell = "";
                     fixedOffNeurons = 0;
@@ -774,6 +792,10 @@ namespace Neural
             }
             workbook.Worksheets.Add(worksheet);
             workbook.Save(fileXls);
+            workbook2.Worksheets.Add(worksheet2);
+            workbook2.Save(fileXls2);
+            workbook3.Worksheets.Add(worksheet3);
+            workbook3.Save(fileXls3);
             MessageBox.Show("Перебор окончен.");
         }
 
@@ -797,8 +819,20 @@ namespace Neural
             {
                 network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weight] = tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weight][0];
                 tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weight][0] = 0.0;
-                this.offWeightsCount--;
+                this.offWeightsSumInput -= network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weight];
+                this.offWeightsSumAbsoluteInput -= Math.Abs(network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weight]);
             }
+
+            //if next layer is
+            if (network.Layers[currentNeuron.numberLayer + 1] != null)
+            {
+                for (int i = 0; i < network.Layers[currentNeuron.numberLayer + 1].Neurons.Length; i++)
+                {
+                    this.offWeightsSumOutput -= network.Layers[currentNeuron.numberLayer + 1].Neurons[i].Weights[currentNeuron.numberNeuron];
+                    this.offWeightsSumAbsoluteOutput -= Math.Abs(network.Layers[currentNeuron.numberLayer + 1].Neurons[i].Weights[currentNeuron.numberNeuron]);
+                }
+            }
+
         }
 
         //отключение весов
@@ -809,7 +843,17 @@ namespace Neural
                 
                 tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weights][0] = network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weights];
                 network.Layers[currentNeuron.numberLayer].Neurons[currentNeuron.numberNeuron].Weights[weights] = 0.0;
-                this.offWeightsCount++;
+                this.offWeightsSumInput += tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weights][0];
+                this.offWeightsSumAbsoluteInput += Math.Abs(tempWeights[currentNeuron.numberLayer][currentNeuron.numberNeuron][weights][0]);
+            }
+            //if next layer is
+            if (network.Layers[currentNeuron.numberLayer + 1] != null)
+            {
+                for (int i = 0; i < network.Layers[currentNeuron.numberLayer + 1].Neurons.Length; i++ )
+                {
+                    this.offWeightsSumOutput += network.Layers[currentNeuron.numberLayer + 1].Neurons[i].Weights[currentNeuron.numberNeuron];
+                    this.offWeightsSumAbsoluteOutput += Math.Abs(network.Layers[currentNeuron.numberLayer + 1].Neurons[i].Weights[currentNeuron.numberNeuron]);
+                }
             }
         }
 
