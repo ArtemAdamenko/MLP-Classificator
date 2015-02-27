@@ -52,6 +52,10 @@
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.hiddenTopology = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -72,7 +76,7 @@
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(700, 531);
@@ -86,7 +90,7 @@
             this.groupBox1.Controls.Add(this.testNetButton);
             this.groupBox1.Controls.Add(this.errorTextBox);
             this.groupBox1.Controls.Add(this.testErrorLabel);
-            this.groupBox1.Location = new System.Drawing.Point(15, 136);
+            this.groupBox1.Location = new System.Drawing.Point(10, 179);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(320, 371);
             this.groupBox1.TabIndex = 2;
@@ -151,6 +155,7 @@
             // testNetButton
             // 
             this.testNetButton.Enabled = false;
+            this.testNetButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.testNetButton.Location = new System.Drawing.Point(9, 342);
             this.testNetButton.Name = "testNetButton";
             this.testNetButton.Size = new System.Drawing.Size(83, 23);
@@ -161,6 +166,7 @@
             // 
             // errorTextBox
             // 
+            this.errorTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.errorTextBox.Enabled = false;
             this.errorTextBox.Location = new System.Drawing.Point(216, 344);
             this.errorTextBox.Name = "errorTextBox";
@@ -221,7 +227,8 @@
             // 
             // neuronsCountBox
             // 
-            this.neuronsCountBox.Location = new System.Drawing.Point(145, 16);
+            this.neuronsCountBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.neuronsCountBox.Location = new System.Drawing.Point(227, 12);
             this.neuronsCountBox.Name = "neuronsCountBox";
             this.neuronsCountBox.ReadOnly = true;
             this.neuronsCountBox.Size = new System.Drawing.Size(74, 20);
@@ -238,6 +245,10 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.hiddenTopology);
+            this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Controls.Add(this.checkBox1);
             this.groupBox2.Controls.Add(this.startOffNeuronsButton);
             this.groupBox2.Controls.Add(this.neuronsToOffBox);
             this.groupBox2.Controls.Add(this.label1);
@@ -245,14 +256,15 @@
             this.groupBox2.Controls.Add(this.neuronsCountBox);
             this.groupBox2.Location = new System.Drawing.Point(18, 30);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(231, 100);
+            this.groupBox2.Size = new System.Drawing.Size(308, 143);
             this.groupBox2.TabIndex = 26;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Автоматическое отключение нейронов";
             // 
             // startOffNeuronsButton
             // 
-            this.startOffNeuronsButton.Location = new System.Drawing.Point(145, 71);
+            this.startOffNeuronsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.startOffNeuronsButton.Location = new System.Drawing.Point(226, 114);
             this.startOffNeuronsButton.Name = "startOffNeuronsButton";
             this.startOffNeuronsButton.Size = new System.Drawing.Size(75, 23);
             this.startOffNeuronsButton.TabIndex = 27;
@@ -262,20 +274,55 @@
             // 
             // neuronsToOffBox
             // 
-            this.neuronsToOffBox.Location = new System.Drawing.Point(145, 42);
+            this.neuronsToOffBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.neuronsToOffBox.Location = new System.Drawing.Point(227, 38);
             this.neuronsToOffBox.Name = "neuronsToOffBox";
             this.neuronsToOffBox.Size = new System.Drawing.Size(74, 20);
             this.neuronsToOffBox.TabIndex = 26;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(255, 30);
+            this.button1.Location = new System.Drawing.Point(338, 0);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 27;
             this.button1.Text = "Зум";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(227, 71);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(15, 14);
+            this.checkBox1.TabIndex = 28;
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 71);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(177, 13);
+            this.label3.TabIndex = 28;
+            this.label3.Text = "Добавить корректирующую сеть:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 94);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(83, 13);
+            this.label4.TabIndex = 29;
+            this.label4.Text = "Скрытые слои:";
+            // 
+            // hiddenTopology
+            // 
+            this.hiddenTopology.Location = new System.Drawing.Point(226, 91);
+            this.hiddenTopology.Name = "hiddenTopology";
+            this.hiddenTopology.Size = new System.Drawing.Size(76, 20);
+            this.hiddenTopology.TabIndex = 30;
             // 
             // FormDrawNeurons
             // 
@@ -333,5 +380,9 @@
         private System.Windows.Forms.TextBox neuronsToOffBox;
         private System.Windows.Forms.Button startOffNeuronsButton;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox hiddenTopology;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

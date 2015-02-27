@@ -60,6 +60,13 @@ namespace Neural.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap _1 {
+            get {
+                object obj = ResourceManager.GetObject("1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap hello {
             get {
                 object obj = ResourceManager.GetObject("hello", resourceCulture);

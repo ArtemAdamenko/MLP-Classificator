@@ -8,8 +8,6 @@ using System.IO;
 using System.Windows.Forms;
 using System.Threading;
 using System.Collections;
-using AForge.Neuro;
-using AForge.Neuro.Learning;
 using Accord.Neuro;
 using Accord.Math;
 using Accord.Neuro.Learning;
@@ -49,6 +47,7 @@ namespace Neural
 
         private Thread workerThread = null;
         private bool needToStop = false;
+        
         ActivationNetwork network;
         IActivationFunction activationFunc = null;
         ISupervisedLearning teacher = null;
@@ -63,8 +62,8 @@ namespace Neural
             RollingPointPairList listError = new RollingPointPairList(300);
             RollingPointPairList listValidate = new RollingPointPairList(300);
             GraphPane myPane = zedGraphControl1.GraphPane;
-            LineItem curve = myPane.AddCurve("Качество обучения", listError, Color.Blue, SymbolType.None);
-            LineItem curve2 = myPane.AddCurve("Кросс-валидация", listValidate, Color.Green, SymbolType.None);
+            LineItem curve = myPane.AddCurve("Качество обучения", listError, Color.Blue, SymbolType.Plus);
+            LineItem curve2 = myPane.AddCurve("Кросс-валидация", listValidate, Color.Green, SymbolType.Triangle);
             myPane.Title.Text = "Обучение нейронной сети";
             myPane.XAxis.Title.Text = "Итерации";
             myPane.YAxis.Title.Text = "Изменение ошибки обучения";

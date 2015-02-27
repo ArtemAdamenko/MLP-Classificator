@@ -43,6 +43,7 @@
             // 
             // typeLearningBox
             // 
+            this.typeLearningBox.BackColor = System.Drawing.SystemColors.Control;
             this.typeLearningBox.Controls.Add(this.RegressionButton);
             this.typeLearningBox.Controls.Add(this.classificationButton);
             this.typeLearningBox.Location = new System.Drawing.Point(256, 187);
@@ -55,6 +56,7 @@
             // RegressionButton
             // 
             this.RegressionButton.Enabled = false;
+            this.RegressionButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.RegressionButton.Location = new System.Drawing.Point(6, 48);
             this.RegressionButton.Name = "RegressionButton";
             this.RegressionButton.Size = new System.Drawing.Size(188, 23);
@@ -66,6 +68,7 @@
             // classificationButton
             // 
             this.classificationButton.Enabled = false;
+            this.classificationButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.classificationButton.Location = new System.Drawing.Point(6, 19);
             this.classificationButton.Name = "classificationButton";
             this.classificationButton.Size = new System.Drawing.Size(188, 23);
@@ -86,6 +89,7 @@
             // 
             // button2
             // 
+            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.Location = new System.Drawing.Point(6, 51);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(188, 23);
@@ -96,6 +100,7 @@
             // 
             // createButton
             // 
+            this.createButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.createButton.Location = new System.Drawing.Point(6, 19);
             this.createButton.Name = "createButton";
             this.createButton.Size = new System.Drawing.Size(188, 23);
@@ -107,6 +112,7 @@
             // nextButton
             // 
             this.nextButton.Enabled = false;
+            this.nextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.nextButton.Location = new System.Drawing.Point(375, 283);
             this.nextButton.Name = "nextButton";
             this.nextButton.Size = new System.Drawing.Size(75, 23);
@@ -117,8 +123,9 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackgroundImage = global::Neural.Properties.Resources.hello;
+            this.pictureBox1.BackgroundImage = global::Neural.Properties.Resources._1;
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(12, 12);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(459, 169);
@@ -127,8 +134,8 @@
             // 
             // HelloForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(483, 321);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.nextButton);

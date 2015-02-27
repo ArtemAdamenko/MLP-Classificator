@@ -132,6 +132,7 @@ namespace Neural
             // 
             // inputCountBox
             // 
+            this.inputCountBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.inputCountBox.Location = new System.Drawing.Point(100, 39);
             this.inputCountBox.Name = "inputCountBox";
             this.inputCountBox.ReadOnly = true;
@@ -140,6 +141,7 @@ namespace Neural
             // 
             // fileTextBox
             // 
+            this.fileTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.fileTextBox.Location = new System.Drawing.Point(100, 13);
             this.fileTextBox.Name = "fileTextBox";
             this.fileTextBox.ReadOnly = true;
@@ -169,6 +171,7 @@ namespace Neural
             this.groupBox3.Controls.Add(this.fileTextBox);
             this.groupBox3.Controls.Add(this.learningRateBox);
             this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBox3.Location = new System.Drawing.Point(707, 27);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(195, 235);
@@ -178,6 +181,7 @@ namespace Neural
             // 
             // neuronsBox
             // 
+            this.neuronsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.neuronsBox.Location = new System.Drawing.Point(99, 116);
             this.neuronsBox.Name = "neuronsBox";
             this.neuronsBox.Size = new System.Drawing.Size(87, 20);
@@ -194,6 +198,7 @@ namespace Neural
             // 
             // momentBox
             // 
+            this.momentBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.momentBox.Location = new System.Drawing.Point(99, 208);
             this.momentBox.Name = "momentBox";
             this.momentBox.ReadOnly = true;
@@ -211,6 +216,7 @@ namespace Neural
             // 
             // algoritmBox
             // 
+            this.algoritmBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.algoritmBox.FormattingEnabled = true;
             this.algoritmBox.Items.AddRange(new object[] {
             "BackProp",
@@ -232,6 +238,7 @@ namespace Neural
             // 
             // alphaBox
             // 
+            this.alphaBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.alphaBox.Location = new System.Drawing.Point(100, 91);
             this.alphaBox.Name = "alphaBox";
             this.alphaBox.Size = new System.Drawing.Size(86, 20);
@@ -248,6 +255,7 @@ namespace Neural
             // 
             // classesBox
             // 
+            this.classesBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.classesBox.Location = new System.Drawing.Point(100, 65);
             this.classesBox.Name = "classesBox";
             this.classesBox.ReadOnly = true;
@@ -274,6 +282,7 @@ namespace Neural
             // 
             // learningRateBox
             // 
+            this.learningRateBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.learningRateBox.Location = new System.Drawing.Point(98, 182);
             this.learningRateBox.Name = "learningRateBox";
             this.learningRateBox.ReadOnly = true;
@@ -314,6 +323,7 @@ namespace Neural
             // 
             // validErrorBox
             // 
+            this.validErrorBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.validErrorBox.Location = new System.Drawing.Point(118, 74);
             this.validErrorBox.Name = "validErrorBox";
             this.validErrorBox.Size = new System.Drawing.Size(66, 20);
@@ -321,6 +331,7 @@ namespace Neural
             // 
             // errorPercent
             // 
+            this.errorPercent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.errorPercent.Location = new System.Drawing.Point(118, 16);
             this.errorPercent.Name = "errorPercent";
             this.errorPercent.Size = new System.Drawing.Size(66, 20);
@@ -336,6 +347,7 @@ namespace Neural
             // 
             // currentIterationBox
             // 
+            this.currentIterationBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.currentIterationBox.Location = new System.Drawing.Point(118, 48);
             this.currentIterationBox.Name = "currentIterationBox";
             this.currentIterationBox.Size = new System.Drawing.Size(66, 20);
@@ -352,6 +364,7 @@ namespace Neural
             // stopButton
             // 
             this.stopButton.Enabled = false;
+            this.stopButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.stopButton.Location = new System.Drawing.Point(108, 19);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(81, 23);
@@ -362,6 +375,7 @@ namespace Neural
             // startButton
             // 
             this.startButton.Enabled = false;
+            this.startButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startButton.Location = new System.Drawing.Point(6, 19);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(105, 23);
@@ -449,7 +463,7 @@ namespace Neural
             // loadDataButton
             // 
             this.loadDataButton.Name = "loadDataButton";
-            this.loadDataButton.Size = new System.Drawing.Size(137, 22);
+            this.loadDataButton.Size = new System.Drawing.Size(152, 22);
             this.loadDataButton.Text = "Загрузить";
             this.loadDataButton.Click += new System.EventHandler(this.loadDataButton_Click);
             // 
@@ -545,6 +559,7 @@ namespace Neural
             // zedGraphControl1
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.zedGraphControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.zedGraphControl1.Location = new System.Drawing.Point(6, 12);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
@@ -574,6 +589,7 @@ namespace Neural
             // 
             // maxIterationsBox
             // 
+            this.maxIterationsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.maxIterationsBox.Location = new System.Drawing.Point(122, 70);
             this.maxIterationsBox.Name = "maxIterationsBox";
             this.maxIterationsBox.Size = new System.Drawing.Size(66, 20);
@@ -590,6 +606,7 @@ namespace Neural
             // 
             // maxNeuronsInLayerBox
             // 
+            this.maxNeuronsInLayerBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.maxNeuronsInLayerBox.Location = new System.Drawing.Point(122, 44);
             this.maxNeuronsInLayerBox.Name = "maxNeuronsInLayerBox";
             this.maxNeuronsInLayerBox.Size = new System.Drawing.Size(66, 20);
@@ -606,6 +623,7 @@ namespace Neural
             // 
             // validationLevelBox
             // 
+            this.validationLevelBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.validationLevelBox.Location = new System.Drawing.Point(122, 18);
             this.validationLevelBox.Name = "validationLevelBox";
             this.validationLevelBox.Size = new System.Drawing.Size(66, 20);
