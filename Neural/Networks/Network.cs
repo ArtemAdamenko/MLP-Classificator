@@ -135,10 +135,10 @@ namespace Neural
         }
 
         //compute net with subnets
-        public virtual double[] Compute(double[] input, Subnet[] subNets)
+        public virtual double[] Compute(double[] input, Subnet subnet)
         {
 
-            Subnet subnet = subNets[0];
+           // Subnet subnet = subNets[0];
             List<int> assosiatedInputLayers = subnet.getParentInputLayers();
             List<int> assosiatedOutputLayers = subnet.getParentOutputLayers();
             // local variable to avoid mutlithread conflicts

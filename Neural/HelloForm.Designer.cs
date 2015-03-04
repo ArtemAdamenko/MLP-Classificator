@@ -36,6 +36,7 @@
             this.createButton = new System.Windows.Forms.Button();
             this.nextButton = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.correctButton = new System.Windows.Forms.Button();
             this.typeLearningBox.SuspendLayout();
             this.actionsBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -79,13 +80,15 @@
             // 
             // actionsBox
             // 
+            this.actionsBox.Controls.Add(this.correctButton);
             this.actionsBox.Controls.Add(this.button2);
             this.actionsBox.Controls.Add(this.createButton);
             this.actionsBox.Location = new System.Drawing.Point(21, 187);
             this.actionsBox.Name = "actionsBox";
-            this.actionsBox.Size = new System.Drawing.Size(200, 80);
+            this.actionsBox.Size = new System.Drawing.Size(200, 119);
             this.actionsBox.TabIndex = 1;
             this.actionsBox.TabStop = false;
+            this.actionsBox.Text = "Операции";
             // 
             // button2
             // 
@@ -132,6 +135,17 @@
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
             // 
+            // correctButton
+            // 
+            this.correctButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.correctButton.Location = new System.Drawing.Point(6, 80);
+            this.correctButton.Name = "correctButton";
+            this.correctButton.Size = new System.Drawing.Size(188, 23);
+            this.correctButton.TabIndex = 4;
+            this.correctButton.Text = "Корректировать сеть";
+            this.correctButton.UseVisualStyleBackColor = true;
+            this.correctButton.Click += new System.EventHandler(this.correctButton_Click);
+            // 
             // HelloForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -160,5 +174,6 @@
         private System.Windows.Forms.Button createButton;
         private System.Windows.Forms.Button nextButton;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button correctButton;
     }
 }

@@ -40,7 +40,6 @@ namespace Neural
         //App options
         Network network = null;
         Thread Worker;
-        List<string> connectedNeurons;
 
         string fileXlsNeurons;
         Workbook workbook;
@@ -73,7 +72,12 @@ namespace Neural
                     maxNeurons = network.Layers[layer].Neurons.Length;
                 }
             }
-            bmp = new Bitmap(200 * (network.Layers.Length+1), 50 * maxNeurons);
+            //except out of panel
+            if (200 * (network.Layers.Length + 1) > this.pictureBox1.Width)
+                bmp = new Bitmap(200 * (network.Layers.Length + 1), 50 * maxNeurons);
+            else
+                bmp = new Bitmap(this.pictureBox1.Width, 50 * maxNeurons);
+
             formGraphics = Graphics.FromImage(bmp);
             int x = 0;
 
@@ -325,40 +329,7 @@ namespace Neural
   
             if (this.selectedType == "classification")
             {
-                //subnet for correcting crash neural net
-                //###################################
-                Subnet[] subnets = new Subnet[1];
-                if (this.checkBox1.Checked)
-                {
-                    String[] temp = this.hiddenTopology.Text.Split(',');
-                    List<int> hiddenNeuronsAndLayers = new List<int>();
-                    /*if (temp.Length < 1)
-                        throw new Exception();*/
-                    for (int i = 0; i < temp.Length; i++)
-                    {
-                        hiddenNeuronsAndLayers.Add(int.Parse(temp[i]));
-                    }
-                    //add output layer
-                    hiddenNeuronsAndLayers.Add(1);
-                    
-                    subnets[0] = new Subnet(connectedNeurons.Count, hiddenNeuronsAndLayers.ToArray());
-
-                    Hashtable inputRelations = new Hashtable();
-                    int neuron = 0;
-                    foreach (string connected in connectedNeurons)
-                    {
-                        inputRelations.Add(neuron, connected);
-                        neuron++;
-                    }
-                    subnets[0].setInputAssosiated(inputRelations);
-
-                    Hashtable outputRelations = new Hashtable();
-                    outputRelations.Add(0, "1:0");
-                    outputRelations.Add(1, "1:1");
-                    subnets[0].setOutputAssosiated(outputRelations);
-                }
-                //####################################
-
+                
                 double[] res;
                 try
                 {
@@ -371,7 +342,7 @@ namespace Neural
                         {
                             input[i] = data[count, i];
                         }
-                        res = network.Compute(input, subnets);
+                        res = network.Compute(input);
                         double value = Math.Abs(1 - res[classesList.IndexOf(classes[count])]);
                         if (value > 0.0001)
                         {
@@ -677,13 +648,13 @@ namespace Neural
         {
             string time = DateTime.Now.ToString("MM_dd_yyyy_HH_mm_ss");
 
-            fileXlsNeurons = "C:\\Neurons" + time + ".xls";
+            fileXlsNeurons = "C:\\Neurons_" + time + ".xls";
             workbook = new Workbook();
             worksheet = new Worksheet("First Sheet");
-            fileXlsWeightsRel = "C:\\WeightsRel" + time + ".xls";
+            fileXlsWeightsRel = "C:\\WeightsRel_" + time + ".xls";
             workbook2 = new Workbook();
             worksheet2 = new Worksheet("First Sheet");
-            fileXlsWeightsAbs = "C:\\WeightsAbs" + time + ".xls";
+            fileXlsWeightsAbs = "C:\\WeightsAbs_" + time + ".xls";
             workbook3 = new Workbook();
             worksheet3 = new Worksheet("First Sheet");
             //глобальный счетчик выделенных в диапазон нейронов
@@ -762,7 +733,6 @@ namespace Neural
             }
 
 
-            connectedNeurons = new List<string>();
             for (int k = 0; k < rangeNeurons.Length-2; k++)
             {
                 for (int currentNeuron = 0; currentNeuron < rangeNeurons.Length; currentNeuron++)
@@ -774,13 +744,11 @@ namespace Neural
                         {
                             offWeights(network, rangeNeurons[off - rangeNeurons.Length]);
                             verticalGroup += rangeNeurons[off - rangeNeurons.Length].numberLayer.ToString() + ":" + rangeNeurons[off - rangeNeurons.Length].numberNeuron.ToString();
-                            connectedNeurons.Add(rangeNeurons[off - rangeNeurons.Length].numberLayer.ToString() + ":" + rangeNeurons[off - rangeNeurons.Length].numberNeuron.ToString());
                         }
                         else
                         {
                             offWeights(network, rangeNeurons[off]);
                             verticalGroup += rangeNeurons[off].numberLayer.ToString() + ":" + rangeNeurons[off].numberNeuron.ToString();
-                            connectedNeurons.Add(rangeNeurons[off].numberLayer.ToString() + ":" + rangeNeurons[off].numberNeuron.ToString());
                         }
                         verticalGroup += "|";
                         fixedOffNeurons++;
@@ -800,7 +768,6 @@ namespace Neural
                             continue;
 
                         offWeights(network, rangeNeurons[j]);
-                        connectedNeurons.Add(rangeNeurons[j].numberLayer.ToString() + ":" + rangeNeurons[j].numberNeuron.ToString());
                         this.testing();
 
                         worksheet.Cells[combinations, j+1] = new Cell(this.testQuality);
@@ -810,7 +777,6 @@ namespace Neural
                         worksheet3.Cells[combinations, step + 1] = new Cell(this.offWeightsSumAbsoluteOutput.ToString("F2"));
 
                         onWeights(network, rangeNeurons[j]);
-                        connectedNeurons.Remove(rangeNeurons[j].numberLayer.ToString() + ":" + rangeNeurons[j].numberNeuron.ToString());
                     }
                     //batch neurons to On
                     for (int off = currentNeuron; off <= currentNeuron + k; off++)
@@ -818,13 +784,11 @@ namespace Neural
                         if (off > rangeNeurons.Length - 1)
                         {
                             onWeights(network, rangeNeurons[off - rangeNeurons.Length]);
-                            connectedNeurons.Remove(rangeNeurons[off - rangeNeurons.Length].numberLayer.ToString() + ":" + rangeNeurons[off - rangeNeurons.Length].numberNeuron.ToString());
-                            //break;
+
                         }
                         else
                         {
                             onWeights(network, rangeNeurons[off]);
-                            connectedNeurons.Remove(rangeNeurons[off].numberLayer.ToString() + ":" + rangeNeurons[off].numberNeuron.ToString());
                         }
                     }
 
@@ -941,6 +905,18 @@ namespace Neural
         private void button1_Click(object sender, EventArgs e)
         {
             
+        }
+
+        private void saveNetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.Filter = "bin files (*.bin)|*.bin";
+            if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK
+                    && saveFileDialog1.FileName.Length > 0)
+            {
+
+                network.Save(saveFileDialog1.FileName);
+                MessageBox.Show("Сеть сохранена");
+            }
         }
 
     }

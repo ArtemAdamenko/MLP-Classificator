@@ -33,6 +33,11 @@ namespace Neural
                     FormDrawNeurons form = new FormDrawNeurons();
                     form.Show(this);
                 }
+                if (option == "correct")
+                {
+                    FormDrawCorrectNeurons form = new FormDrawCorrectNeurons();
+                    form.Show(this);
+                }
                 this.classificationButton.Enabled = false;
                 this.RegressionButton.Enabled = false;
                 this.nextButton.Enabled = false;
@@ -64,6 +69,13 @@ namespace Neural
         {
             typeLearn = "regression";
             this.nextButton.Enabled = true;
+        }
+
+        private void correctButton_Click(object sender, EventArgs e)
+        {
+            option = "correct";
+            this.classificationButton.Enabled = true;
+            this.RegressionButton.Enabled = true;
         }
     }
 }

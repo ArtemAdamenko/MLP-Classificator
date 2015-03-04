@@ -23,6 +23,13 @@ namespace Neural
 
         }
 
+        public Subnet(Network network)
+        {
+
+            this.network = network;
+
+        }
+
         public double[] Compute()
         {
             res = this.network.Compute(this.inputValues.ToArray());
