@@ -35,3 +35,4 @@ C:\Documents and Settings\артем\Мои документы\Visual Studio 201
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\ExcelLibrary.dll
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\AForge.dll
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\obj\x86\Release\Neural.FormDrawCorrectNeurons.resources
+C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\AForge.Math.dll

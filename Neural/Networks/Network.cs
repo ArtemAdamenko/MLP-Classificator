@@ -1,11 +1,3 @@
-// AForge Neural Net Library
-// AForge.NET framework
-// http://www.aforgenet.com/framework/
-//
-// Copyright © AForge.NET, 2007-2012
-// contacts@aforgenet.com
-//
-
 namespace Neural
 {
     using System;
@@ -13,6 +5,7 @@ namespace Neural
     using System.Runtime.Serialization;
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Collections.Generic;
+    using System.Collections;
 
     /// <summary>
     /// Base neural network class.
@@ -24,6 +17,11 @@ namespace Neural
     [Serializable]
     public abstract class Network
     {
+        protected List<Record> relationsValues;
+        public List<Record> RelationsValues
+        {
+            get { return relationsValues; }
+        }
         /// <summary>
         /// Network's inputs count.
         /// </summary>
@@ -119,6 +117,7 @@ namespace Neural
         /// 
         public virtual double[] Compute( double[] input )
         {
+            this.relationsValues = new List<Record>();
             // local variable to avoid mutlithread conflicts
             double[] output = input;
 
@@ -126,6 +125,15 @@ namespace Neural
             for ( int i = 0; i < layers.Length; i++ )
             {
                 output = layers[i].Compute( output );
+
+                List<Record> neuronsOfLayer = layers[i].RelationsValues;
+
+                foreach (Record neuron in neuronsOfLayer)
+                {
+                    neuron.numberLayer = i;
+                }
+
+                this.relationsValues.AddRange(neuronsOfLayer);
             }
 
             // assign output property as well (works correctly for single threaded usage)
@@ -133,28 +141,50 @@ namespace Neural
 
             return output;
         }
+        //get weights values of net
+        private double[] getWeights(List<String> requireWeights, double[] input)
+        {
+            double[] weights = new double[requireWeights.Count];
+            int i = 0;
+            foreach (String item in requireWeights)
+            {
+                String[] elem = item.Split(':');
+
+                int layer = Int32.Parse(elem[0]);
+                int neuron = Int32.Parse(elem[1]);
+                int weight = Int32.Parse(elem[2]);
+
+                weights[i] = layers[layer].Neurons[neuron].Weights[weight];
+                if (layer >= 1)
+                    weights[i] *= layers[layer - 1].Neurons[weight].Output;
+                else
+                    weights[i] *= input[weight];
+
+                i++;
+
+            }
+
+            return weights;
+        }
+
+
 
         //compute net with subnets
-        public virtual double[] Compute(double[] input, Subnet subnet)
+        public virtual double[] Compute(double[] input, Subnet subnet, List<Record> MinMaxValues)
         {
-
-           // Subnet subnet = subNets[0];
-            List<int> assosiatedInputLayers = subnet.getParentInputLayers();
-            List<int> assosiatedOutputLayers = subnet.getParentOutputLayers();
+            List<String> inputs = subnet.inputAssosiated;
+            double[] weights = this.getWeights(inputs, input);
+            subnet.Compute(weights);
             // local variable to avoid mutlithread conflicts
             double[] output = input;
 
             // compute each layer
             for (int i = 0; i < layers.Length; i++)
             {
-                if (assosiatedInputLayers.IndexOf(i) != -1 || assosiatedOutputLayers.IndexOf(i) != -1)
-                    output = layers[i].Compute(output, subnet, i);
-                else
-                    output = layers[i].Compute(output);
-                
+                output = layers[i].Compute(output, subnet, i, MinMaxValues);
             }
 
-            // assign output property as well (works correctly for single threaded usage)S
+            // assign output property as well (works correctly for single threaded usage)
             this.output = output;
 
             return output;

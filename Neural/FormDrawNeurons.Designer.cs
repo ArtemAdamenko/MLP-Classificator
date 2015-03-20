@@ -42,9 +42,8 @@
             this.testErrorLabel = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.LoadNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LoadDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.NetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.neuronsCountBox = new System.Windows.Forms.TextBox();
@@ -52,8 +51,9 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.saveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LoadNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -189,20 +189,12 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.LoadDataToolStripMenuItem,
-            this.saveNetToolStripMenuItem,
-            this.LoadNetToolStripMenuItem});
+            this.NetToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1062, 24);
             this.menuStrip1.TabIndex = 5;
             this.menuStrip1.Text = "menuStrip1";
-            // 
-            // LoadNetToolStripMenuItem
-            // 
-            this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
-            this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
-            this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
             // LoadDataToolStripMenuItem
             // 
@@ -211,12 +203,14 @@
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
             this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
-            // saveNetToolStripMenuItem
+            // NetToolStripMenuItem
             // 
-            this.saveNetToolStripMenuItem.Name = "saveNetToolStripMenuItem";
-            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
-            this.saveNetToolStripMenuItem.Text = "Сохранить сеть";
-            this.saveNetToolStripMenuItem.Click += new System.EventHandler(this.saveNetToolStripMenuItem_Click);
+            this.NetToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveNetToolStripMenuItem,
+            this.LoadNetToolStripMenuItem});
+            this.NetToolStripMenuItem.Name = "NetToolStripMenuItem";
+            this.NetToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.NetToolStripMenuItem.Text = "Сеть";
             // 
             // openFileDialog2
             // 
@@ -282,15 +276,19 @@
             this.neuronsToOffBox.Size = new System.Drawing.Size(74, 20);
             this.neuronsToOffBox.TabIndex = 26;
             // 
-            // button1
+            // saveNetToolStripMenuItem
             // 
-            this.button1.Location = new System.Drawing.Point(395, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 27;
-            this.button1.Text = "Зум";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.saveNetToolStripMenuItem.Name = "saveNetToolStripMenuItem";
+            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.saveNetToolStripMenuItem.Text = "Сохранить сеть";
+            this.saveNetToolStripMenuItem.Click += new System.EventHandler(this.saveNetToolStripMenuItem_Click);
+            // 
+            // LoadNetToolStripMenuItem
+            // 
+            this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
+            this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
             // FormDrawNeurons
             // 
@@ -298,7 +296,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1062, 562);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.panel1);
@@ -330,7 +327,6 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem LoadNetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem LoadDataToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.Button testNetButton;
@@ -347,8 +343,9 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox neuronsToOffBox;
         private System.Windows.Forms.Button startOffNeuronsButton;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ToolStripMenuItem saveNetToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem NetToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.ToolStripMenuItem saveNetToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem LoadNetToolStripMenuItem;
     }
 }

@@ -1,15 +1,8 @@
-// AForge Neural Net Library
-// AForge.NET framework
-// http://www.aforgenet.com/framework/
-//
-// Copyright © AForge.NET, 2007-2012
-// contacts@aforgenet.com
-//
-
 namespace Neural
 {
     using System;
-
+    using System.Collections.Generic;
+    using System.Collections;
     /// <summary>
     /// Activation neuron.
     /// </summary>
@@ -23,6 +16,12 @@ namespace Neural
     [Serializable]
     public class ActivationNeuron : Neuron
     {
+
+        private List<Record> relationsValues;
+        public List<Record> RelationsValues
+        {
+            get { return relationsValues; }
+        }
         /// <summary>
         /// Threshold value.
         /// </summary>
@@ -119,6 +118,7 @@ namespace Neural
         /// 
         public override double Compute( double[] input )
         {
+            this.relationsValues = new List<Record>();
             // check for corrent input vector
             if ( input.Length != inputsCount )
                 throw new ArgumentException( "Wrong length of the input vector." );
@@ -130,6 +130,10 @@ namespace Neural
             for ( int i = 0; i < weights.Length; i++ )
             {
                 sum += weights[i] * input[i];
+                Record elem = new Record();
+                elem.numberWeight = i;
+                elem.value = weights[i] * input[i];
+                this.relationsValues.Add(elem);
             }
             sum += threshold;
 
@@ -141,8 +145,9 @@ namespace Neural
             return output;
         }
 
-        public override double Compute(double[] input, Subnet subnet)
+        public override double Compute(double[] input, Subnet subnet, int numberLayer, int numberNeuron, List<Record> MinMaxValues)
         {
+            Random rnd = new Random();
             // check for corrent input vector
             if (input.Length != inputsCount)
                 throw new ArgumentException("Wrong length of the input vector.");
@@ -153,12 +158,26 @@ namespace Neural
             // compute weighted sum of inputs
             for (int i = 0; i < weights.Length; i++)
             {
-                sum += weights[i] * input[i];
+                if (subnet.outputAssosiated.Contains(numberLayer.ToString() + ":" + numberNeuron.ToString() + ":" + i.ToString()))
+                {
+                    double min = 0.0;
+                    double max = 0.0;
+                    foreach (Record elem in MinMaxValues)
+                    {
+                        if ((elem.numberLayer == numberLayer) && (elem.numberNeuron == numberNeuron) && (elem.numberWeight == i))
+                        {
+                            min = elem.min;
+                            max = elem.max;
+                        }
+                    }
+                    double normValue = (((subnet.res[0] - (-1)) * (max - min)) / (1 - (-1))) + min;
+                    sum += (weights[i] * normValue ) * input[i];
+                   // weights[i] = weights[i] * subnet.res[0];
+                    subnet.res.RemoveAt(0);
+                }
+                else sum += weights[i] * input[i];
             }
 
-            //add compute value from subnet
-            for (int i = 0; i < subnet.res.Length; i++)
-                sum += subnet.res[i];
 
             sum += threshold;
 
@@ -168,6 +187,8 @@ namespace Neural
             this.output = output;
 
             return output;
+
+
         }
 
     }

@@ -43,6 +43,9 @@
     <Reference Include="AForge">
       <HintPath>.\AForge.dll</HintPath>
     </Reference>
+    <Reference Include="AForge.Math">
+      <HintPath>..\..\..\..\AForge.Math.dll</HintPath>
+    </Reference>
     <Reference Include="ExcelLibrary">
       <HintPath>.\ExcelLibrary.dll</HintPath>
     </Reference>
@@ -61,8 +64,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activation Functions\BipolarSigmoidFunction.cs" />
     <Compile Include="Activation Functions\IActivationFunction.cs" />
     <Compile Include="Activation Functions\SigmoidFunction.cs" />
+    <Compile Include="Activation Functions\ThresholdFunction.cs" />
+    <Compile Include="Initialization\GaussianWeights.cs" />
     <Compile Include="Initialization\NguyenWidrow.cs" />
     <Compile Include="Layers\ActivationLayer.cs" />
     <Compile Include="Layers\Layer.cs" />
@@ -87,6 +93,7 @@
     <Compile Include="HelloForm.Designer.cs">
       <DependentUpon>HelloForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogHelper.cs" />
     <Compile Include="Networks\ActivationNetwork.cs" />
     <Compile Include="Networks\Network.cs" />
     <Compile Include="Neurons\ActivationNeuron.cs" />
@@ -100,6 +107,7 @@
     <Compile Include="FormDrawCorrectNeurons.Designer.cs">
       <DependentUpon>FormDrawCorrectNeurons.cs</DependentUpon>
     </Compile>
+    <Compile Include="Record.cs" />
     <EmbeddedResource Include="LearnNetForm.resx">
       <DependentUpon>LearnNetForm.cs</DependentUpon>
     </EmbeddedResource>

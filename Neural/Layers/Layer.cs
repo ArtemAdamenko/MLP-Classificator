@@ -1,15 +1,9 @@
-// AForge Neural Net Library
-// AForge.NET framework
-// http://www.aforgenet.com/framework/
-//
-// Copyright © AForge.NET, 2007-2012
-// contacts@aforgenet.com
-//
 
 namespace Neural
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections;
 
     /// <summary>
     /// Base neural layer class.
@@ -21,6 +15,11 @@ namespace Neural
     [Serializable]
     public abstract class Layer
     {
+        protected List<Record> relationsValues;
+        public List<Record> RelationsValues
+        {
+            get { return relationsValues; }
+        }
         /// <summary>
         /// Layer's inputs count.
         /// </summary>
@@ -115,12 +114,22 @@ namespace Neural
         /// 
         public virtual double[] Compute( double[] input )
         {
+            relationsValues = new List<Record>();
             // local variable to avoid mutlithread conflicts
             double[] output = new double[neuronsCount];
 
             // compute each neuron
-            for ( int i = 0; i < neurons.Length; i++ )
-                output[i] = neurons[i].Compute( input );
+            for (int i = 0; i < neurons.Length; i++)
+            {
+                output[i] = neurons[i].Compute(input);
+
+                List<Record> weightsOfNeuron = (neurons[i] as ActivationNeuron).RelationsValues;
+                foreach (Record weight in weightsOfNeuron)
+                {
+                    weight.numberNeuron = i;
+                }
+                relationsValues.AddRange(weightsOfNeuron);
+            }
 
             // assign output property as well (works correctly for single threaded usage)
             this.output = output;
@@ -128,35 +137,15 @@ namespace Neural
             return output;
         }
 
-        public virtual double[] Compute(double[] input, Subnet subnet, int numberLayer)
+        public virtual double[] Compute(double[] input, Subnet subnet, int numberLayer, List<Record> MinMaxValues)
         {
-            //List<int> assosiatedInputNeurons = subnet.getParentInputNeurons();
-            //List<int> assosiatedOutputNeurons = subnet.getParentOutputNeurons();
             // local variable to avoid mutlithread conflicts
             double[] output = new double[neuronsCount];
 
             // compute each neuron
             for (int i = 0; i < neurons.Length; i++)
             {
-                //if find of need neuron in current layer
-                if (subnet.inputAssosiated.ContainsValue(numberLayer.ToString() + ":" + i.ToString()))
-                {
-                    //add him return value in input of our subnet
-                    subnet.setInputValue(neurons[i].Compute(input));
-                    if (subnet.inputAll)
-                        subnet.Compute();
-                }
-
-                //if find of need neuron in current layer
-                if (subnet.outputAssosiated.ContainsValue(numberLayer.ToString() + ":" + i.ToString()))
-                {
-                    if (subnet.res != null)
-                    {
-                        output[i] = neurons[i].Compute(input, subnet);
-                    }
-                }else
-                    output[i] = neurons[i].Compute(input);
-
+                output[i] = neurons[i].Compute(input, subnet, numberLayer, i, MinMaxValues);
             }
 
             // assign output property as well (works correctly for single threaded usage)

@@ -1,11 +1,3 @@
-// AForge Neural Net Library
-// AForge.NET framework
-// http://www.aforgenet.com/framework/
-//
-// Copyright © AForge.NET, 2007-2012
-// contacts@aforgenet.com
-//
-
 namespace Neural
 {
     using System;

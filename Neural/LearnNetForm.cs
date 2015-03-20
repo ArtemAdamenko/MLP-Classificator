@@ -40,7 +40,7 @@ namespace Neural
         private int[] neuronsAndLayers;
         private int[] classes;
         List<int> classesList = new List<int>();
-        private int[] samplesPerClass;
+        //private int[] samplesPerClass;
         private double validLevel = 0.2;
         private int maxIterations = 500;
         private int maxNeuronsInLayer = 10;
@@ -118,11 +118,12 @@ namespace Neural
                     //get input and output count
                     line = reader.ReadLine();
                     rowCountData++;
-                    colCountData = line.Trim().Split(' ').Length;
+                    //-1 last element empty
+                    colCountData = line.Trim().Split(';').Length;
 
-                    //mass for new normalization data
-                    double[] minData = new double[colCountData];
-                    double[] maxData = new double[colCountData];
+                    //mass for new normalization cols input data
+                    double[] minData = new double[colCountData - 1];
+                    double[] maxData = new double[colCountData - 1];
 
                     //must be > 1 column in training data
                     if (colCountData == 1)
@@ -133,35 +134,37 @@ namespace Neural
                         rowCountData++;
                     }
 
-                    double[,] tempData = new double[rowCountData, colCountData];
+                    double[,] tempData = new double[rowCountData, colCountData - 1];
                     int[] tempClasses = new int[rowCountData];
 
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     line = "";
-                    
-                    samplesPerClass = new int[2000];
 
                     // read the data
                     classesList.Clear();
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
-                        string[] strs = line.Trim().Split(' ');
+                        string[] strs = line.Trim().Split(';');
+                        List<String> inputVals = new List<String>(strs);
+
+                        //del empty values in the end
+                        inputVals.RemoveAll(str => String.IsNullOrEmpty(str));
+
                         // parse input and output values for learning
-                        //gather all input by cols
                         for (int j = 0; j < colCountData - 1; j++)
                         {
-                            tempData[i, j] = double.Parse(strs[j]);
+                            tempData[i, j] = double.Parse(inputVals[j]);
 
-                            //search min/max values for each columnt
+                            //search min/max values for each column
                             if (tempData[i, j] < minData[j])
                                 minData[j] = tempData[i, j];
                             if (tempData[i, j] > maxData[j])
                                 maxData[j] = tempData[i, j];
                         }
 
-                        if (strs.Length-1 < colCountData - 1)
-                            continue;
-                        tempClasses[i] = int.Parse(strs[colCountData - 1]);
+                        //if (strs.Length-1 < colCountData - 1)
+                          //  continue;
+                        tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
 
                         //insert class in list of classes, if not find
                         if (classesList.IndexOf(tempClasses[i]) == -1)
@@ -169,14 +172,15 @@ namespace Neural
                             classesList.Add(tempClasses[i]);
                         }
 
-                        samplesPerClass[tempClasses[i]]++;
+                        //samplesPerClass[tempClasses[i]]++;
 
                         i++;
                     }
 
+                    //normalization input values
                     for (int row = 0; row < rowCountData; row++)
                     {
-                        for (int column = 0; column < colCountData; column++)
+                        for (int column = 0; column < colCountData - 1; column++)
                         {
                             tempData[row, column] = (((tempData[row, column] - minData[column]) * 1 / (maxData[column] - minData[column])));
                             
@@ -184,8 +188,8 @@ namespace Neural
                     }
 
                     // allocate and set data
-                    data = new double[i, colCountData];
-                    Array.Copy(tempData, 0, data, 0, i * colCountData);
+                    data = new double[i, colCountData - 1];
+                    Array.Copy(tempData, 0, data, 0, i * (colCountData - 1));
                     classes = new int[i];
                     this.classesBox.Text = classesList.Count.ToString();
                     Array.Copy(tempClasses, 0, classes, 0, i);
@@ -425,9 +429,7 @@ namespace Neural
             return count;
         }
 
-        /**
-         * Запись результата очередного обучения в таблицу
-         * */
+        //Запись результата очередного обучения в таблицу
         private void recordNeuroNet()
         {
             String topology = "";
@@ -496,38 +498,44 @@ namespace Neural
                 int K = 0;
                 int J = 0;
 
-                for (int i = 1; i < samples; i++)
+                for (int i = 0; i < samples; i++)
                 {
                     //80% training, 20% for validate data
                     if ((i % 5) == 0) // validate input 20 %
-                    {                               
-                        validateInput[K] = new double[colCountData-1];
-
-                        for (int c = 0; c < colCountData - 1; c++)
+                    {
+                        if (this.validateInput.GetLength(0) > K)
                         {
-                            validateInput[K][c] = data[i, c];
-                        }
+                            validateInput[K] = new double[colCountData - 1];
 
-                        validateOutput[K] = new double[classesList.Count];
-                        validateOutput[K][classesList.IndexOf(classes[i])] = 1;
-                        validClasses[K] = classes[i];
-                        K++;
+                            for (int c = 0; c < colCountData - 1; c++)
+                            {
+                                validateInput[K][c] = data[i, c];
+                            }
+
+                            validateOutput[K] = new double[classesList.Count];
+                            validateOutput[K][classesList.IndexOf(classes[i])] = 1;
+                            validClasses[K] = classes[i];
+                            K++;
+                        }
                     }
                     else //forward input 80 %
                     {
                         // input data
-                        this.input[J] = new double[colCountData - 1];
-
-                        for (int c = 0; c < colCountData - 1; c++)
+                        if (this.input.GetLength(0) > J)
                         {
-                            this.input[J][c] = data[i, c];
-                        }
+                            this.input[J] = new double[colCountData - 1];
 
-                        //output data
-                        this.output[J] = new double[classesList.Count];
-                        this.output[J][classesList.IndexOf(classes[i])] = 1;
-                        trainClasses[J] = classes[i];
-                         J++;
+                            for (int c = 0; c < colCountData - 1; c++)
+                            {
+                                this.input[J][c] = data[i, c];
+                            }
+
+                            //output data
+                            this.output[J] = new double[classesList.Count];
+                            this.output[J][classesList.IndexOf(classes[i])] = 1;
+                            trainClasses[J] = classes[i];
+                            J++;
+                        }
                     }
                 }
             }
@@ -656,7 +664,7 @@ namespace Neural
 
                 if (this.selectedTypeLearn == "classification")
                 {
-                    this.validation();
+                    validateError = this.validation();
                 }
                 else if (this.selectedTypeLearn == "regression")
                 {
@@ -710,24 +718,24 @@ namespace Neural
 
         }
 
-        private void validation()
+        private double validation()
         {
+            double testQuality = 0.0;
+            double validate = 0.0;
             double[] res;
-            for (int count = 0; count < validateInput.Length - 1; count++)
+            for (int count = 0; count < validateInput.Length; count++)
             {
                 res = network.Compute(validateInput[count]);
-                double value = Math.Abs( 1 - res[classesList.IndexOf(validClasses[count])] );
-                if (value > 0.0001)
-                {
-                    validateError += value;
-                }
+                double value = Math.Abs(validClasses[count] - this.max(res));
+
+                validate += value;
+       
             }
-            validateError = ( 1 - ( validateError / validateInput.Length ) ) * 100;
+            testQuality = (1 - (validate / validateInput.Length)) * 100;
+            return testQuality;
         }
 
-        /**
-        * Сохранение нейронной сети по указанному пути
-        * */
+        //Сохранение нейронной сети по указанному пути
         private void SaveNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog1.Filter = "bin files (*.bin)|*.bin";
@@ -746,7 +754,7 @@ namespace Neural
             double[] res = new double[classesList.Count];
 		    double[] input = new double[colCountData - 1];
 
-            using(System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetTest.csv"))
+            using(System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\Test_" + LogHelper.getTime() + ".csv"))
             //file.WriteLine("Желаемый ответ; Результат");
                 
                 for (int i = 0; i < data.GetLength(0); i++)
@@ -779,7 +787,7 @@ namespace Neural
             double[] res = new double[classesList.Count];
             double[] input = new double[colCountData - 1];
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetValid.csv"))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\SpreadSHeetValid" + LogHelper.getTime() + ".csv"))
 
                 for (int i = 0; i < validateInput.GetLength(0)-1; i++)
                 {
@@ -821,7 +829,7 @@ namespace Neural
 
         private void SaveWeightsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Weights.csv"))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\Weights_" + LogHelper.getTime() + ".csv"))
             for (int i = 0; i < network.Layers.Length; i++)
             {
                 for (int j = 0; j < network.Layers[i].Neurons.Length; j++)

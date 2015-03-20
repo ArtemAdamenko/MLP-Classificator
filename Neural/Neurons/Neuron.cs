@@ -1,15 +1,8 @@
-// AForge Neural Net Library
-// AForge.NET framework
-// http://www.aforgenet.com/framework/
-//
-// Copyright © AForge.NET, 2007-2012
-// contacts@aforgenet.com
-//
-
 namespace Neural
 {
     using System;
     using AForge;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Base neuron class.
@@ -159,6 +152,6 @@ namespace Neural
         /// The output value is also stored in <see cref="Output"/> property.</remarks>
         /// 
         public abstract double Compute( double[] input );
-        public abstract double Compute(double[] input, Subnet subnet);
+        public abstract double Compute(double[] input, Subnet subnet, int numberLayer, int numberNeuron, List<Record> MinMaxValues);
     }
 }
