@@ -32,6 +32,8 @@ namespace Neural
             List<int> classesList = new List<int>();
             private String selectedType = "";
             private bool needToStop = false;
+            int rowCountData = 0;
+            int colCountData = 0;
         #endregion
 
         #region draw options
@@ -417,15 +419,20 @@ namespace Neural
                     // open selected file
                     reader = File.OpenText(openFileDialog2.FileName);
 
-                    
-                    int rowCountData = 0;
-                    String line = reader.ReadLine();
-                    rowCountData++;
-                    int colCountData = line.Trim().Split(' ').Length;
+                    //get row count values
+                    String line;
+                    rowCountData = 0;
+                    colCountData = 0;
 
-                    //mass for new normalization data
-                    double[] minData = new double[colCountData];
-                    double[] maxData = new double[colCountData];
+                    //get input and output count
+                    line = reader.ReadLine();
+                    rowCountData++;
+                    //-1 last element empty
+                    colCountData = line.Trim().Split(';').Length;
+
+                    //mass for new normalization cols input data
+                    double[] minData = new double[colCountData - 1];
+                    double[] maxData = new double[colCountData - 1];
 
                     //must be > 1 column in training data
                     if (colCountData == 1)
@@ -436,47 +443,57 @@ namespace Neural
                         rowCountData++;
                     }
 
-                    double[,] tempData = new double[rowCountData, colCountData];
+                    double[,] tempData = new double[rowCountData, colCountData - 1];
                     int[] tempClasses = new int[rowCountData];
 
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     line = "";
 
+                    // read the data
                     classesList.Clear();
-
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
-                        string[] strs = line.Trim().Split(' ');
+                        string[] strs = line.Trim().Split(';');
+                        List<String> inputVals = new List<String>(strs);
+
+                        //del empty values in the end
+                        inputVals.RemoveAll(str => String.IsNullOrEmpty(str));
+
                         // parse input and output values for learning
-                        //gather all input by cols
                         for (int j = 0; j < colCountData - 1; j++)
                         {
-                            tempData[i, j] = double.Parse(strs[j]);
+                            tempData[i, j] = double.Parse(inputVals[j]);
 
-                            //search min/max values for each columnt
+                            //search min/max values for each column
                             if (tempData[i, j] < minData[j])
                                 minData[j] = tempData[i, j];
                             if (tempData[i, j] > maxData[j])
                                 maxData[j] = tempData[i, j];
                         }
 
-                        tempClasses[i] = int.Parse(strs[colCountData - 1]);
+                        //if (strs.Length-1 < colCountData - 1)
+                        //  continue;
+                        tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
 
                         //insert class in list of classes, if not find
                         if (classesList.IndexOf(tempClasses[i]) == -1)
                         {
                             classesList.Add(tempClasses[i]);
                         }
+
+                        //samplesPerClass[tempClasses[i]]++;
+
                         i++;
                     }
 
-                    tempData = normalization(tempData, minData.ToArray(), maxData.ToArray(), rowCountData, colCountData);
-                  
+                    //normalization input values
+                    tempData = this.normalization(tempData, minData, maxData, rowCountData, colCountData);
+
                     // allocate and set data
-                    data = new double[i, colCountData];
-                    Array.Copy(tempData, 0, data, 0, i * colCountData);
+                    data = new double[i, colCountData - 1];
+                    Array.Copy(tempData, 0, data, 0, i * (colCountData - 1));
                     classes = new int[i];
-                    Array.Copy(tempClasses.ToArray(), 0, classes, 0, i);
+                    Array.Copy(tempClasses, 0, classes, 0, i);
 
                 }
                 catch (Exception exc)
@@ -499,7 +516,7 @@ namespace Neural
         {
             for (int row = 0; row < rowCountData; row++)
             {
-                for (int column = 0; column < colCountData; column++)
+                for (int column = 0; column < colCountData - 1; column++)
                 {
                     data[row, column] = (((data[row, column] - min[column]) * 1 / (max[column] - min[column])));
 

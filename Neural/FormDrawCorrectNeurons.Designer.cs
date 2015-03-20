@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.testNetButton = new System.Windows.Forms.Button();
@@ -105,7 +106,7 @@
             this.errorTextBox.Location = new System.Drawing.Point(103, 19);
             this.errorTextBox.Name = "errorTextBox";
             this.errorTextBox.ReadOnly = true;
-            this.errorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.errorTextBox.Size = new System.Drawing.Size(100, 21);
             this.errorTextBox.TabIndex = 8;
             // 
             // testErrorLabel
@@ -113,7 +114,7 @@
             this.testErrorLabel.AutoSize = true;
             this.testErrorLabel.Location = new System.Drawing.Point(4, 21);
             this.testErrorLabel.Name = "testErrorLabel";
-            this.testErrorLabel.Size = new System.Drawing.Size(83, 13);
+            this.testErrorLabel.Size = new System.Drawing.Size(88, 13);
             this.testErrorLabel.TabIndex = 7;
             this.testErrorLabel.Text = "% валидности: ";
             // 
@@ -135,14 +136,14 @@
             // LoadNetToolStripMenuItem
             // 
             this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(99, 20);
             this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
             this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
             // LoadDataToolStripMenuItem
             // 
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
-            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(118, 20);
+            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
             this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
@@ -186,7 +187,7 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(8, 47);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 13);
+            this.label3.Size = new System.Drawing.Size(66, 13);
             this.label3.TabIndex = 33;
             this.label3.Text = "Популяций:";
             // 
@@ -195,7 +196,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 71);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 13);
+            this.label1.Size = new System.Drawing.Size(43, 13);
             this.label1.TabIndex = 34;
             this.label1.Text = "Отбор:";
             // 
@@ -205,7 +206,7 @@
             this.betterBox.Location = new System.Drawing.Point(103, 71);
             this.betterBox.Name = "betterBox";
             this.betterBox.ReadOnly = true;
-            this.betterBox.Size = new System.Drawing.Size(100, 20);
+            this.betterBox.Size = new System.Drawing.Size(100, 21);
             this.betterBox.TabIndex = 35;
             // 
             // PopulationBox
@@ -214,7 +215,7 @@
             this.PopulationBox.Location = new System.Drawing.Point(103, 45);
             this.PopulationBox.Name = "PopulationBox";
             this.PopulationBox.ReadOnly = true;
-            this.PopulationBox.Size = new System.Drawing.Size(100, 20);
+            this.PopulationBox.Size = new System.Drawing.Size(100, 21);
             this.PopulationBox.TabIndex = 36;
             // 
             // button2
@@ -257,7 +258,7 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(8, 15);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(151, 13);
+            this.label5.Size = new System.Drawing.Size(153, 13);
             this.label5.TabIndex = 42;
             this.label5.Text = "Средняя ошибка поколения:";
             // 
@@ -267,7 +268,7 @@
             this.mediumErrorPopulationBox.Location = new System.Drawing.Point(198, 8);
             this.mediumErrorPopulationBox.Name = "mediumErrorPopulationBox";
             this.mediumErrorPopulationBox.ReadOnly = true;
-            this.mediumErrorPopulationBox.Size = new System.Drawing.Size(100, 20);
+            this.mediumErrorPopulationBox.Size = new System.Drawing.Size(100, 21);
             this.mediumErrorPopulationBox.TabIndex = 44;
             // 
             // label4
@@ -275,7 +276,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(6, 41);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(159, 13);
+            this.label4.Size = new System.Drawing.Size(163, 13);
             this.label4.TabIndex = 45;
             this.label4.Text = "Лучший результат поколения:";
             // 
@@ -285,7 +286,7 @@
             this.betterPopulationValueBox.Location = new System.Drawing.Point(198, 34);
             this.betterPopulationValueBox.Name = "betterPopulationValueBox";
             this.betterPopulationValueBox.ReadOnly = true;
-            this.betterPopulationValueBox.Size = new System.Drawing.Size(100, 20);
+            this.betterPopulationValueBox.Size = new System.Drawing.Size(100, 21);
             this.betterPopulationValueBox.TabIndex = 46;
             // 
             // label6
@@ -293,7 +294,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(8, 67);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(131, 13);
+            this.label6.Size = new System.Drawing.Size(132, 13);
             this.label6.TabIndex = 47;
             this.label6.Text = "Коэффициент вариации:";
             // 
@@ -303,7 +304,7 @@
             this.covariationPopulationBox.Location = new System.Drawing.Point(198, 60);
             this.covariationPopulationBox.Name = "covariationPopulationBox";
             this.covariationPopulationBox.ReadOnly = true;
-            this.covariationPopulationBox.Size = new System.Drawing.Size(100, 20);
+            this.covariationPopulationBox.Size = new System.Drawing.Size(100, 21);
             this.covariationPopulationBox.TabIndex = 48;
             // 
             // groupBox1
@@ -346,7 +347,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(209, 47);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(97, 13);
+            this.label7.Size = new System.Drawing.Size(95, 13);
             this.label7.TabIndex = 40;
             this.label7.Text = "Текущий процесс";
             // 

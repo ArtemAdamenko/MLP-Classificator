@@ -36,3 +36,25 @@ C:\Documents and Settings\артем\Мои документы\Visual Studio 201
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\AForge.dll
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\obj\x86\Release\Neural.FormDrawCorrectNeurons.resources
 C:\Documents and Settings\артем\Мои документы\Visual Studio 2010\Projects\NeuroClass\Neural\bin\Release\AForge.Math.dll
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.exe
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.pdb
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Neural.exe
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Neural.pdb
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Accord.Math.dll
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Accord.Neuro.dll
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\AForge.dll
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\ExcelLibrary.dll
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\ZedGraph.dll
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Accord.Math.pdb
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Accord.Math.xml
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Accord.Neuro.pdb
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\Accord.Neuro.xml
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\ZedGraph.xml
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\NeuroClass.csprojResolveAssemblyReference.cache
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.LearnNetForm.resources
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.FormDrawNeurons.resources
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.HelloForm.resources
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.Properties.Resources.resources
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\Neural.FormDrawCorrectNeurons.resources
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\obj\x86\Release\NeuroClass.csproj.GenerateResource.Cache
+C:\Users\Artem\Documents\Visual Studio 2013\Projects\MLP-Classificator\Neural\bin\Release\AForge.Math.dll

@@ -44,6 +44,8 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.LoadDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.NetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LoadNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.neuronsCountBox = new System.Windows.Forms.TextBox();
@@ -52,8 +54,9 @@
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.saveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.LoadNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label3 = new System.Windows.Forms.Label();
+            this.iterationsBox = new System.Windows.Forms.TextBox();
+            this.stopButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -88,9 +91,9 @@
             this.groupBox1.Controls.Add(this.testNetButton);
             this.groupBox1.Controls.Add(this.errorTextBox);
             this.groupBox1.Controls.Add(this.testErrorLabel);
-            this.groupBox1.Location = new System.Drawing.Point(10, 129);
+            this.groupBox1.Location = new System.Drawing.Point(10, 158);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(320, 421);
+            this.groupBox1.Size = new System.Drawing.Size(320, 392);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Изменение сети";
@@ -111,7 +114,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(6, 19);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
-            this.dataGridView1.Size = new System.Drawing.Size(308, 368);
+            this.dataGridView1.Size = new System.Drawing.Size(308, 339);
             this.dataGridView1.TabIndex = 8;
             // 
             // Layer
@@ -154,7 +157,7 @@
             // 
             this.testNetButton.Enabled = false;
             this.testNetButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.testNetButton.Location = new System.Drawing.Point(9, 393);
+            this.testNetButton.Location = new System.Drawing.Point(7, 362);
             this.testNetButton.Name = "testNetButton";
             this.testNetButton.Size = new System.Drawing.Size(83, 23);
             this.testNetButton.TabIndex = 6;
@@ -166,18 +169,18 @@
             // 
             this.errorTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.errorTextBox.Enabled = false;
-            this.errorTextBox.Location = new System.Drawing.Point(216, 395);
+            this.errorTextBox.Location = new System.Drawing.Point(214, 364);
             this.errorTextBox.Name = "errorTextBox";
             this.errorTextBox.ReadOnly = true;
-            this.errorTextBox.Size = new System.Drawing.Size(100, 20);
+            this.errorTextBox.Size = new System.Drawing.Size(100, 21);
             this.errorTextBox.TabIndex = 8;
             // 
             // testErrorLabel
             // 
             this.testErrorLabel.AutoSize = true;
-            this.testErrorLabel.Location = new System.Drawing.Point(123, 398);
+            this.testErrorLabel.Location = new System.Drawing.Point(121, 367);
             this.testErrorLabel.Name = "testErrorLabel";
-            this.testErrorLabel.Size = new System.Drawing.Size(87, 13);
+            this.testErrorLabel.Size = new System.Drawing.Size(93, 13);
             this.testErrorLabel.TabIndex = 7;
             this.testErrorLabel.Text = "% обученности: ";
             // 
@@ -199,7 +202,7 @@
             // LoadDataToolStripMenuItem
             // 
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
-            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(118, 20);
+            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
             this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
@@ -212,6 +215,20 @@
             this.NetToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.NetToolStripMenuItem.Text = "Сеть";
             // 
+            // saveNetToolStripMenuItem
+            // 
+            this.saveNetToolStripMenuItem.Name = "saveNetToolStripMenuItem";
+            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.saveNetToolStripMenuItem.Text = "Сохранить сеть";
+            this.saveNetToolStripMenuItem.Click += new System.EventHandler(this.saveNetToolStripMenuItem_Click);
+            // 
+            // LoadNetToolStripMenuItem
+            // 
+            this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
+            this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
+            // 
             // openFileDialog2
             // 
             this.openFileDialog2.FileName = "openFileDialog2";
@@ -221,7 +238,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 16);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(133, 13);
+            this.label1.Size = new System.Drawing.Size(135, 13);
             this.label1.TabIndex = 23;
             this.label1.Text = "Кол-во нейронов в сети: ";
             // 
@@ -231,7 +248,7 @@
             this.neuronsCountBox.Location = new System.Drawing.Point(227, 12);
             this.neuronsCountBox.Name = "neuronsCountBox";
             this.neuronsCountBox.ReadOnly = true;
-            this.neuronsCountBox.Size = new System.Drawing.Size(74, 20);
+            this.neuronsCountBox.Size = new System.Drawing.Size(74, 21);
             this.neuronsCountBox.TabIndex = 24;
             // 
             // label2
@@ -239,12 +256,15 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 45);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(112, 13);
+            this.label2.Size = new System.Drawing.Size(117, 13);
             this.label2.TabIndex = 25;
             this.label2.Text = "Отключать нейроны:";
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.stopButton);
+            this.groupBox2.Controls.Add(this.iterationsBox);
+            this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.startOffNeuronsButton);
             this.groupBox2.Controls.Add(this.neuronsToOffBox);
             this.groupBox2.Controls.Add(this.label1);
@@ -252,7 +272,7 @@
             this.groupBox2.Controls.Add(this.neuronsCountBox);
             this.groupBox2.Location = new System.Drawing.Point(18, 30);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(308, 93);
+            this.groupBox2.Size = new System.Drawing.Size(308, 122);
             this.groupBox2.TabIndex = 26;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Автоматическое отключение нейронов";
@@ -260,7 +280,7 @@
             // startOffNeuronsButton
             // 
             this.startOffNeuronsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.startOffNeuronsButton.Location = new System.Drawing.Point(226, 64);
+            this.startOffNeuronsButton.Location = new System.Drawing.Point(116, 93);
             this.startOffNeuronsButton.Name = "startOffNeuronsButton";
             this.startOffNeuronsButton.Size = new System.Drawing.Size(75, 23);
             this.startOffNeuronsButton.TabIndex = 27;
@@ -273,22 +293,36 @@
             this.neuronsToOffBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.neuronsToOffBox.Location = new System.Drawing.Point(227, 38);
             this.neuronsToOffBox.Name = "neuronsToOffBox";
-            this.neuronsToOffBox.Size = new System.Drawing.Size(74, 20);
+            this.neuronsToOffBox.Size = new System.Drawing.Size(74, 21);
             this.neuronsToOffBox.TabIndex = 26;
             // 
-            // saveNetToolStripMenuItem
+            // label3
             // 
-            this.saveNetToolStripMenuItem.Name = "saveNetToolStripMenuItem";
-            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.saveNetToolStripMenuItem.Text = "Сохранить сеть";
-            this.saveNetToolStripMenuItem.Click += new System.EventHandler(this.saveNetToolStripMenuItem_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 69);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(56, 13);
+            this.label3.TabIndex = 28;
+            this.label3.Text = "Итерации";
             // 
-            // LoadNetToolStripMenuItem
+            // iterationsBox
             // 
-            this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
-            this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
+            this.iterationsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.iterationsBox.Location = new System.Drawing.Point(227, 66);
+            this.iterationsBox.Name = "iterationsBox";
+            this.iterationsBox.ReadOnly = true;
+            this.iterationsBox.Size = new System.Drawing.Size(75, 21);
+            this.iterationsBox.TabIndex = 29;
+            // 
+            // stopButton
+            // 
+            this.stopButton.Location = new System.Drawing.Point(226, 93);
+            this.stopButton.Name = "stopButton";
+            this.stopButton.Size = new System.Drawing.Size(75, 23);
+            this.stopButton.TabIndex = 30;
+            this.stopButton.Text = "Стоп";
+            this.stopButton.UseVisualStyleBackColor = true;
+            this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
             // 
             // FormDrawNeurons
             // 
@@ -347,5 +381,8 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.ToolStripMenuItem saveNetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem LoadNetToolStripMenuItem;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox iterationsBox;
+        private System.Windows.Forms.Button stopButton;
     }
 }

@@ -43,8 +43,9 @@
     <Reference Include="AForge">
       <HintPath>.\AForge.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Math">
-      <HintPath>..\..\..\..\AForge.Math.dll</HintPath>
+    <Reference Include="AForge.Math, Version=2.2.5.0, Culture=neutral, PublicKeyToken=abba2e25397ee8c9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\AForge.Math.dll</HintPath>
     </Reference>
     <Reference Include="ExcelLibrary">
       <HintPath>.\ExcelLibrary.dll</HintPath>

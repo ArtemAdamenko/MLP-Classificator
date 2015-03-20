@@ -98,7 +98,7 @@ namespace Neural
         }
 
         //load data for classification
-        private void getDataForClass()
+        private void getTrainDataForClass()
         {
             // show file selection dialog
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -216,7 +216,7 @@ namespace Neural
         }
 
         //load data for regression
-        private void getDataForregression()
+        private void getTrainDataForregression()
         {
             // show file selection dialog
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -293,19 +293,6 @@ namespace Neural
 
         }
 
-        // Load data
-        private void loadDataButton_Click(object sender, System.EventArgs e)
-        {
-            if (this.selectedTypeLearn == "classification")
-            {
-                this.getDataForClass();
-            }
-            else if (this.selectedTypeLearn == "regression")
-            {
-                this.getDataForregression();
-            }
-            
-        }
 
         // Enable/disale controls
         private void EnableControls(bool enable)
@@ -822,11 +809,6 @@ namespace Neural
             return classificator;
         }
 
-        private void ViewTopologyNetToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            new Thread(() => Application.Run(new FormDrawNeurons())).Start();
-        }
-
         private void SaveWeightsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\Weights_" + LogHelper.getTime() + ".csv"))
@@ -874,6 +856,18 @@ namespace Neural
         private void crossValidToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.crossValid();
+        }
+
+        private void loadTrainDataButton_Click(object sender, EventArgs e)
+        {
+            if (this.selectedTypeLearn == "classification")
+            {
+                this.getTrainDataForClass();
+            }
+            else if (this.selectedTypeLearn == "regression")
+            {
+                this.getTrainDataForregression();
+            }
         }
     }
 }
