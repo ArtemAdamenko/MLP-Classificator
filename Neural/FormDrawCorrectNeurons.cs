@@ -34,6 +34,7 @@ namespace Neural
             private bool needToStop = false;
             int rowCountData = 0;
             int colCountData = 0;
+            DateTime t = DateTime.Now;
         #endregion
 
         #region draw options
@@ -629,9 +630,9 @@ namespace Neural
             zedGraphControl1.GraphPane.CurveList[0].Clear();
             //create subnet  
             Random rnd = new Random();
-            int input = 10;
+            int input = 20;
            // int hidden = rnd.Next(1, 20);
-            int hidden = 20;
+            int hidden = 30;
             int output = 20;
 
             ActivationNetwork network1 = new ActivationNetwork(new SigmoidFunction(2.0), input, hidden, output);
@@ -679,6 +680,7 @@ namespace Neural
 
             double tempQuality = 0.0;
             double betterQuality = 0.0;
+            DateTime t = DateTime.Now;
             while (!needToStop)
             {
                 ActivationNetwork network = new ActivationNetwork(new BipolarSigmoidFunction(2.0), input, hidden, output);
@@ -692,6 +694,9 @@ namespace Neural
                 subnet.quality = this.testing(subnet);
                 subnets.Add(subnet);
 
+                DateTime t2 = DateTime.Now;
+                System.TimeSpan diffTime = t2.Subtract(t);
+                this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
                 LogHelper.Write(subnets.Count.ToString() + ";" + subnet.quality.ToString(), "CorrectLog");
                 this.updateBarCHart(subnet.quality, subnets.Count - 1);
 
@@ -705,22 +710,27 @@ namespace Neural
                         betterQuality = tempQuality;
                     subnets.Clear();
                     zedGraphControl1.GraphPane.CurveList[0].Clear();
-                    
 
-                    //get one connection and set one random new connection for find optimization connecteds
-                    for (int k = 0; k < 5; k++)
-                    {
-                        int oldOutput = rnd.Next(0, connectedOutputNeurons.Count);
-                        String oldValue = connectedOutputNeurons[oldOutput];
-                        connectedOutputNeurons.RemoveAt(oldOutput);
+                    if (betterQuality < 90.0)
+                    {                     //get one connection and set one random new connection for find optimization connecteds
+                        for (int k = 0; k < 50; k++)
+                        {
+                            int oldOutput = rnd.Next(0, connectedOutputNeurons.Count);
+                            String oldValue = connectedOutputNeurons[oldOutput];
+                            connectedOutputNeurons.RemoveAt(oldOutput);
 
-                        //new connection output
-                        int newOutput = rnd.Next(0, availableRelationsTemp.Count);
-                        String newValue = availableRelationsTemp[newOutput];
-                        availableRelationsTemp.RemoveAt(newOutput);
+                            //new connection output
+                            int newOutput = rnd.Next(0, availableRelationsTemp.Count);
+                            String newValue = availableRelationsTemp[newOutput];
+                            availableRelationsTemp.RemoveAt(newOutput);
 
-                        connectedOutputNeurons.Add(newValue);
-                        availableRelationsTemp.Add(oldValue);
+                            connectedOutputNeurons.Add(newValue);
+                            availableRelationsTemp.Add(oldValue);
+                        }
+                    }
+                    else {
+                        needToStop = true;
+                        break;
                     }
 
                     this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
@@ -779,6 +789,8 @@ namespace Neural
             int cntOfPopulationsPerStep = 2;
 
             LogHelper.Write("Скрещивание...", "CorrectLog");
+            //start clock
+            
             while (localSubNets.Count > 0 && !needToStop)
             {
                 coefficients = this.coefficientVariations(subnets);
@@ -805,6 +817,9 @@ namespace Neural
                 LogHelper.Write(subnets.Count.ToString() + ";" + sub.quality.ToString(), "CorrectLog");
                 this.updateBarCHart(sub.quality, subnets.Count);
 
+                DateTime t2 = DateTime.Now;
+                System.TimeSpan diffTime = t2.Subtract(t);
+                this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
                 //скрещивания окончилось
                 if (localSubNets.Count == 0)
                 {
@@ -1007,7 +1022,7 @@ namespace Neural
                 for (int i = 0; i < data.GetLength(0); i++)
                 {
                     //gather inputs for compute, n-1 inputs
-                    for (int k = 0; k < this.network.InputsCount - 1; k++)
+                    for (int k = 0; k < this.network.InputsCount; k++)
                     {
                         input[k] = data[i, k];
                     }
@@ -1039,7 +1054,7 @@ namespace Neural
 
             testQuality = (1-(validateError / data.GetLength(0))) * 100;
             this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F6")));
-            MessageBox.Show("Тестирование пройдено");
+          //  MessageBox.Show("Тестирование пройдено");
         }
         
         //обновление графика

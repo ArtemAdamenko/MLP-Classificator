@@ -51,12 +51,13 @@
             this.neuronsCountBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.stopButton = new System.Windows.Forms.Button();
+            this.iterationsBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.label3 = new System.Windows.Forms.Label();
-            this.iterationsBox = new System.Windows.Forms.TextBox();
-            this.stopButton = new System.Windows.Forms.Button();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -262,6 +263,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.timeLabel);
             this.groupBox2.Controls.Add(this.stopButton);
             this.groupBox2.Controls.Add(this.iterationsBox);
             this.groupBox2.Controls.Add(this.label3);
@@ -277,10 +279,38 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Автоматическое отключение нейронов";
             // 
+            // stopButton
+            // 
+            this.stopButton.Location = new System.Drawing.Point(226, 93);
+            this.stopButton.Name = "stopButton";
+            this.stopButton.Size = new System.Drawing.Size(75, 23);
+            this.stopButton.TabIndex = 30;
+            this.stopButton.Text = "Стоп";
+            this.stopButton.UseVisualStyleBackColor = true;
+            this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
+            // 
+            // iterationsBox
+            // 
+            this.iterationsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.iterationsBox.Location = new System.Drawing.Point(227, 66);
+            this.iterationsBox.Name = "iterationsBox";
+            this.iterationsBox.ReadOnly = true;
+            this.iterationsBox.Size = new System.Drawing.Size(75, 21);
+            this.iterationsBox.TabIndex = 29;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 69);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(56, 13);
+            this.label3.TabIndex = 28;
+            this.label3.Text = "Итерации";
+            // 
             // startOffNeuronsButton
             // 
             this.startOffNeuronsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.startOffNeuronsButton.Location = new System.Drawing.Point(116, 93);
+            this.startOffNeuronsButton.Location = new System.Drawing.Point(145, 93);
             this.startOffNeuronsButton.Name = "startOffNeuronsButton";
             this.startOffNeuronsButton.Size = new System.Drawing.Size(75, 23);
             this.startOffNeuronsButton.TabIndex = 27;
@@ -296,33 +326,13 @@
             this.neuronsToOffBox.Size = new System.Drawing.Size(74, 21);
             this.neuronsToOffBox.TabIndex = 26;
             // 
-            // label3
+            // timeLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 69);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(56, 13);
-            this.label3.TabIndex = 28;
-            this.label3.Text = "Итерации";
-            // 
-            // iterationsBox
-            // 
-            this.iterationsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.iterationsBox.Location = new System.Drawing.Point(227, 66);
-            this.iterationsBox.Name = "iterationsBox";
-            this.iterationsBox.ReadOnly = true;
-            this.iterationsBox.Size = new System.Drawing.Size(75, 21);
-            this.iterationsBox.TabIndex = 29;
-            // 
-            // stopButton
-            // 
-            this.stopButton.Location = new System.Drawing.Point(226, 93);
-            this.stopButton.Name = "stopButton";
-            this.stopButton.Size = new System.Drawing.Size(75, 23);
-            this.stopButton.TabIndex = 30;
-            this.stopButton.Text = "Стоп";
-            this.stopButton.UseVisualStyleBackColor = true;
-            this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(9, 102);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(0, 13);
+            this.timeLabel.TabIndex = 31;
             // 
             // FormDrawNeurons
             // 
@@ -384,5 +394,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox iterationsBox;
         private System.Windows.Forms.Button stopButton;
+        private System.Windows.Forms.Label timeLabel;
     }
 }

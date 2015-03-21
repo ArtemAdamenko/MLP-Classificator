@@ -142,9 +142,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\hello.JPG" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\1.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

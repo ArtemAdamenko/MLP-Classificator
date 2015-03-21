@@ -58,6 +58,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -174,9 +175,9 @@
             // subNetButton
             // 
             this.subNetButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.subNetButton.Location = new System.Drawing.Point(42, 89);
+            this.subNetButton.Location = new System.Drawing.Point(126, 92);
             this.subNetButton.Name = "subNetButton";
-            this.subNetButton.Size = new System.Drawing.Size(120, 23);
+            this.subNetButton.Size = new System.Drawing.Size(110, 23);
             this.subNetButton.TabIndex = 29;
             this.subNetButton.Text = "Обучить подсеть";
             this.subNetButton.UseVisualStyleBackColor = true;
@@ -221,9 +222,9 @@
             // button2
             // 
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(168, 89);
+            this.button2.Location = new System.Drawing.Point(242, 92);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(117, 23);
+            this.button2.Size = new System.Drawing.Size(73, 23);
             this.button2.TabIndex = 37;
             this.button2.Text = "Стоп";
             this.button2.UseVisualStyleBackColor = true;
@@ -309,6 +310,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.timeLabel);
             this.groupBox1.Controls.Add(this.mediumErrorPopulationBox);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.covariationPopulationBox);
@@ -350,6 +352,14 @@
             this.label7.Size = new System.Drawing.Size(95, 13);
             this.label7.TabIndex = 40;
             this.label7.Text = "Текущий процесс";
+            // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(8, 97);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(0, 13);
+            this.timeLabel.TabIndex = 41;
             // 
             // FormDrawCorrectNeurons
             // 
@@ -414,5 +424,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label timeLabel;
     }
 }

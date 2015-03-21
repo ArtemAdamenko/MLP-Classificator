@@ -234,13 +234,13 @@ namespace Neural
         private void LoadNet()
         {
             // Initialize the OpenFileDialog to look for text files.
-            openFileDialog1.Filter = "Bin Files|*.bin";
+            openFileDialog2.Filter = "Bin Files|*.bin";
 
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFileDialog2.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 try
                 {
-                    network = Network.Load(openFileDialog1.FileName);
+                    network = Network.Load(openFileDialog2.FileName);
 
                     //подсчет нейронов в сети
                     int neuronsCount = 0;
@@ -677,7 +677,7 @@ namespace Neural
             {
                 // если текущий слой первый и не последний из выделенного диапазона
                 if ((layer == beginLayer) && (layer != endLayer))
-                {   
+                {
                     //собираем нейроны от первого нейрона, до конца слоя
                     for (int neurons = beginNeuron; neurons < network.Layers[layer].Neurons.Length; neurons++)
                     {
@@ -731,7 +731,7 @@ namespace Neural
             int fixedOffNeurons = 0;
             double allWeightsOfNet = 0;
             //TO Function
-            for (int layer = 0; layer < network.Layers.Length; layer++ )
+            for (int layer = 0; layer < network.Layers.Length; layer++)
             {
                 for (int neuro = 0; neuro < network.Layers[layer].Neurons.Length; neuro++)
                 {
@@ -741,97 +741,99 @@ namespace Neural
                     }
                 }
             }
-
+            //start clock
+            DateTime t = DateTime.Now;
 
             for (int k = 0; k < rangeNeurons.Length - 2; k++)
             {
-                while (!needToStop)
+                //if (needToStop)
+                // break;
+                for (int currentNeuron = 0; currentNeuron < rangeNeurons.Length; currentNeuron++)
                 {
-                    for (int currentNeuron = 0; currentNeuron < rangeNeurons.Length; currentNeuron++)
+                    if (needToStop)
+                        break;
+                    //batch neurons off
+                    for (int off = currentNeuron; off <= currentNeuron + k; off++)
                     {
-                        while (!needToStop)
+                        if (off > rangeNeurons.Length - 1)
                         {
-                            //batch neurons off
-                            for (int off = currentNeuron; off <= currentNeuron + k; off++)
-                            {
-                                if (off > rangeNeurons.Length - 1)
-                                {
-                                    offWeights(network, rangeNeurons[off - rangeNeurons.Length]);
-                                    verticalGroup += rangeNeurons[off - rangeNeurons.Length].numberLayer.ToString() + ":" + rangeNeurons[off - rangeNeurons.Length].numberNeuron.ToString();
-                                }
-                                else
-                                {
-                                    offWeights(network, rangeNeurons[off]);
-                                    verticalGroup += rangeNeurons[off].numberLayer.ToString() + ":" + rangeNeurons[off].numberNeuron.ToString();
-                                }
-                                verticalGroup += "|";
-                                fixedOffNeurons++;
+                            offWeights(network, rangeNeurons[off - rangeNeurons.Length]);
+                            verticalGroup += rangeNeurons[off - rangeNeurons.Length].numberLayer.ToString() + ":" + rangeNeurons[off - rangeNeurons.Length].numberNeuron.ToString();
+                        }
+                        else
+                        {
+                            offWeights(network, rangeNeurons[off]);
+                            verticalGroup += rangeNeurons[off].numberLayer.ToString() + ":" + rangeNeurons[off].numberNeuron.ToString();
+                        }
+                        verticalGroup += "|";
+                        fixedOffNeurons++;
 
-                            }
+                    }
 
-                            QualityWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
-                            WeightsSumWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
-                            AbsWeightsSumWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
+                    QualityWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
+                    WeightsSumWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
+                    AbsWeightsSumWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
 
-                            int step = 1;
-                            for (int j = 0; j < rangeNeurons.Length; j++, step += 2)
-                            {
-                                if (needToStop)
-                                    break;
-                                if ((j >= currentNeuron) && (j <= currentNeuron + k))
-                                    continue;
-                                if ((j <= ((currentNeuron + k) - rangeNeurons.Length)) && (j >= (currentNeuron - rangeNeurons.Length)))
-                                    continue;
+                    int step = 1;
+                    for (int j = 0; j < rangeNeurons.Length; j++, step += 2)
+                    {
+                        if (needToStop)
+                            break;
+                        if ((j >= currentNeuron) && (j <= currentNeuron + k))
+                            continue;
+                        if ((j <= ((currentNeuron + k) - rangeNeurons.Length)) && (j >= (currentNeuron - rangeNeurons.Length)))
+                            continue;
 
-                                offWeights(network, rangeNeurons[j]);
+                        offWeights(network, rangeNeurons[j]);
 
-                                QualityWorkSheet.Cells[combinations, j + 1] = new Cell(this.testing());
-                                testIterations++;
-                                this.iterationsBox.Invoke(new Action(() => this.iterationsBox.Text = testIterations.ToString()));
-                                WeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumInput.ToString("F2"));
-                                WeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumOutput.ToString("F2"));
-                                AbsWeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumAbsoluteInput.ToString("F2"));
-                                AbsWeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumAbsoluteOutput.ToString("F2"));
+                        QualityWorkSheet.Cells[combinations, j + 1] = new Cell(this.testing());
+                        testIterations++;
+                        DateTime t2 = DateTime.Now;
+                        System.TimeSpan diffTime = t2.Subtract(t);
+                        this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
+                        this.iterationsBox.Invoke(new Action(() => this.iterationsBox.Text = testIterations.ToString()));
+                        WeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumInput.ToString("F2"));
+                        WeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumOutput.ToString("F2"));
+                        AbsWeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumAbsoluteInput.ToString("F2"));
+                        AbsWeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumAbsoluteOutput.ToString("F2"));
 
-                                onWeights(network, rangeNeurons[j]);
-                            }
-                            //batch neurons to On
-                            for (int off = currentNeuron; off <= currentNeuron + k; off++)
-                            {
-                                if (off > rangeNeurons.Length - 1)
-                                {
-                                    onWeights(network, rangeNeurons[off - rangeNeurons.Length]);
+                        onWeights(network, rangeNeurons[j]);
+                    }
+                    //batch neurons to On
+                    for (int off = currentNeuron; off <= currentNeuron + k; off++)
+                    {
+                        if (off > rangeNeurons.Length - 1)
+                        {
+                            onWeights(network, rangeNeurons[off - rangeNeurons.Length]);
 
-                                }
-                                else
-                                {
-                                    onWeights(network, rangeNeurons[off]);
-                                }
-                            }
-
-                            QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 1] = new Cell(fixedOffNeurons + 1);
-                            QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 2] = new Cell(((double)(fixedOffNeurons + 1) / (double)getCountNeuronsOfNet(network)).ToString());
-                            QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 3] = new Cell((fixedOffNeurons + 1).ToString() + "/" + getCountNeuronsOfNet(network));
-
-                            combinations++;
-                            verticalGroup = "";
-                            fixedOffNeurons = 0;
+                        }
+                        else
+                        {
+                            onWeights(network, rangeNeurons[off]);
                         }
                     }
+
+                    QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 1] = new Cell(fixedOffNeurons + 1);
+                    QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 2] = new Cell(((double)(fixedOffNeurons + 1) / (double)getCountNeuronsOfNet(network)).ToString());
+                    QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 3] = new Cell((fixedOffNeurons + 1).ToString() + "/" + getCountNeuronsOfNet(network));
+
+                    combinations++;
+                    verticalGroup = "";
+                    fixedOffNeurons = 0;
+
                 }
-                QualityWorkBook.Worksheets.Add(QualityWorkSheet);
-                QualityWorkBook.Save(fileXlsNeurons);
-
-                WeightsSumWorkBook.Worksheets.Add(WeightsSumWorkSheet);
-                WeightsSumWorkBook.Save(fileXlsWeightsRel);
-
-                AbsWeightsSumWorkBook.Worksheets.Add(AbsWeightsSumWorkSheet);
-                AbsWeightsSumWorkBook.Save(fileXlsWeightsAbs);
-                MessageBox.Show("Перебор окончен.");
-
-                if (needToStop)
-                    break;
             }
+            QualityWorkBook.Worksheets.Add(QualityWorkSheet);
+            QualityWorkBook.Save(fileXlsNeurons);
+
+            WeightsSumWorkBook.Worksheets.Add(WeightsSumWorkSheet);
+            WeightsSumWorkBook.Save(fileXlsWeightsRel);
+
+            AbsWeightsSumWorkBook.Worksheets.Add(AbsWeightsSumWorkSheet);
+            AbsWeightsSumWorkBook.Save(fileXlsWeightsAbs);
+            MessageBox.Show("Перебор окончен.");
+
+
         }
 
         //установление заголовков для отчета по отключения нейронов в xls файл
