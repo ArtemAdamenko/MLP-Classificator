@@ -47,9 +47,11 @@ namespace Neural
         {
             InitializeComponent();
 
+            RollingPointPairList listErrorP = new RollingPointPairList(200);
             RollingPointPairList listError = new RollingPointPairList(200);
             GraphPane myPane = zedGraphControl1.GraphPane;
-            LineItem curve = myPane.AddCurve("Изменение качества", listError, Color.Blue, SymbolType.None);
+            LineItem curve = myPane.AddCurve("Изменение по модулю", listError, Color.Blue, SymbolType.None);
+            LineItem curve2 = myPane.AddCurve("Изменение вероятности", listErrorP, Color.Goldenrod, SymbolType.XCross);
             myPane.Title.Text = "Корректирование нейронной сети";
             myPane.XAxis.Title.Text = "Корректирующие подсети";
             myPane.YAxis.Title.Text = "Процент правильных ответов";
@@ -321,10 +323,12 @@ namespace Neural
         }
 
         // запуск тестирования сети
-        private double testing(Subnet thisSubnet = null)
+        private double[] testing(Subnet thisSubnet = null)
         {
-            double testQuality = 0.0;
-            double validateError = 0.0;
+            double probabilisticTestQuality = 0.0;
+            double probabilisticValidateError = 0.0;
+            double moduleTestQuality = 0.0;
+            double moduleValidateError = 0.0;
             double[] input = new double[this.network.InputsCount];
             double[] res;
 
@@ -352,10 +356,11 @@ namespace Neural
                         tempRelationsValues.Clear();
                         //double value = Math.Abs(1 - res[classesList.IndexOf(classes[count])]);
                         double value = Math.Abs(classes[count] - this.max(res));
+                        double valueP = 1 - res[classes[count]];
 
-                        
 
-                        validateError += value;
+                        probabilisticValidateError += valueP;
+                        moduleValidateError += value;
 
                         /*else
                         {
@@ -376,8 +381,10 @@ namespace Neural
                     }
 
                 }
-                testQuality = (1-(validateError / data.GetLength(0))) * 100;
-                this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F6")));
+                moduleTestQuality = (1 - (moduleValidateError / data.GetLength(0))) * 100;
+                this.moduleErrorBox.Invoke(new Action(() => this.moduleErrorBox.Text = moduleTestQuality.ToString("F6")));
+                probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
+                this.probabilisticErrorTextBox.Invoke(new Action(() => this.probabilisticErrorTextBox.Text = probabilisticTestQuality.ToString("F6")));
 
             }
 
@@ -396,7 +403,7 @@ namespace Neural
                 }
                 this.errorTextBox.Text = (testError / data.GetLength(0)).ToString("F10");*/
             }
-            return testQuality;
+            return new double[2]{moduleTestQuality, probabilisticTestQuality};
  
         }
 
@@ -626,8 +633,9 @@ namespace Neural
         //генерация подсетей
         private void GenerateSubNets()
         {
-            double commonNetQuality = this.testing();
+            double[] commonNetQuality = this.testing();
             zedGraphControl1.GraphPane.CurveList[0].Clear();
+            zedGraphControl1.GraphPane.CurveList[1].Clear();
             //create subnet  
             Random rnd = new Random();
             int input = 20;
@@ -638,6 +646,7 @@ namespace Neural
             ActivationNetwork network1 = new ActivationNetwork(new SigmoidFunction(2.0), input, hidden, output);
             Subnet subnet1 = new Subnet(network1);
             List<Subnet> subnets = new List<Subnet>();
+            
             List<String> availableRelations = this.getAvailableWeights(this.network);
   
             //generate connections between common net and subnet
@@ -691,14 +700,18 @@ namespace Neural
                 Subnet subnet = new Subnet(network);
                 subnet.inputAssosiated = connectedInputNeurons;
                 subnet.outputAssosiated = connectedOutputNeurons;
-                subnet.quality = this.testing(subnet);
+
+                commonNetQuality = this.testing(subnet);
+                subnet.quality = commonNetQuality[0];
+
                 subnets.Add(subnet);
 
                 DateTime t2 = DateTime.Now;
                 System.TimeSpan diffTime = t2.Subtract(t);
                 this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
                 LogHelper.Write(subnets.Count.ToString() + ";" + subnet.quality.ToString(), "CorrectLog");
-                this.updateBarCHart(subnet.quality, subnets.Count - 1);
+
+                this.updateBarCHart(subnet.quality, subnets.Count - 1, commonNetQuality[1]);
 
                 //window in 100 elements
                 if (subnets.Count == 100)
@@ -710,6 +723,7 @@ namespace Neural
                         betterQuality = tempQuality;
                     subnets.Clear();
                     zedGraphControl1.GraphPane.CurveList[0].Clear();
+                    zedGraphControl1.GraphPane.CurveList[1].Clear();
 
                     if (betterQuality < 90.0)
                     {                     //get one connection and set one random new connection for find optimization connecteds
@@ -762,6 +776,7 @@ namespace Neural
             LogHelper.Write("Отбор лучших...", "CorrectLog");
 
             zedGraphControl1.GraphPane.CurveList[0].Clear();
+            zedGraphControl1.GraphPane.CurveList[1].Clear();
 
             //сортировка по убыванию
             subnets = subnets.OrderByDescending(net => net.quality).ToList();
@@ -781,9 +796,12 @@ namespace Neural
         {
             List<Subnet> localSubNets = new List<Subnet>(subnets);
             List<Subnet> startSubnets = new List<Subnet>(subnets);
+           // List<double> probabilistic = new List<double>();
             Random rnd = new Random();
             double[] coefficients;
             double quality = 0.0;
+
+            double[] commonNetQuality = new double[2];
 
             int population = 0;
             int cntOfPopulationsPerStep = 2;
@@ -811,11 +829,14 @@ namespace Neural
                 Subnet sub = new Subnet(this.summarazing(tempSub1, tempSub2, coefficients));
                 sub.inputAssosiated = connectedInputNeurons;
                 sub.outputAssosiated = connectedOutputNeurons;
-                sub.quality = this.testing(sub);
 
+                commonNetQuality = this.testing(sub);
+                sub.quality = commonNetQuality[0];
+                sub.probabilistic = commonNetQuality[1];
+               // probabilistic.Add(commonNetQuality[1]);
                 subnets.Add(sub);
                 LogHelper.Write(subnets.Count.ToString() + ";" + sub.quality.ToString(), "CorrectLog");
-                this.updateBarCHart(sub.quality, subnets.Count);
+                this.updateBarCHart(sub.quality, subnets.Count, sub.probabilistic);
 
                 DateTime t2 = DateTime.Now;
                 System.TimeSpan diffTime = t2.Subtract(t);
@@ -842,7 +863,7 @@ namespace Neural
                         //отображаем лучших оставшихся на графике
                         for (int i = 0; i < subnets.Count; i++)
                         {
-                            this.updateBarCHart(subnets[i].quality, i);
+                            this.updateBarCHart(subnets[i].quality, i, subnets[i].probabilistic);
                             mediumErrorForPopulation += subnets[i].quality;
                         }
 
@@ -940,7 +961,7 @@ namespace Neural
         }
 
         //изменение весов в зависимости от результатов тестирования
-        private void trololo(Subnet subnet)
+        /*private void trololo(Subnet subnet)
         {
             Network network = subnet.Network;
             double quality = 0.0;
@@ -973,7 +994,7 @@ namespace Neural
                 }
             }
         }
-
+        */
         //суммирование весов двух подсетей
         private Network summarazing(Subnet net1, Subnet net2, double[] coefficients)
         {
@@ -1010,8 +1031,10 @@ namespace Neural
 
         private void test()
         {
-            double testQuality = 0.0;
-            double validateError = 0.0;
+            double moduleTestQuality = 0.0;
+            double probabilisticTestQuality = 0.0;
+            double moduleValidateError = 0.0;
+            double probabilisticValidateError = 0.0;
 
             String[] lines = new String[1];
             double[] res = new double[classesList.Count];
@@ -1037,8 +1060,10 @@ namespace Neural
                     }
 
                     double value = Math.Abs(classes[i] - this.max(res));
+                    double valueP = 1 - res[classes[i]];
 
-                    validateError += value;
+                    moduleValidateError += value;
+                    probabilisticValidateError += valueP;
        
 
                     if (this.selectedType == "classification")
@@ -1052,25 +1077,34 @@ namespace Neural
                     file.WriteLine(lines[0].ToString());
                 }
 
-            testQuality = (1-(validateError / data.GetLength(0))) * 100;
-            this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F6")));
+            moduleTestQuality = (1-(moduleValidateError / data.GetLength(0))) * 100;
+            probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
+            this.moduleErrorBox.Invoke(new Action(() => this.moduleErrorBox.Text = moduleTestQuality.ToString("F6")));
+            this.probabilisticErrorTextBox.Invoke(new Action(() => this.probabilisticErrorTextBox.Text = probabilisticTestQuality.ToString("F6")));
           //  MessageBox.Show("Тестирование пройдено");
         }
         
         //обновление графика
-        private void updateBarCHart(double y,  int x)
+        private void updateBarCHart(double y,  int x, double p)
         {
             CurveItem curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
             if (curve == null)
                 return;
+            CurveItem curve2 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
+            if (curve2 == null)
+                return;
 
             // Get the PointPairList
             IPointListEdit qualities = curve.Points as IPointListEdit;
+            IPointListEdit qualitiesP = curve2.Points as IPointListEdit;
 
             if (qualities == null)
                 return;
+            if (qualitiesP == null)
+                return;
 
             qualities.Add(x, y);
+            qualitiesP.Add(x, p);
             zedGraphControl1.AxisChange();
             zedGraphControl1.Invalidate();
         }

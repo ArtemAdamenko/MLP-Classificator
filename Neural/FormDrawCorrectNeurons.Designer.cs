@@ -32,7 +32,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.testNetButton = new System.Windows.Forms.Button();
-            this.errorTextBox = new System.Windows.Forms.TextBox();
+            this.probabilisticErrorTextBox = new System.Windows.Forms.TextBox();
             this.testErrorLabel = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -42,7 +42,6 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.subNetButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.betterBox = new System.Windows.Forms.TextBox();
             this.PopulationBox = new System.Windows.Forms.TextBox();
@@ -56,9 +55,11 @@
             this.label6 = new System.Windows.Forms.Label();
             this.covariationPopulationBox = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.timeLabel = new System.Windows.Forms.Label();
+            this.moduleErrorBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -92,7 +93,7 @@
             // 
             this.testNetButton.Enabled = false;
             this.testNetButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.testNetButton.Location = new System.Drawing.Point(218, 16);
+            this.testNetButton.Location = new System.Drawing.Point(215, 21);
             this.testNetButton.Name = "testNetButton";
             this.testNetButton.Size = new System.Drawing.Size(83, 23);
             this.testNetButton.TabIndex = 6;
@@ -100,24 +101,24 @@
             this.testNetButton.UseVisualStyleBackColor = true;
             this.testNetButton.Click += new System.EventHandler(this.testNetButton_Click);
             // 
-            // errorTextBox
+            // probabilisticErrorTextBox
             // 
-            this.errorTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.errorTextBox.Enabled = false;
-            this.errorTextBox.Location = new System.Drawing.Point(103, 19);
-            this.errorTextBox.Name = "errorTextBox";
-            this.errorTextBox.ReadOnly = true;
-            this.errorTextBox.Size = new System.Drawing.Size(100, 21);
-            this.errorTextBox.TabIndex = 8;
+            this.probabilisticErrorTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.probabilisticErrorTextBox.Enabled = false;
+            this.probabilisticErrorTextBox.Location = new System.Drawing.Point(103, 19);
+            this.probabilisticErrorTextBox.Name = "probabilisticErrorTextBox";
+            this.probabilisticErrorTextBox.ReadOnly = true;
+            this.probabilisticErrorTextBox.Size = new System.Drawing.Size(100, 21);
+            this.probabilisticErrorTextBox.TabIndex = 8;
             // 
             // testErrorLabel
             // 
             this.testErrorLabel.AutoSize = true;
             this.testErrorLabel.Location = new System.Drawing.Point(4, 21);
             this.testErrorLabel.Name = "testErrorLabel";
-            this.testErrorLabel.Size = new System.Drawing.Size(88, 13);
+            this.testErrorLabel.Size = new System.Drawing.Size(93, 13);
             this.testErrorLabel.TabIndex = 7;
-            this.testErrorLabel.Text = "% валидности: ";
+            this.testErrorLabel.Text = "% Вероятности: ";
             // 
             // openFileDialog1
             // 
@@ -137,14 +138,14 @@
             // LoadNetToolStripMenuItem
             // 
             this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(99, 20);
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
             this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
             this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
             // LoadDataToolStripMenuItem
             // 
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
-            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
+            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(118, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
             this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
@@ -183,15 +184,6 @@
             this.subNetButton.UseVisualStyleBackColor = true;
             this.subNetButton.Click += new System.EventHandler(this.subNetButton_Click);
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 47);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(66, 13);
-            this.label3.TabIndex = 33;
-            this.label3.Text = "Популяций:";
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -204,19 +196,19 @@
             // betterBox
             // 
             this.betterBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.betterBox.Location = new System.Drawing.Point(103, 71);
+            this.betterBox.Location = new System.Drawing.Point(151, 71);
             this.betterBox.Name = "betterBox";
             this.betterBox.ReadOnly = true;
-            this.betterBox.Size = new System.Drawing.Size(100, 21);
+            this.betterBox.Size = new System.Drawing.Size(37, 21);
             this.betterBox.TabIndex = 35;
             // 
             // PopulationBox
             // 
             this.PopulationBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PopulationBox.Location = new System.Drawing.Point(103, 45);
+            this.PopulationBox.Location = new System.Drawing.Point(103, 69);
             this.PopulationBox.Name = "PopulationBox";
             this.PopulationBox.ReadOnly = true;
-            this.PopulationBox.Size = new System.Drawing.Size(100, 21);
+            this.PopulationBox.Size = new System.Drawing.Size(37, 21);
             this.PopulationBox.TabIndex = 36;
             // 
             // button2
@@ -326,17 +318,26 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Результаты";
             // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(8, 97);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(0, 13);
+            this.timeLabel.TabIndex = 41;
+            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.moduleErrorBox);
+            this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Controls.Add(this.errorTextBox);
+            this.groupBox2.Controls.Add(this.probabilisticErrorTextBox);
             this.groupBox2.Controls.Add(this.PopulationBox);
             this.groupBox2.Controls.Add(this.betterBox);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.testNetButton);
             this.groupBox2.Controls.Add(this.testErrorLabel);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Location = new System.Drawing.Point(12, 27);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(318, 97);
@@ -347,19 +348,30 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(209, 47);
+            this.label7.Location = new System.Drawing.Point(212, 58);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(95, 13);
             this.label7.TabIndex = 40;
             this.label7.Text = "Текущий процесс";
             // 
-            // timeLabel
+            // moduleErrorBox
             // 
-            this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(8, 97);
-            this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(0, 13);
-            this.timeLabel.TabIndex = 41;
+            this.moduleErrorBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.moduleErrorBox.Enabled = false;
+            this.moduleErrorBox.Location = new System.Drawing.Point(103, 44);
+            this.moduleErrorBox.Name = "moduleErrorBox";
+            this.moduleErrorBox.ReadOnly = true;
+            this.moduleErrorBox.Size = new System.Drawing.Size(100, 21);
+            this.moduleErrorBox.TabIndex = 42;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(4, 46);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(84, 13);
+            this.label3.TabIndex = 41;
+            this.label3.Text = "% По модулю: ";
             // 
             // FormDrawCorrectNeurons
             // 
@@ -403,12 +415,11 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.Button testNetButton;
         private System.Windows.Forms.Label testErrorLabel;
-        private System.Windows.Forms.TextBox errorTextBox;
+        private System.Windows.Forms.TextBox probabilisticErrorTextBox;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button subNetButton;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox betterBox;
         private System.Windows.Forms.TextBox PopulationBox;
@@ -425,5 +436,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label timeLabel;
+        private System.Windows.Forms.TextBox moduleErrorBox;
+        private System.Windows.Forms.Label label3;
     }
 }

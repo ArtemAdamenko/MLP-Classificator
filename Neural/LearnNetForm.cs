@@ -33,15 +33,18 @@ namespace Neural
         private double alpha = 2.0;
         private double moment = 0.3;
         private int iterations = 0;
+
         private double error = 0.0;
-        private double validateError = 0.0;
+        private double moduleValidateError = 0.0;
+        private double probabilisticValidateError = 0.0;
+
         private String selectedAlgo = "";
         private String selectedTypeLearn = "";
         private int[] neuronsAndLayers;
         private int[] classes;
         List<int> classesList = new List<int>();
         //private int[] samplesPerClass;
-        private double validLevel = 0.2;
+        private double validLevel = 95;
         private int maxIterations = 500;
         private int maxNeuronsInLayer = 10;
 
@@ -61,9 +64,11 @@ namespace Neural
             InitializeComponent();
             RollingPointPairList listError = new RollingPointPairList(300);
             RollingPointPairList listValidate = new RollingPointPairList(300);
+            RollingPointPairList listValidateP = new RollingPointPairList(300);
             GraphPane myPane = zedGraphControl1.GraphPane;
             LineItem curve = myPane.AddCurve("Качество обучения", listError, Color.Blue, SymbolType.Plus);
-            LineItem curve2 = myPane.AddCurve("Кросс-валидация", listValidate, Color.Green, SymbolType.Triangle);
+            LineItem curve2 = myPane.AddCurve("Кросс-валидация (вероятность)", listValidateP, Color.Green, SymbolType.Triangle);
+            LineItem curve3 = myPane.AddCurve("Кросс-валидация (модуль)", listValidate, Color.Goldenrod, SymbolType.XCross);
             myPane.Title.Text = "Обучение нейронной сети";
             myPane.XAxis.Title.Text = "Итерации";
             myPane.YAxis.Title.Text = "Изменение ошибки обучения";
@@ -312,16 +317,16 @@ namespace Neural
             // get learning rate
             try
             {
-                validLevel = Math.Max(0.00001, Math.Min(1, double.Parse(validationLevelBox.Text)));
+                validLevel = Math.Max(0.0, Math.Min(100, double.Parse(validationLevelBox.Text)));
             }
             catch
             {
-                validLevel = 0.2;
+                validLevel = 95;
             }
             // get learning rate
             try
             {
-                maxIterations = Math.Max(500, Math.Min(10000, int.Parse(maxIterationsBox.Text)));
+                maxIterations = Math.Max(0, Math.Min(10000, int.Parse(maxIterationsBox.Text)));
             }
             catch
             {
@@ -330,7 +335,7 @@ namespace Neural
             // get learning rate
             try
             {
-                maxNeuronsInLayer = Math.Max(3, Math.Min(30, int.Parse(maxNeuronsInLayerBox.Text)));
+                maxNeuronsInLayer = Math.Max(1, Math.Min(1000, int.Parse(maxNeuronsInLayerBox.Text)));
             }
             catch
             {
@@ -372,7 +377,7 @@ namespace Neural
                 neuronsAndLayers = new int[temp.Length+1];
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    neuronsAndLayers[i] = Math.Max(1, Math.Min(200, int.Parse(temp[i])));
+                    neuronsAndLayers[i] = Math.Max(1, Math.Min(1000, int.Parse(temp[i])));
                 }
                 if (this.selectedTypeLearn == "classification")
                     neuronsAndLayers[temp.Length] = classesList.Count;
@@ -405,7 +410,7 @@ namespace Neural
 
         }
 
-        private int getCountOfRelations()
+      /*  private int getCountOfRelations()
         {
             int count = 0;
             count = network.InputsCount * network.Layers[0].Neurons.Length;
@@ -414,7 +419,7 @@ namespace Neural
                 count += network.Layers[i].Neurons.Length * network.Layers[i - 1].Neurons.Length;
             }
             return count;
-        }
+        }*/
 
         //Запись результата очередного обучения в таблицу
         private void recordNeuroNet()
@@ -427,16 +432,22 @@ namespace Neural
             }
 
             topology += network.Layers[network.Layers.Length-1].Neurons.Length;
-            String moment = this.moment.ToString();
-            String learningRate = this.learningRate.ToString();
+            String moment = "";
+            String learningRate = "";
+            if (this.selectedAlgo != "RProp")
+            {
+                moment = this.moment.ToString();
+                learningRate = this.learningRate.ToString();
+            }
 
             this.lastRunsGridView.Invoke(
                             new Action(() =>
-                                lastRunsGridView.Rows.Add(this.iterations.ToString(), this.error.ToString(), (this.validateError).ToString(),
+                                lastRunsGridView.Rows.Add(this.iterations.ToString(), this.error.ToString(), (this.moduleValidateError).ToString(), (this.probabilisticValidateError).ToString(),
                                 this.selectedAlgo, topology, this.alpha.ToString(), learningRate, moment)
                                 ));
         }
 
+        //создание сети для обучения и учителя по топологии
         private void createLearn(int[] topology)
         {
             if (this.alphaBox.Text != "")
@@ -583,84 +594,104 @@ namespace Neural
             // iterations
             this.iterations = 1;
             this.error = 0.0;
-            this.validateError = 0.0;
+            this.moduleValidateError = 0.0;
+            this.probabilisticValidateError = 0.0;
 
             zedGraphControl1.GraphPane.CurveList[0].Clear();
             zedGraphControl1.GraphPane.CurveList[1].Clear();
+            zedGraphControl1.GraphPane.CurveList[2].Clear();
             zedGraphControl1.AxisChange();
 
             // loop
             while (!needToStop)
             {
-                if ((iterations >= maxIterations) && (validateError > validLevel))
+                if (maxIterations != 0)
                 {
-                    recordNeuroNet();
-                    int potentialLayer = -1;
+                    if ((iterations >= maxIterations) && (this.error < validLevel))
+                    {
+                        recordNeuroNet();
+                        int potentialLayer = -1;
 
-                    //search free layer for add neuron
-                    for (int hiddenLayer = 0; hiddenLayer < network.Layers.Length-1; hiddenLayer++)
-                    {
-                        if (network.Layers[hiddenLayer].Neurons.Length < maxNeuronsInLayer)
+                        //search free layer for add neuron
+                        for (int hiddenLayer = 0; hiddenLayer < network.Layers.Length - 1; hiddenLayer++)
                         {
-                            potentialLayer = hiddenLayer;
-                            break;
-                        }
-                    }
-                    //layers full, add new free layer
-                    if (potentialLayer == -1)
-                    {
-                        int[] tempNet = new int[network.Layers.Length+1];
-                        int i = 0;
-                        for (i = 0; i < network.Layers.Length-1; i++)
-                        {
-                            tempNet[i] = network.Layers[i].Neurons.Length;
-                        }
-                        tempNet[i] = 1; // new layer before last layer
-                        tempNet[i+1] = network.Output.Length; // last layer in end
-                        createLearn(tempNet);
-                    }
-                    else if (potentialLayer != -1)
-                    {
-                        int[] tempNet = new int[network.Layers.Length];
-                        int i = 0;
-                        int newCntNeurons = 0;
-                        for (i = 0; i < network.Layers.Length; i++)
-                        {
-                            if (i == potentialLayer)
+                            if (network.Layers[hiddenLayer].Neurons.Length < maxNeuronsInLayer)
                             {
-                                newCntNeurons = network.Layers[i].Neurons.Length + 1;
-                                tempNet[i] = newCntNeurons;
+                                potentialLayer = hiddenLayer;
+                                break;
                             }
-                            else 
+                        }
+                        //layers full, add new free layer
+                        if (potentialLayer == -1)
+                        {
+                            int[] tempNet = new int[network.Layers.Length + 1];
+                            int i = 0;
+                            for (i = 0; i < network.Layers.Length - 1; i++)
                             {
                                 tempNet[i] = network.Layers[i].Neurons.Length;
                             }
-                            
+                            tempNet[i] = 1; // new layer before last layer
+                            tempNet[i + 1] = network.Output.Length; // last layer in end
+                            createLearn(tempNet);
                         }
-                        createLearn(tempNet);
+                        else if (potentialLayer != -1)
+                        {
+                            int[] tempNet = new int[network.Layers.Length];
+                            int i = 0;
+                            int newCntNeurons = 0;
+                            for (i = 0; i < network.Layers.Length; i++)
+                            {
+                                if (i == potentialLayer)
+                                {
+                                    newCntNeurons = network.Layers[i].Neurons.Length + 1;
+                                    tempNet[i] = newCntNeurons;
+                                }
+                                else
+                                {
+                                    tempNet[i] = network.Layers[i].Neurons.Length;
+                                }
+
+                            }
+                            createLearn(tempNet);
+                        }
+
+
+                        zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[0].Clear()));
+                        zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[1].Clear()));
+                        zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[2].Clear()));
+                        iterations = 1;
                     }
-
-
-                    zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[0].Clear()));
-                    zedGraphControl1.Invoke(new Action(() => zedGraphControl1.GraphPane.CurveList[1].Clear()));
-                    iterations = 1;
+                    else if (iterations >= maxIterations && this.error > validLevel)
+                    {
+                        recordNeuroNet();
+                        needToStop = true;
+                        break;
+                    }
+                }
+                else if (maxIterations == 0 && this.error > validLevel)
+                {
+                    recordNeuroNet();
+                    needToStop = true;
+                    break;
                 }
                 // run epoch of learning procedure
                 error = ( 1 - ( teacher.RunEpoch( this.input, this.output )/this.input.GetLength(0) ) ) * 100;
-                validateError = 0.0;
+                //moduleValidateError = 0.0;
+                //probabilisticValidateError = 0.0;
 
                 if (this.selectedTypeLearn == "classification")
                 {
-                    validateError = this.validation();
+                    moduleValidateError = this.moduleValidation();
+                    probabilisticValidateError = this.probabilisticValidation();
                 }
-                else if (this.selectedTypeLearn == "regression")
+               /* else if (this.selectedTypeLearn == "regression")
                 {
                     for (int count = 0; count < validateInput.GetLength(0) - 1; count++)
                     {
                         validateError += Math.Abs(network.Compute(validateInput[count])[0] - validateOutput[count][0]);
                     }
                     validateError = validateError / validateInput.GetLength(0);
-                }
+                }*/
 
                 // Make sure that the curvelist has at least one curve
                 if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
@@ -669,21 +700,28 @@ namespace Neural
                 // Get the first CurveItem in the graph
                 CurveItem curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
                 CurveItem curve2 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
+                CurveItem curve3 = zedGraphControl1.GraphPane.CurveList[2] as LineItem;
                 if (curve == null)
                     return;
                 if (curve2 == null)
                     return;
-
+                if (curve3 == null)
+                    return;
                 // Get the PointPairList
                 IPointListEdit listErrors = curve.Points as IPointListEdit;
-                IPointListEdit listValidates = curve2.Points as IPointListEdit;
+                IPointListEdit listValidatesP = curve2.Points as IPointListEdit;
+                IPointListEdit listValidates = curve3.Points as IPointListEdit;
 
                 if (listErrors == null)
                     return;
                 if (listValidates == null)
                     return;
+                if (listValidatesP == null)
+                    return;
+
                 listErrors.Add(this.iterations, error);
-                listValidates.Add(this.iterations, validateError);
+                listValidates.Add(this.iterations, moduleValidateError);
+                listValidatesP.Add(this.iterations, probabilisticValidateError);
 
                 // Make sure the Y axis is rescaled to accommodate actual data
                 zedGraphControl1.AxisChange();
@@ -694,7 +732,8 @@ namespace Neural
                 // set current iteration's info
                 currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), this.iterations.ToString());
                 errorPercent.Invoke(new Action<string>((s) => errorPercent.Text = s), error.ToString("F14"));
-                validErrorBox.Invoke(new Action<string>((s) => validErrorBox.Text = s), validateError.ToString("F14"));
+                moduleValidBox.Invoke(new Action<string>((s) => moduleValidBox.Text = s), moduleValidateError.ToString("F14"));
+                probabilisticValidBox.Invoke(new Action<string>((s) => probabilisticValidBox.Text = s), probabilisticValidateError.ToString("F14"));
 
 
                 // increase current iteration
@@ -705,7 +744,8 @@ namespace Neural
 
         }
 
-        private double validation()
+        //валидация по модулю
+        private double moduleValidation()
         {
             double testQuality = 0.0;
             double validate = 0.0;
@@ -717,6 +757,24 @@ namespace Neural
 
                 validate += value;
        
+            }
+            testQuality = (1 - (validate / validateInput.Length)) * 100;
+            return testQuality;
+        }
+
+        //валидация по вероятности
+        private double probabilisticValidation()
+        {
+            double testQuality = 0.0;
+            double validate = 0.0;
+            double[] res;
+            for (int count = 0; count < validateInput.Length; count++)
+            {
+                res = network.Compute(validateInput[count]);
+                double value = 1 - res[validClasses[count]];
+
+                validate += value;
+
             }
             testQuality = (1 - (validate / validateInput.Length)) * 100;
             return testQuality;
@@ -735,6 +793,7 @@ namespace Neural
             }
         }
 
+        //тестирование сети(80%) с записью результата в файл
         private void TestNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             String[] lines = new String[1];
@@ -768,6 +827,8 @@ namespace Neural
 
         }
 
+
+        //кросс-валидация(20%) сети с записью результата в файл
         private void crossValid()
         {
             String[] lines = new String[1];
@@ -794,6 +855,7 @@ namespace Neural
             MessageBox.Show("Кросс-валидация пройдена.");
         }
 
+        //посик наиболее вероятного класса
         private int max(double[] mass)
         {
             int classificator = 0;
@@ -809,6 +871,7 @@ namespace Neural
             return classificator;
         }
 
+        //сохранение весов текущей ИНС в файл
         private void SaveWeightsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\Weights_" + LogHelper.getTime() + ".csv"))
@@ -819,7 +882,7 @@ namespace Neural
                     for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
                     {
                         
-                        file.WriteLine("L[" + i.ToString() + "]N[" + j.ToString() + "]W[" + k.ToString() + "] = " + network.Layers[i].Neurons[j].Weights[k]);
+                        file.WriteLine("L[" + i.ToString() + "]N[" + j.ToString() + "]W[" + k.ToString() + "];" + network.Layers[i].Neurons[j].Weights[k] + ";");
                         
                     }
                 }
@@ -827,6 +890,7 @@ namespace Neural
             MessageBox.Show("Веса сохранены");
         }
 
+        //выбор алгоритма обучения
         private void algoritmBox_SelectedValueChanged(object sender, EventArgs e)
         {
             selectedAlgo = algoritmBox.SelectedItem.ToString();
@@ -847,17 +911,20 @@ namespace Neural
             
         }
 
+        //загрузка формы
         private void Form1_Load(object sender, EventArgs e)
         {
             HelloForm form = this.Owner as HelloForm;
             this.selectedTypeLearn = form.typeLearn;
         }
 
+        //запуск кросс-валидации
         private void crossValidToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.crossValid();
         }
 
+        //загрузка обучающей выборки
         private void loadTrainDataButton_Click(object sender, EventArgs e)
         {
             if (this.selectedTypeLearn == "classification")

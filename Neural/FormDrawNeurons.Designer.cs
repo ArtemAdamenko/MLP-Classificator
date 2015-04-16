@@ -51,13 +51,16 @@
             this.neuronsCountBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.stopButton = new System.Windows.Forms.Button();
             this.iterationsBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.timeLabel = new System.Windows.Forms.Label();
+            this.тестToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.входнойВекторToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.outputVectorButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -88,13 +91,14 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.outputVectorButton);
             this.groupBox1.Controls.Add(this.dataGridView1);
             this.groupBox1.Controls.Add(this.testNetButton);
             this.groupBox1.Controls.Add(this.errorTextBox);
             this.groupBox1.Controls.Add(this.testErrorLabel);
             this.groupBox1.Location = new System.Drawing.Point(10, 158);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(320, 392);
+            this.groupBox1.Size = new System.Drawing.Size(320, 422);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Изменение сети";
@@ -202,10 +206,12 @@
             // 
             // LoadDataToolStripMenuItem
             // 
+            this.LoadDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.тестToolStripMenuItem,
+            this.входнойВекторToolStripMenuItem});
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
-            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
+            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(118, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
-            this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
             // NetToolStripMenuItem
             // 
@@ -219,14 +225,14 @@
             // saveNetToolStripMenuItem
             // 
             this.saveNetToolStripMenuItem.Name = "saveNetToolStripMenuItem";
-            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.saveNetToolStripMenuItem.Text = "Сохранить сеть";
             this.saveNetToolStripMenuItem.Click += new System.EventHandler(this.saveNetToolStripMenuItem_Click);
             // 
             // LoadNetToolStripMenuItem
             // 
             this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
             this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
@@ -279,6 +285,14 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Автоматическое отключение нейронов";
             // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(9, 102);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(0, 13);
+            this.timeLabel.TabIndex = 31;
+            // 
             // stopButton
             // 
             this.stopButton.Location = new System.Drawing.Point(226, 93);
@@ -326,20 +340,37 @@
             this.neuronsToOffBox.Size = new System.Drawing.Size(74, 21);
             this.neuronsToOffBox.TabIndex = 26;
             // 
-            // timeLabel
+            // тестToolStripMenuItem
             // 
-            this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(9, 102);
-            this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(0, 13);
-            this.timeLabel.TabIndex = 31;
+            this.тестToolStripMenuItem.Name = "тестToolStripMenuItem";
+            this.тестToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.тестToolStripMenuItem.Text = "Тест";
+            this.тестToolStripMenuItem.Click += new System.EventHandler(this.тестToolStripMenuItem_Click);
+            // 
+            // входнойВекторToolStripMenuItem
+            // 
+            this.входнойВекторToolStripMenuItem.Name = "входнойВекторToolStripMenuItem";
+            this.входнойВекторToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.входнойВекторToolStripMenuItem.Text = "Входной вектор";
+            this.входнойВекторToolStripMenuItem.Click += new System.EventHandler(this.входнойВекторToolStripMenuItem_Click);
+            // 
+            // outputVectorButton
+            // 
+            this.outputVectorButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.outputVectorButton.Location = new System.Drawing.Point(8, 391);
+            this.outputVectorButton.Name = "outputVectorButton";
+            this.outputVectorButton.Size = new System.Drawing.Size(112, 23);
+            this.outputVectorButton.TabIndex = 9;
+            this.outputVectorButton.Text = "Выходной вектор";
+            this.outputVectorButton.UseVisualStyleBackColor = true;
+            this.outputVectorButton.Click += new System.EventHandler(this.outputVectorButton_Click);
             // 
             // FormDrawNeurons
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1062, 562);
+            this.ClientSize = new System.Drawing.Size(1062, 592);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.panel1);
@@ -395,5 +426,8 @@
         private System.Windows.Forms.TextBox iterationsBox;
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.Label timeLabel;
+        private System.Windows.Forms.ToolStripMenuItem тестToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem входнойВекторToolStripMenuItem;
+        private System.Windows.Forms.Button outputVectorButton;
     }
 }

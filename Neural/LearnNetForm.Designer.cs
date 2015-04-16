@@ -69,8 +69,10 @@ namespace Neural
             this.learningRateBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.validErrorBox = new System.Windows.Forms.TextBox();
+            this.pLabel = new System.Windows.Forms.Label();
+            this.probabilisticValidBox = new System.Windows.Forms.TextBox();
+            this.mLabel = new System.Windows.Forms.Label();
+            this.moduleValidBox = new System.Windows.Forms.TextBox();
             this.errorPercent = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.currentIterationBox = new System.Windows.Forms.TextBox();
@@ -91,14 +93,6 @@ namespace Neural
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lastRunsGridView = new System.Windows.Forms.DataGridView();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.maxIterationsBox = new System.Windows.Forms.TextBox();
@@ -108,6 +102,15 @@ namespace Neural
             this.validationLevelBox = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.probabilisticCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -218,7 +221,7 @@ namespace Neural
             this.algoritmBox.Items.AddRange(new object[] {
             "BackProp",
             "RProp"});
-            this.algoritmBox.Location = new System.Drawing.Point(2, 167);
+            this.algoritmBox.Location = new System.Drawing.Point(7, 166);
             this.algoritmBox.Name = "algoritmBox";
             this.algoritmBox.Size = new System.Drawing.Size(183, 21);
             this.algoritmBox.TabIndex = 14;
@@ -296,35 +299,54 @@ namespace Neural
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.label7);
-            this.groupBox4.Controls.Add(this.validErrorBox);
+            this.groupBox4.Controls.Add(this.pLabel);
+            this.groupBox4.Controls.Add(this.probabilisticValidBox);
+            this.groupBox4.Controls.Add(this.mLabel);
+            this.groupBox4.Controls.Add(this.moduleValidBox);
             this.groupBox4.Controls.Add(this.errorPercent);
             this.groupBox4.Controls.Add(this.label3);
             this.groupBox4.Controls.Add(this.currentIterationBox);
             this.groupBox4.Controls.Add(this.label5);
             this.groupBox4.Location = new System.Drawing.Point(707, 405);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(195, 108);
+            this.groupBox4.Size = new System.Drawing.Size(195, 149);
             this.groupBox4.TabIndex = 6;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Текущая итерация";
             // 
-            // label7
+            // pLabel
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 83);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(113, 13);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "% Кросс-валидации:";
+            this.pLabel.AutoSize = true;
+            this.pLabel.Location = new System.Drawing.Point(4, 89);
+            this.pLabel.Name = "pLabel";
+            this.pLabel.Size = new System.Drawing.Size(86, 13);
+            this.pLabel.TabIndex = 8;
+            this.pLabel.Text = "% Вероятности";
             // 
-            // validErrorBox
+            // probabilisticValidBox
             // 
-            this.validErrorBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.validErrorBox.Location = new System.Drawing.Point(118, 80);
-            this.validErrorBox.Name = "validErrorBox";
-            this.validErrorBox.Size = new System.Drawing.Size(66, 21);
-            this.validErrorBox.TabIndex = 5;
+            this.probabilisticValidBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.probabilisticValidBox.Location = new System.Drawing.Point(119, 86);
+            this.probabilisticValidBox.Name = "probabilisticValidBox";
+            this.probabilisticValidBox.Size = new System.Drawing.Size(66, 21);
+            this.probabilisticValidBox.TabIndex = 7;
+            // 
+            // mLabel
+            // 
+            this.mLabel.AutoSize = true;
+            this.mLabel.Location = new System.Drawing.Point(3, 122);
+            this.mLabel.Name = "mLabel";
+            this.mLabel.Size = new System.Drawing.Size(77, 13);
+            this.mLabel.TabIndex = 6;
+            this.mLabel.Text = "% По модулю";
+            // 
+            // moduleValidBox
+            // 
+            this.moduleValidBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.moduleValidBox.Location = new System.Drawing.Point(118, 119);
+            this.moduleValidBox.Name = "moduleValidBox";
+            this.moduleValidBox.Size = new System.Drawing.Size(66, 21);
+            this.moduleValidBox.TabIndex = 5;
             // 
             // errorPercent
             // 
@@ -338,7 +360,7 @@ namespace Neural
             // 
             this.label3.Location = new System.Drawing.Point(3, 17);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(70, 17);
+            this.label3.Size = new System.Drawing.Size(85, 21);
             this.label3.TabIndex = 2;
             this.label3.Text = "% Обучения:";
             // 
@@ -384,7 +406,7 @@ namespace Neural
             // 
             this.groupBox5.Controls.Add(this.startButton);
             this.groupBox5.Controls.Add(this.stopButton);
-            this.groupBox5.Location = new System.Drawing.Point(707, 519);
+            this.groupBox5.Location = new System.Drawing.Point(707, 560);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(195, 57);
             this.groupBox5.TabIndex = 11;
@@ -409,7 +431,7 @@ namespace Neural
             this.TestNetToolStripMenuItem,
             this.crossValidToolStripMenuItem});
             this.нейроннаяСетьToolStripMenuItem.Name = "нейроннаяСетьToolStripMenuItem";
-            this.нейроннаяСетьToolStripMenuItem.Size = new System.Drawing.Size(107, 20);
+            this.нейроннаяСетьToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
             this.нейроннаяСетьToolStripMenuItem.Text = "Нейронная сеть";
             // 
             // SaveToolStripMenuItem
@@ -418,7 +440,7 @@ namespace Neural
             this.SaveNetToolStripMenuItem,
             this.SaveWeightsToolStripMenuItem});
             this.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
-            this.SaveToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.SaveToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.SaveToolStripMenuItem.Text = "Сохранить";
             // 
             // SaveNetToolStripMenuItem
@@ -438,14 +460,14 @@ namespace Neural
             // TestNetToolStripMenuItem
             // 
             this.TestNetToolStripMenuItem.Name = "TestNetToolStripMenuItem";
-            this.TestNetToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.TestNetToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.TestNetToolStripMenuItem.Text = "Тестировать";
             this.TestNetToolStripMenuItem.Click += new System.EventHandler(this.TestNetToolStripMenuItem_Click);
             // 
             // crossValidToolStripMenuItem
             // 
             this.crossValidToolStripMenuItem.Name = "crossValidToolStripMenuItem";
-            this.crossValidToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.crossValidToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.crossValidToolStripMenuItem.Text = "Кросс-валидация";
             this.crossValidToolStripMenuItem.Click += new System.EventHandler(this.crossValidToolStripMenuItem_Click);
             // 
@@ -454,13 +476,13 @@ namespace Neural
             this.выборкаToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadTrainDataButton});
             this.выборкаToolStripMenuItem.Name = "выборкаToolStripMenuItem";
-            this.выборкаToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
+            this.выборкаToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
             this.выборкаToolStripMenuItem.Text = "Выборка";
             // 
             // loadTrainDataButton
             // 
             this.loadTrainDataButton.Name = "loadTrainDataButton";
-            this.loadTrainDataButton.Size = new System.Drawing.Size(152, 22);
+            this.loadTrainDataButton.Size = new System.Drawing.Size(124, 22);
             this.loadTrainDataButton.Text = "Обучения";
             this.loadTrainDataButton.Click += new System.EventHandler(this.loadTrainDataButton_Click);
             // 
@@ -494,6 +516,7 @@ namespace Neural
             this.Column5,
             this.Column6,
             this.Column7,
+            this.probabilisticCol,
             this.Column8,
             this.Column9,
             this.Column10,
@@ -504,54 +527,6 @@ namespace Neural
             this.lastRunsGridView.RowHeadersVisible = false;
             this.lastRunsGridView.Size = new System.Drawing.Size(658, 207);
             this.lastRunsGridView.TabIndex = 0;
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Итерация";
-            this.Column5.Name = "Column5";
-            this.Column5.Width = 81;
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Ошибка";
-            this.Column6.Name = "Column6";
-            this.Column6.Width = 72;
-            // 
-            // Column7
-            // 
-            this.Column7.HeaderText = "Валидация";
-            this.Column7.Name = "Column7";
-            this.Column7.Width = 87;
-            // 
-            // Column8
-            // 
-            this.Column8.HeaderText = "Алгоритм";
-            this.Column8.Name = "Column8";
-            this.Column8.Width = 80;
-            // 
-            // Column9
-            // 
-            this.Column9.HeaderText = "Топология";
-            this.Column9.Name = "Column9";
-            this.Column9.Width = 85;
-            // 
-            // Column10
-            // 
-            this.Column10.HeaderText = "Альфа";
-            this.Column10.Name = "Column10";
-            this.Column10.Width = 65;
-            // 
-            // Column11
-            // 
-            this.Column11.HeaderText = "Коэф.обучения";
-            this.Column11.Name = "Column11";
-            this.Column11.Width = 110;
-            // 
-            // Column12
-            // 
-            this.Column12.HeaderText = "Момент";
-            this.Column12.Name = "Column12";
-            this.Column12.Width = 70;
             // 
             // zedGraphControl1
             // 
@@ -587,9 +562,9 @@ namespace Neural
             // maxIterationsBox
             // 
             this.maxIterationsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.maxIterationsBox.Location = new System.Drawing.Point(122, 75);
+            this.maxIterationsBox.Location = new System.Drawing.Point(127, 75);
             this.maxIterationsBox.Name = "maxIterationsBox";
-            this.maxIterationsBox.Size = new System.Drawing.Size(66, 21);
+            this.maxIterationsBox.Size = new System.Drawing.Size(61, 21);
             this.maxIterationsBox.TabIndex = 5;
             // 
             // label14
@@ -604,9 +579,9 @@ namespace Neural
             // maxNeuronsInLayerBox
             // 
             this.maxNeuronsInLayerBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.maxNeuronsInLayerBox.Location = new System.Drawing.Point(122, 47);
+            this.maxNeuronsInLayerBox.Location = new System.Drawing.Point(127, 47);
             this.maxNeuronsInLayerBox.Name = "maxNeuronsInLayerBox";
-            this.maxNeuronsInLayerBox.Size = new System.Drawing.Size(66, 21);
+            this.maxNeuronsInLayerBox.Size = new System.Drawing.Size(61, 21);
             this.maxNeuronsInLayerBox.TabIndex = 3;
             // 
             // label13
@@ -621,28 +596,82 @@ namespace Neural
             // validationLevelBox
             // 
             this.validationLevelBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.validationLevelBox.Location = new System.Drawing.Point(122, 19);
+            this.validationLevelBox.Location = new System.Drawing.Point(127, 19);
             this.validationLevelBox.Name = "validationLevelBox";
-            this.validationLevelBox.Size = new System.Drawing.Size(66, 21);
+            this.validationLevelBox.Size = new System.Drawing.Size(61, 21);
             this.validationLevelBox.TabIndex = 1;
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(5, 23);
+            this.label12.Location = new System.Drawing.Point(4, 21);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(112, 13);
+            this.label12.Size = new System.Drawing.Size(124, 13);
             this.label12.TabIndex = 0;
-            this.label12.Text = "Уровень валидации:";
+            this.label12.Text = "Уровень обучения(%):";
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // Column5
+            // 
+            this.Column5.HeaderText = "Итерация";
+            this.Column5.Name = "Column5";
+            this.Column5.Width = 81;
+            // 
+            // Column6
+            // 
+            this.Column6.HeaderText = "Ошибка";
+            this.Column6.Name = "Column6";
+            this.Column6.Width = 72;
+            // 
+            // Column7
+            // 
+            this.Column7.HeaderText = "Валидация(модуль)";
+            this.Column7.Name = "Column7";
+            this.Column7.Width = 132;
+            // 
+            // probabilisticCol
+            // 
+            this.probabilisticCol.HeaderText = "Валидация(вер.)";
+            this.probabilisticCol.Name = "probabilisticCol";
+            this.probabilisticCol.Width = 117;
+            // 
+            // Column8
+            // 
+            this.Column8.HeaderText = "Алгоритм";
+            this.Column8.Name = "Column8";
+            this.Column8.Width = 80;
+            // 
+            // Column9
+            // 
+            this.Column9.HeaderText = "Топология";
+            this.Column9.Name = "Column9";
+            this.Column9.Width = 85;
+            // 
+            // Column10
+            // 
+            this.Column10.HeaderText = "Альфа";
+            this.Column10.Name = "Column10";
+            this.Column10.Width = 65;
+            // 
+            // Column11
+            // 
+            this.Column11.HeaderText = "Коэф.обучения";
+            this.Column11.Name = "Column11";
+            this.Column11.Width = 110;
+            // 
+            // Column12
+            // 
+            this.Column12.HeaderText = "Момент";
+            this.Column12.Name = "Column12";
+            this.Column12.Width = 70;
+            // 
             // LearnNetForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
-            this.ClientSize = new System.Drawing.Size(906, 582);
+            this.ClientSize = new System.Drawing.Size(906, 621);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox5);
@@ -675,8 +704,8 @@ namespace Neural
 
         private GroupBox groupBox5;
         private TextBox errorPercent;
-        private Label label7;
-        private TextBox validErrorBox;
+        private Label mLabel;
+        private TextBox moduleValidBox;
         private SaveFileDialog saveFileDialog1;
         private MenuStrip menuStrip1;
         private GroupBox groupBox2;
@@ -704,14 +733,6 @@ namespace Neural
         private TextBox neuronsBox;
         private Label label11;
         private DataGridView lastRunsGridView;
-        private DataGridViewTextBoxColumn Column5;
-        private DataGridViewTextBoxColumn Column6;
-        private DataGridViewTextBoxColumn Column7;
-        private DataGridViewTextBoxColumn Column8;
-        private DataGridViewTextBoxColumn Column9;
-        private DataGridViewTextBoxColumn Column10;
-        private DataGridViewTextBoxColumn Column11;
-        private DataGridViewTextBoxColumn Column12;
         private GroupBox groupBox6;
         private TextBox maxIterationsBox;
         private Label label14;
@@ -722,6 +743,17 @@ namespace Neural
         private ToolStripMenuItem crossValidToolStripMenuItem;
         private IContainer components;
         private OpenFileDialog openFileDialog1;
+        private Label pLabel;
+        private TextBox probabilisticValidBox;
+        private DataGridViewTextBoxColumn Column5;
+        private DataGridViewTextBoxColumn Column6;
+        private DataGridViewTextBoxColumn Column7;
+        private DataGridViewTextBoxColumn probabilisticCol;
+        private DataGridViewTextBoxColumn Column8;
+        private DataGridViewTextBoxColumn Column9;
+        private DataGridViewTextBoxColumn Column10;
+        private DataGridViewTextBoxColumn Column11;
+        private DataGridViewTextBoxColumn Column12;
 
     }
 }

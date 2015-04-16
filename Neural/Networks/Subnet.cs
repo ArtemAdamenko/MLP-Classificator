@@ -13,6 +13,7 @@ namespace Neural
         public List<String> outputAssosiated;
         public List<double> res;
         public double quality = 0.0;
+        public double probabilistic = 0.0;
         public int[] topology;
 
         public Subnet(Network network)

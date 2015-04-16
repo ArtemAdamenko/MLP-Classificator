@@ -290,22 +290,7 @@ namespace Neural
             }
         }
 
-        //Вызов потока загрузки выборки
-        private void LoadDataToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (this.selectedType == "classification")
-            {
-                Worker = new Thread(getDataForClass);
-            }
-            else if (this.selectedType == "regression")
-            {
-                Worker = new Thread(getDataForRegression);
-            }
-            Worker.SetApartmentState(ApartmentState.STA);
-            Worker.Start();
-            this.testNetButton.Enabled = true;
-        }
-
+        //поиск наиболее вероятного класса
         private int max(double[] mass)
         {
             int classificator = 0;
@@ -321,7 +306,7 @@ namespace Neural
             return classificator;
         }
 
-        //запуск тестирования сетиs
+        //запуск тестирования сети
         private double testing()
         {
             double[] res;
@@ -341,7 +326,8 @@ namespace Neural
                             input[i] = data[count, i];
                         }
                         res = network.Compute(input);
-                        double value = Math.Abs(classes[count] - this.max(res));
+                        double output = this.max(res);
+                        double value = Math.Abs(classes[count] - output);
 
                         validate += value;
                     }
@@ -380,7 +366,7 @@ namespace Neural
 
         }
 
-        //Процент ошибки при тестировании на выбранной выборке
+        //Запуск тестирования сети, с желаемым классом
         private void testNetButton_Click(object sender, EventArgs e)
         {
             //проверка откл/вкл нейронов
@@ -502,7 +488,7 @@ namespace Neural
             }
         }
 
-        //load data for regression
+        //load data for regression !!OFF
         private void getDataForRegression()
         {
             // show file selection dialog
@@ -576,7 +562,7 @@ namespace Neural
 
         }
 
-       //Запуск автоматическго отключения нейронов
+       //Запуск автоматическго отключения нейронов !!!!FIX
         private void startOffNeuronsButton_Click(object sender, EventArgs e)
         {
             int begin = 0;
@@ -926,6 +912,7 @@ namespace Neural
             }
         }
 
+        //загрузка окна
         private void FormDrawNeurons_Load(object sender, EventArgs e)
         {
             HelloForm form = this.Owner as HelloForm;
@@ -945,9 +932,203 @@ namespace Neural
             }
         }
 
+        //остановка отлючения нейронов
         private void stopButton_Click(object sender, EventArgs e)
         {
             needToStop = true;
+        }
+
+        //выбор опции Тестирующего вектора
+        private void тестToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.selectedType == "classification")
+            {
+                Worker = new Thread(getDataForClass);
+            }
+            else if (this.selectedType == "regression")
+            {
+                Worker = new Thread(getDataForRegression);
+            }
+            Worker.SetApartmentState(ApartmentState.STA);
+            Worker.Start();
+            this.testNetButton.Enabled = true;
+            this.outputVectorButton.Enabled = false;
+        }
+
+        //выбор опции Входной вектор
+        private void входнойВекторToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.selectedType == "classification")
+            {
+                Worker = new Thread(getDataForClassCompute);
+            }
+            else if (this.selectedType == "regression")
+            {
+                Worker = new Thread(getDataForRegression);
+            }
+            Worker.SetApartmentState(ApartmentState.STA);
+            Worker.Start();
+            this.testNetButton.Enabled = false;
+            this.outputVectorButton.Enabled = true;
+
+        }
+
+        //загрузка входного вектора без желаемого класса
+        private void getDataForClassCompute()
+        {
+            // show file selection dialog
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader reader = null;
+                int i = 0;
+                try
+                {
+                    // open selected file
+                    reader = File.OpenText(openFileDialog1.FileName);
+
+                    //get row count values
+                    String line;
+                    rowCountData = 0;
+                    colCountData = 0;
+
+                    //get input and output count
+                    line = reader.ReadLine();
+                    rowCountData++;
+                    //-1 last element empty
+                    colCountData = line.Trim().Split(';').Length;
+
+                    //mass for new normalization cols input data
+                    double[] minData = new double[colCountData];
+                    double[] maxData = new double[colCountData];
+
+                    //must be > 1 column in training data
+                    if (colCountData == 1)
+                        throw new Exception();
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        rowCountData++;
+                    }
+
+                    double[,] tempData = new double[rowCountData, colCountData];
+
+                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    line = "";
+
+                    while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
+                    {
+                        string[] strs = line.Trim().Split(';');
+                        List<String> inputVals = new List<String>(strs);
+
+                        //del empty values in the end
+                        inputVals.RemoveAll(str => String.IsNullOrEmpty(str));
+
+                        // parse input and output values for learning
+                        for (int j = 0; j < colCountData; j++)
+                        {
+                            tempData[i, j] = double.Parse(inputVals[j]);
+
+                            //search min/max values for each column
+                            if (tempData[i, j] < minData[j])
+                                minData[j] = tempData[i, j];
+                            if (tempData[i, j] > maxData[j])
+                                maxData[j] = tempData[i, j];
+                        }
+
+
+                        i++;
+                    }
+
+                    //normalization input values
+                    for (int row = 0; row < rowCountData; row++)
+                    {
+                        for (int column = 0; column < colCountData; column++)
+                        {
+                            tempData[row, column] = (((tempData[row, column] - minData[column]) * 1 / (maxData[column] - minData[column])));
+
+                        }
+                    }
+
+                    // allocate and set data
+                    data = new double[i, colCountData];
+                    Array.Copy(tempData, 0, data, 0, i * colCountData);
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message, "Ошибка на  " + i.ToString() + " строке", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                finally
+                {
+                    // close file
+                    if (reader != null)
+                        reader.Close();
+                }
+
+            }
+        }
+
+        //запуск просчет выходного вектора
+        private void outputVectorButton_Click(object sender, EventArgs e)
+        {
+            //проверка откл/вкл нейронов
+            this.CheckNeurons();
+            //тестирование
+            this.getOutputVector();
+        }
+
+        //просчет выходного вектора на основе входного, не используется желаемый класс
+        private void getOutputVector()
+        {
+            double[] res;
+            double[] input = new double[colCountData];
+
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Test") + "\\OutVector_" + LogHelper.getTime() + ".csv"))
+                if (this.selectedType == "classification")
+                {
+                    for (int count = 0; count < data.GetLength(0) - 1; count++)
+                    {
+                        try
+                        {
+                            //gather inputs for compute, n-1 inputs
+                            for (int i = 0; i < colCountData; i++)
+                            {
+                                input[i] = data[count, i];
+                            }
+                            res = network.Compute(input);
+                            double output = this.max(res);
+                            file.WriteLine(output.ToString() + ";");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        }
+
+                    }
+                }
+
+                else if (this.selectedType == "regression")
+                {
+                    /* double testError = 0.0;
+                     double[] input = new double[colCountData - 1];
+
+                     for (int i = 0; i < data.GetLength(0); i++)
+                     {
+                         //gather inputs for compute, n-1 inputs
+                         for (int j = 0; j < colCountData - 1; j++)
+                         {
+                             input[j] = data[i, j];
+                         }
+                         testError += Math.Abs(network.Compute(input)[0] - data[i, colCountData - 1]);
+                     }
+                     this.errorTextBox.Text = (testError / data.GetLength(0)).ToString("F10");
+
+                     */
+                }
+            MessageBox.Show("Выходной вектор сформирован.");
+
         }
 
     }
