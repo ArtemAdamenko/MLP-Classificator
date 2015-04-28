@@ -34,26 +34,35 @@ namespace Neural
             return pathToLog;
         }
 
-        public static void Write(String msg, String fileName)
+        public static void WriteEvo(string path, Subnet net, string parents = "")
         {
             try
             {
                 // Путь .\\Log
-                string pathToLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log");
+                string pathToLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path.ToString());
                 if (!Directory.Exists(pathToLog))
                     Directory.CreateDirectory(pathToLog); // Создаем директорию, если нужно
-                string filename = Path.Combine(pathToLog, string.Format("{0}_{1:dd.MM.yyy}.csv",
-                AppDomain.CurrentDomain.FriendlyName, DateTime.Now));
-                string fullText = string.Format(msg);
-                lock (sync)
-                {
-                    File.AppendAllText(filename, fullText+ ";" + Environment.NewLine, Encoding.GetEncoding("Windows-1251"));
-                }
+                string filename = Path.Combine(pathToLog, net.ID + "_" + parents + "_" + net.quality + ".csv");
+
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(filename))
+                    for (int i = 0; i < net.Network.Layers.Length; i++)
+                    {
+                        for (int j = 0; j < net.Network.Layers[i].Neurons.Length; j++)
+                        {
+                            for (int k = 0; k < net.Network.Layers[i].Neurons[j].Weights.Length; k++)
+                            {
+
+                                file.WriteLine("L[" + i.ToString() + "]N[" + j.ToString() + "]W[" + k.ToString() + "];" + net.Network.Layers[i].Neurons[j].Weights[k] + ";");
+
+                            }
+                        }
+                    }
             }
             catch
             {
                 // Перехватываем все и ничего не делаем
             }
         }
+
     }
 }

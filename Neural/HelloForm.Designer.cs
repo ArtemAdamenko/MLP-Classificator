@@ -32,11 +32,10 @@
             this.RegressionButton = new System.Windows.Forms.Button();
             this.classificationButton = new System.Windows.Forms.Button();
             this.actionsBox = new System.Windows.Forms.GroupBox();
+            this.correctButton = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.createButton = new System.Windows.Forms.Button();
-            this.nextButton = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.correctButton = new System.Windows.Forms.Button();
             this.typeLearningBox.SuspendLayout();
             this.actionsBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -90,6 +89,17 @@
             this.actionsBox.TabStop = false;
             this.actionsBox.Text = "Операции";
             // 
+            // correctButton
+            // 
+            this.correctButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.correctButton.Location = new System.Drawing.Point(6, 80);
+            this.correctButton.Name = "correctButton";
+            this.correctButton.Size = new System.Drawing.Size(188, 23);
+            this.correctButton.TabIndex = 4;
+            this.correctButton.Text = "Корректировать сеть";
+            this.correctButton.UseVisualStyleBackColor = true;
+            this.correctButton.Click += new System.EventHandler(this.correctButton_Click);
+            // 
             // button2
             // 
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -112,18 +122,6 @@
             this.createButton.UseVisualStyleBackColor = true;
             this.createButton.Click += new System.EventHandler(this.createButton_Click);
             // 
-            // nextButton
-            // 
-            this.nextButton.Enabled = false;
-            this.nextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.nextButton.Location = new System.Drawing.Point(375, 283);
-            this.nextButton.Name = "nextButton";
-            this.nextButton.Size = new System.Drawing.Size(75, 23);
-            this.nextButton.TabIndex = 2;
-            this.nextButton.Text = "Далее";
-            this.nextButton.UseVisualStyleBackColor = true;
-            this.nextButton.Click += new System.EventHandler(this.nextButton_Click);
-            // 
             // pictureBox1
             // 
             this.pictureBox1.BackgroundImage = global::Neural.Properties.Resources._1;
@@ -135,24 +133,12 @@
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
             // 
-            // correctButton
-            // 
-            this.correctButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.correctButton.Location = new System.Drawing.Point(6, 80);
-            this.correctButton.Name = "correctButton";
-            this.correctButton.Size = new System.Drawing.Size(188, 23);
-            this.correctButton.TabIndex = 4;
-            this.correctButton.Text = "Корректировать сеть";
-            this.correctButton.UseVisualStyleBackColor = true;
-            this.correctButton.Click += new System.EventHandler(this.correctButton_Click);
-            // 
             // HelloForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(483, 321);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.nextButton);
             this.Controls.Add(this.actionsBox);
             this.Controls.Add(this.typeLearningBox);
             this.Name = "HelloForm";
@@ -172,7 +158,6 @@
         private System.Windows.Forms.GroupBox actionsBox;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button createButton;
-        private System.Windows.Forms.Button nextButton;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button correctButton;
     }

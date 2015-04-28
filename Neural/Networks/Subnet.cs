@@ -15,10 +15,13 @@ namespace Neural
         public double quality = 0.0;
         public double probabilistic = 0.0;
         public int[] topology;
+        private static int _ID = 0;
+        public int ID;
 
         public Subnet(Network network)
         {
-
+            _ID++;
+            this.ID = _ID;
             this.network = network;
             this.topology = new int[this.network.Layers.Length];
 
@@ -26,6 +29,7 @@ namespace Neural
             {
                 topology[layer] = this.network.Layers[layer].Neurons.Length;
             }
+            
 
         }
 

@@ -19,7 +19,7 @@ namespace Neural
             InitializeComponent();
         }
 
-        private void nextButton_Click(object sender, EventArgs e)
+        private void start()
         {
             if (typeLearn != "")
             {
@@ -40,7 +40,6 @@ namespace Neural
                 }
                 this.classificationButton.Enabled = false;
                 this.RegressionButton.Enabled = false;
-                this.nextButton.Enabled = false;
             }
             
         }
@@ -62,13 +61,13 @@ namespace Neural
         private void classificationButton_Click(object sender, EventArgs e)
         {
             typeLearn = "classification";
-            this.nextButton.Enabled = true;
+            start();
         }
 
         private void RegressionButton_Click(object sender, EventArgs e)
         {
             typeLearn = "regression";
-            this.nextButton.Enabled = true;
+            start();
         }
 
         private void correctButton_Click(object sender, EventArgs e)

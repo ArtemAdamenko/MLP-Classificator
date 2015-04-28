@@ -45,7 +45,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.betterBox = new System.Windows.Forms.TextBox();
             this.PopulationBox = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.stopButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
             this.label5 = new System.Windows.Forms.Label();
@@ -57,9 +57,14 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.timeLabel = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
             this.moduleErrorBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.populationLabel = new System.Windows.Forms.Label();
+            this.populationtextBox = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.popultextBox = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -73,9 +78,9 @@
             // 
             this.panel1.AutoScroll = true;
             this.panel1.Controls.Add(this.pictureBox2);
-            this.panel1.Location = new System.Drawing.Point(336, 30);
+            this.panel1.Location = new System.Drawing.Point(336, 37);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(714, 218);
+            this.panel1.Size = new System.Drawing.Size(714, 252);
             this.panel1.TabIndex = 1;
             // 
             // pictureBox2
@@ -84,7 +89,7 @@
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox2.Location = new System.Drawing.Point(3, 3);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(708, 212);
+            this.pictureBox2.Size = new System.Drawing.Size(708, 246);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox2.TabIndex = 0;
             this.pictureBox2.TabStop = false;
@@ -157,7 +162,7 @@
             // 
             this.panel2.AutoScroll = true;
             this.panel2.Controls.Add(this.pictureBox1);
-            this.panel2.Location = new System.Drawing.Point(336, 254);
+            this.panel2.Location = new System.Drawing.Point(333, 300);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(714, 296);
             this.panel2.TabIndex = 28;
@@ -166,7 +171,7 @@
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox1.Location = new System.Drawing.Point(0, 6);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(705, 290);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -211,16 +216,16 @@
             this.PopulationBox.Size = new System.Drawing.Size(37, 21);
             this.PopulationBox.TabIndex = 36;
             // 
-            // button2
+            // stopButton
             // 
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(242, 92);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(73, 23);
-            this.button2.TabIndex = 37;
-            this.button2.Text = "Стоп";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.stopButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopButton.Location = new System.Drawing.Point(242, 92);
+            this.stopButton.Name = "stopButton";
+            this.stopButton.Size = new System.Drawing.Size(73, 23);
+            this.stopButton.TabIndex = 37;
+            this.stopButton.Text = "Стоп";
+            this.stopButton.UseVisualStyleBackColor = true;
+            this.stopButton.Click += new System.EventHandler(this.button2_Click);
             // 
             // label2
             // 
@@ -234,7 +239,7 @@
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.zedGraphControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.zedGraphControl1.Location = new System.Drawing.Point(12, 257);
+            this.zedGraphControl1.Location = new System.Drawing.Point(12, 303);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
             this.zedGraphControl1.ScrollMaxX = 0D;
@@ -306,12 +311,12 @@
             this.groupBox1.Controls.Add(this.mediumErrorPopulationBox);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.covariationPopulationBox);
-            this.groupBox1.Controls.Add(this.button2);
+            this.groupBox1.Controls.Add(this.stopButton);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.betterPopulationValueBox);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.subNetButton);
-            this.groupBox1.Location = new System.Drawing.Point(12, 130);
+            this.groupBox1.Location = new System.Drawing.Point(12, 168);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(318, 121);
             this.groupBox1.TabIndex = 49;
@@ -328,6 +333,11 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label9);
+            this.groupBox2.Controls.Add(this.popultextBox);
+            this.groupBox2.Controls.Add(this.label8);
+            this.groupBox2.Controls.Add(this.populationtextBox);
+            this.groupBox2.Controls.Add(this.populationLabel);
             this.groupBox2.Controls.Add(this.moduleErrorBox);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label7);
@@ -340,19 +350,10 @@
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(12, 27);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(318, 97);
+            this.groupBox2.Size = new System.Drawing.Size(318, 135);
             this.groupBox2.TabIndex = 50;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Показания";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(212, 58);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(95, 13);
-            this.label7.TabIndex = 40;
-            this.label7.Text = "Текущий процесс";
             // 
             // moduleErrorBox
             // 
@@ -373,12 +374,66 @@
             this.label3.TabIndex = 41;
             this.label3.Text = "% По модулю: ";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(212, 58);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(95, 13);
+            this.label7.TabIndex = 40;
+            this.label7.Text = "Текущий процесс";
+            // 
+            // populationLabel
+            // 
+            this.populationLabel.AutoSize = true;
+            this.populationLabel.Location = new System.Drawing.Point(4, 95);
+            this.populationLabel.Name = "populationLabel";
+            this.populationLabel.Size = new System.Drawing.Size(103, 13);
+            this.populationLabel.TabIndex = 43;
+            this.populationLabel.Text = "Кол-во популяций:";
+            // 
+            // populationtextBox
+            // 
+            this.populationtextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.populationtextBox.Location = new System.Drawing.Point(103, 92);
+            this.populationtextBox.Name = "populationtextBox";
+            this.populationtextBox.Size = new System.Drawing.Size(37, 21);
+            this.populationtextBox.TabIndex = 44;
+            this.populationtextBox.Text = "2";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(148, 95);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(74, 13);
+            this.label8.TabIndex = 45;
+            this.label8.Text = "в каждом по:";
+            // 
+            // popultextBox
+            // 
+            this.popultextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.popultextBox.Location = new System.Drawing.Point(227, 92);
+            this.popultextBox.Name = "popultextBox";
+            this.popultextBox.Size = new System.Drawing.Size(36, 21);
+            this.popultextBox.TabIndex = 46;
+            this.popultextBox.Text = "3";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(267, 95);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(45, 13);
+            this.label9.TabIndex = 47;
+            this.label9.Text = "Скрещ.";
+            // 
             // FormDrawCorrectNeurons
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1062, 562);
+            this.ClientSize = new System.Drawing.Size(1062, 608);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.zedGraphControl1);
@@ -423,7 +478,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox betterBox;
         private System.Windows.Forms.TextBox PopulationBox;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.Label label2;
         private ZedGraph.ZedGraphControl zedGraphControl1;
         private System.Windows.Forms.Label label5;
@@ -438,5 +493,10 @@
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.TextBox moduleErrorBox;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label populationLabel;
+        private System.Windows.Forms.TextBox popultextBox;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox populationtextBox;
+        private System.Windows.Forms.Label label9;
     }
 }
