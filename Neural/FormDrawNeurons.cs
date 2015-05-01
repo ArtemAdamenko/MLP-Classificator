@@ -617,11 +617,20 @@ namespace Neural
 
             try
             {
-                //TO DO fix
-               /* if ((beginNeuron + beginLayer) > (endNeuron + endLayer))
+                if (beginLayer <= endLayer)
+                {
+                    if (beginLayer == endLayer)
+                    {
+                        if (beginNeuron >= endNeuron)
+                        {
+                            throw new Exception();
+                        }
+                    }
+                }
+                else
                 {
                     throw new Exception();
-                }*/
+                }
                 
             }
             catch

@@ -28,6 +28,15 @@ namespace Neural
         private List<Record> tempRelationsValues = new List<Record>();
 
         #region Neural Net options
+            int input = 0;
+            int[] hidden;
+            int cntPopulation = 0;
+            int cntOfPopulationsPerStep = 0;
+            double alpha = 0.0;
+            double validQuality = 0.0;
+
+            int reconnectingCount = 0;
+
             private double[,] data = null;
             private int[] classes;
             List<int> classesList = new List<int>();
@@ -58,6 +67,34 @@ namespace Neural
             myPane.YAxis.Title.Text = "Процент правильных ответов";
             myPane.XAxis.Scale.MajorStep = 10;
 
+            this.checkTopology();
+
+        }
+
+        private void checkTopology()
+        {
+            //if string not empty and if string topology contain minimum 2 not empty values
+            if ((this.subnetTopologyBox.Text != "") && (this.subnetTopologyBox.Text.Split(',').Where(n => !string.IsNullOrEmpty(n)).ToArray().Length > 1))
+            {
+                string[] topology = this.subnetTopologyBox.Text.Split(',').Where(n => !string.IsNullOrEmpty(n)).ToArray();
+                int input = Int32.Parse(topology[0]);
+                int output = Int32.Parse(topology[topology.Length - 1]);
+                int[] hiddens = new int[topology.Length - 1];
+                int hiddenLayer = 0;
+
+                for (int i = 1; i <= topology.Length - 1; i++)
+                {
+                    hiddens[hiddenLayer] = Int32.Parse(topology[i]);
+                    hiddenLayer++;
+                }
+                this.input = input;
+                this.hidden = hiddens;
+
+                this.relationsLabel.Text = "(" + (input + output).ToString() + ")";
+            }
+            else {
+                this.relationsLabel.Text = "(0)";
+            }
         }
 
         //получение всех доступных связей для подсоединения(входы)   
@@ -618,21 +655,109 @@ namespace Neural
             HelloForm form = this.Owner as HelloForm;
             this.selectedType = form.typeLearn;
         }
+        
+        //запись конфигурации подсоединение подсети к основной ИНС в файл
+        private void connectingSubNetReport(List<String> inputConnected, List<String> outputConnected, String path, int connectingCount)
+        {
+            Workbook connects = new Workbook();
+            Worksheet connSheetInput = new Worksheet("Подсоединенные входы подсетей");
+            Worksheet connSheetOutput = new Worksheet("Подсоединенные выходы подсетей");
 
+            // Путь .\\Log
+            string pathToLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path.ToString());
+            if (!Directory.Exists(pathToLog))
+                Directory.CreateDirectory(pathToLog); // Создаем директорию, если нужно
+            string filename = Path.Combine(pathToLog, "connects_" + connectingCount + ".csv");
+
+            connSheetInput.Cells[0, 0] = new Cell("Индекс");
+            connSheetInput.Cells[0, 1] = new Cell("Слой");
+            connSheetInput.Cells[0, 2] = new Cell("Нейрон");
+            connSheetInput.Cells[0, 3] = new Cell("Связь");
+
+            connSheetOutput.Cells[0, 0] = new Cell("Индекс");
+            connSheetOutput.Cells[0, 1] = new Cell("Слой");
+            connSheetOutput.Cells[0, 2] = new Cell("Нейрон");
+            connSheetOutput.Cells[0, 3] = new Cell("Связь");
+
+            for (int i = 0; i < inputConnected.Count; i++)
+            {
+                connSheetInput.Cells[i + 1, 0] = new Cell(i.ToString());
+                connSheetInput.Cells[i + 1, 1] = new Cell(inputConnected[i].Split(':')[0]);
+                connSheetInput.Cells[i + 1, 2] = new Cell(inputConnected[i].Split(':')[1]);
+                connSheetInput.Cells[i + 1, 3] = new Cell(inputConnected[i].Split(':')[2]);
+            }
+
+            for (int i = 0; i < outputConnected.Count; i++)
+            {
+                connSheetOutput.Cells[i + 1, 0] = new Cell(i.ToString());
+                connSheetOutput.Cells[i + 1, 1] = new Cell(outputConnected[i].Split(':')[0]);
+                connSheetOutput.Cells[i + 1, 2] = new Cell(outputConnected[i].Split(':')[1]);
+                connSheetOutput.Cells[i + 1, 3] = new Cell(outputConnected[i].Split(':')[2]);
+            }
+
+            connects.Worksheets.Add(connSheetInput);
+            connects.Worksheets.Add(connSheetOutput);
+            connects.Save(filename);
+
+        }
+
+        private void checkOptions()
+        {
+            
+            try
+            {
+                this.cntPopulation  = Math.Max(1, Math.Min(100, Int32.Parse(populationtextBox.Text)));
+            }
+            catch
+            {
+                this.cntPopulation = 2;
+            }
+
+            try
+            {
+                this.cntOfPopulationsPerStep = Math.Max(1, Math.Min(100, Int32.Parse(popultextBox.Text)));
+            }
+            catch
+            {
+                this.cntOfPopulationsPerStep = 2;
+            }
+            try
+            {
+                this.alpha = Math.Max(0, Math.Min(2.0, double.Parse(alphaBox.Text)));
+            }
+            catch
+            {
+                this.alpha = 2.0;
+            }
+            try
+            {
+                this.validQuality = Math.Max(0, Math.Min(100, double.Parse(validLevelBox.Text)));
+            }
+            catch
+            {
+                this.validQuality = 75;
+            }
+
+            this.populationtextBox.Invoke(new Action(() => this.populationtextBox.Text =  this.cntPopulation.ToString()));
+            this.popultextBox.Invoke(new Action(() => this.popultextBox.Text = this.cntOfPopulationsPerStep.ToString()));
+            this.alphaBox.Invoke(new Action(() => this.alphaBox.Text = this.alpha.ToString()));
+            this.validLevelBox.Invoke(new Action(() => this.validLevelBox.Text = this.validQuality.ToString()));
+        }
         //генерация подсетей
         private void GenerateSubNets()
         {
+            this.checkOptions();
+
+            Subnet._ID = 0;
+            this.reconnectingCount = 0;
+
             double[] commonNetQuality = this.testing();
             zedGraphControl1.GraphPane.CurveList[0].Clear();
             zedGraphControl1.GraphPane.CurveList[1].Clear();
             //create subnet  
             Random rnd = new Random();
-            int input = 20;
-           // int hidden = rnd.Next(1, 20);
-            int hidden = 30;
-            int output = 20;
 
-            Subnet subnet1 = new Subnet(new ActivationNetwork(new SigmoidFunction(2.0), input, hidden, output));
+            Subnet subnet1 = new Subnet(new ActivationNetwork(new SigmoidFunction(this.alpha), this.input, this.hidden));
             List<Subnet> subnets = new List<Subnet>();
             
   
@@ -657,7 +782,7 @@ namespace Neural
             List<String> outputSubnet = new List<String>(),
                 connectedOutputNeurons = new List<String>();
 
-            for (int outputNeuron = 0; outputNeuron < output; )
+            for (int outputNeuron = 0; outputNeuron < this.hidden[this.hidden.Length-1]; )
             {
 
                 int rndRelation = rnd.Next(0, availableRelations.Count);
@@ -668,19 +793,21 @@ namespace Neural
                 outputNeuron++;
             }
 
+            this.currentFolder = "Evolution\\" + LogHelper.getTime();
+            this.connectingSubNetReport(connectedInputNeurons, connectedOutputNeurons, this.currentFolder, this.reconnectingCount);
+
             this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
             this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
 
             this.label2.Invoke(new Action(() => this.label2.Text = "Отбор..."));
-            currentFolder = "Evolution\\" + LogHelper.getTime();
+            
 
-            double tempQuality = 0.0;
-            double betterQuality = 0.0;
+            double currentQuality = 0.0;
             DateTime t = DateTime.Now;
 
             while (!needToStop)
             {
-                ActivationNetwork network = new ActivationNetwork(new BipolarSigmoidFunction(2.0), input, hidden, output);
+                ActivationNetwork network = new ActivationNetwork(new SigmoidFunction(this.alpha), input, hidden);
 
                 NguyenWidrow initializer = new NguyenWidrow(network);
                 initializer.Randomize(0);
@@ -705,32 +832,65 @@ namespace Neural
                 //window in 100 elements
                 if (subnets.Count == 100)
                 {
-                    tempQuality = this.evolution(subnets, connectedInputNeurons, connectedOutputNeurons);
+                    currentQuality = this.evolution(subnets, connectedInputNeurons, connectedOutputNeurons);
                     this.test();
-
-                    if (tempQuality > betterQuality)
-                        betterQuality = tempQuality;
 
                     subnets.Clear();
                     zedGraphControl1.GraphPane.CurveList[0].Clear();
                     zedGraphControl1.GraphPane.CurveList[1].Clear();
 
-                    if (betterQuality < 90.0)
+                    if ((this.validQuality > currentQuality) && !needToStop)
                     {                     //get one connection and set one random new connection for find optimization connecteds
-                        for (int k = 0; k < 50; k++)
+                        int reconnected = Int32.Parse(reconnectBox.Text);
+                        Random random = new Random();
+
+                        List<String> tempNewInputs = new List<String>();
+                        List<String> tempNewOutputs = new List<String>();
+                        List<String> tempOlds = new List<String>();
+
+                        for (int k = 0; k < reconnected; k++)
                         {
-                            int oldOutput = rnd.Next(0, connectedOutputNeurons.Count);
-                            String oldValue = connectedOutputNeurons[oldOutput];
-                            connectedOutputNeurons.RemoveAt(oldOutput);
+                            int temp = random.Next(0, 2);
+                            //or input conn reconn, or output conn reconn  - random
+                            if (temp == 0 && (connectedInputNeurons.Count >= 1))
+                            {
+                                int oldOutput = rnd.Next(0, connectedInputNeurons.Count);
+                                String oldValue = connectedInputNeurons[oldOutput];
+                                connectedInputNeurons.RemoveAt(oldOutput);
+                                tempOlds.Add(oldValue);
 
-                            //new connection output
-                            int newOutput = rnd.Next(0, availableRelations.Count);
-                            String newValue = availableRelations[newOutput];
-                            availableRelations.RemoveAt(newOutput);
+                                //new connection output
+                                int newOutput = rnd.Next(0, availableRelations.Count);
+                                String newValue = availableRelations[newOutput];
+                                availableRelations.RemoveAt(newOutput);
+                                tempNewInputs.Add(newValue);
 
-                            connectedOutputNeurons.Add(newValue);
-                            availableRelations.Add(oldValue);
+                                //connectedInputNeurons.Add(newValue);
+                                //availableRelations.Add(oldValue);
+                            }
+                            else if (temp == 1 && (connectedOutputNeurons.Count >= 1))
+                            {
+                                int oldOutput = rnd.Next(0, connectedOutputNeurons.Count);
+                                String oldValue = connectedOutputNeurons[oldOutput];
+                                connectedOutputNeurons.RemoveAt(oldOutput);
+                                tempOlds.Add(oldValue);
+
+                                //new connection output
+                                int newOutput = rnd.Next(0, availableRelations.Count);
+                                String newValue = availableRelations[newOutput];
+                                availableRelations.RemoveAt(newOutput);
+                                tempNewOutputs.Add(newValue);
+
+                                //connectedOutputNeurons.Add(newValue);
+                                //availableRelations.Add(oldValue);
+                            }
+
                         }
+                        connectedInputNeurons.AddRange(tempNewInputs);
+                        connectedOutputNeurons.AddRange(tempNewOutputs);
+                        availableRelations.AddRange(tempOlds);
+
+                        this.connectingSubNetReport(connectedInputNeurons, connectedOutputNeurons, this.currentFolder, ++this.reconnectingCount);
                     }
                     else {
                         needToStop = true;
@@ -791,8 +951,6 @@ namespace Neural
             double[] commonNetQuality = new double[2];
 
             int population = 0;
-            int cntOfPopulationsPerStep = Int32.Parse(this.popultextBox.Text);
-            int cntPopulation = Int32.Parse(this.populationtextBox.Text);
             
             while (localSubNets.Count > 0 && !needToStop)
             {
@@ -832,8 +990,8 @@ namespace Neural
                 //скрещивания окончилось
                 if (localSubNets.Count == 0)
                 {
-                    --cntOfPopulationsPerStep;
-                    if (cntOfPopulationsPerStep == 0)
+                    --this.cntOfPopulationsPerStep;
+                    if (this.cntOfPopulationsPerStep == 0)
                     {
                         population++;
 
@@ -872,11 +1030,10 @@ namespace Neural
 
                         startSubnets = new List<Subnet>(subnets);
                         cntOfPopulationsPerStep = Int32.Parse(this.popultextBox.Text); ;
-                        if (population == cntPopulation)
+                        if (population == this.cntPopulation)
                         {
-                            quality = mediumErrorForPopulation;
                             this.globalSubnet = subnets[0];
-                            return quality;
+                            return subnets[0].quality;
                         }
                     }
                     else
@@ -981,7 +1138,7 @@ namespace Neural
             int availableMutations = 0;
             Random rnd = new Random();
 
-            ActivationNetwork evoSubNet = new ActivationNetwork(new BipolarSigmoidFunction(2.0), net1.Network.InputsCount, net1.topology);
+            ActivationNetwork evoSubNet = new ActivationNetwork(new SigmoidFunction(this.alpha), net1.Network.InputsCount, net1.topology);
             NguyenWidrow ng = new NguyenWidrow(evoSubNet);
             ng.Randomize(0);
 
@@ -1120,6 +1277,11 @@ namespace Neural
         private void button2_Click(object sender, EventArgs e)
         {
             needToStop = true;
+        }
+
+        private void subnetTopologyBox_TextChanged(object sender, EventArgs e)
+        {
+            this.checkTopology();
         }
 
     }
