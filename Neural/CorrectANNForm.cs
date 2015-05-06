@@ -15,13 +15,14 @@ using ZedGraph;
 
 namespace Neural
 {
-    public partial class FormDrawCorrectNeurons : Form
+    public partial class CorrectANNForm : Form
     {
         //App options
         Network network = null;
         Thread Worker;
         Subnet globalSubnet;
         string currentFolder = "";
+        Boolean SpreadTest = false;
 
         private List<Record> MinMaxValues;
         private List<Record> relationsValues = new List<Record>();
@@ -40,7 +41,6 @@ namespace Neural
             private double[,] data = null;
             private int[] classes;
             List<int> classesList = new List<int>();
-            private String selectedType = "";
             private bool needToStop = false;
             int rowCountData = 0;
             int colCountData = 0;
@@ -53,7 +53,7 @@ namespace Neural
                 private Pen _myPen = new Pen(Color.Black);
         #endregion
 
-        public FormDrawCorrectNeurons()
+        public CorrectANNForm()
         {
             InitializeComponent();
 
@@ -318,14 +318,9 @@ namespace Neural
         //Вызов потока загрузки выборки
         private void LoadDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.selectedType == "classification")
-            {
-                Worker = new Thread(this.getDataForClass);
-            }
-            else if (this.selectedType == "regression")
-            {
-                Worker = new Thread(this.getDataForRegression);
-            }
+
+            Worker = new Thread(this.getDataForClass);
+
             Worker.SetApartmentState(ApartmentState.STA);
             Worker.Start();
             this.testNetButton.Enabled = true;
@@ -370,44 +365,43 @@ namespace Neural
             double[] input = new double[this.network.InputsCount];
             double[] res;
 
-            if (this.selectedType == "classification")
+
+            for (int count = 0; count < data.GetLength(0); count++)
             {
-                for (int count = 0; count < data.GetLength(0); count++)
+                try
                 {
-                    try
+                    //gather inputs for compute, n-1 inputs
+                    for (int i = 0; i < this.network.InputsCount; i++)
                     {
-                        //gather inputs for compute, n-1 inputs
-                        for (int i = 0; i < this.network.InputsCount; i++)
-                        {
-                            input[i] = data[count, i];
-                        }
-
-                        if (thisSubnet != null)
-                            res = this.network.Compute(input, thisSubnet, MinMaxValues);
-                        else
-                        {
-                            res = this.network.Compute(input);
-                            tempRelationsValues.AddRange(network.RelationsValues.ToArray());
-                        }
-
-                        this.MinMaxRelationsValues(tempRelationsValues);
-                        tempRelationsValues.Clear();
-                        //double value = Math.Abs(1 - res[classesList.IndexOf(classes[count])]);
-                        double value = Math.Abs(classes[count] - this.max(res));
-                        double valueP = 1 - res[classes[count]];
-
-
-                        probabilisticValidateError += valueP;
-                        moduleValidateError += value;
-
+                        input[i] = data[count, i];
                     }
-                    catch (Exception e)
+
+                    if (thisSubnet != null)
+                        res = this.network.Compute(input, thisSubnet, MinMaxValues);
+                    else
                     {
-                        MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
+                        res = this.network.Compute(input);
+                        tempRelationsValues.AddRange(network.RelationsValues.ToArray());
                     }
+
+                    this.MinMaxRelationsValues(tempRelationsValues);
+                    tempRelationsValues.Clear();
+                    //double value = Math.Abs(1 - res[classesList.IndexOf(classes[count])]);
+                    double value = Math.Abs(classes[count] - this.max(res));
+                    double valueP = 1 - res[classes[count]];
+
+
+                    probabilisticValidateError += valueP;
+                    moduleValidateError += value;
 
                 }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+                }
+
+
                 moduleTestQuality = (1 - (moduleValidateError / data.GetLength(0))) * 100;
                 this.moduleErrorBox.Invoke(new Action(() => this.moduleErrorBox.Text = moduleTestQuality.ToString("F6")));
                 probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
@@ -415,21 +409,6 @@ namespace Neural
 
             }
 
-            else if (this.selectedType == "regression")
-            {
-                /*double testError = 0.0;
-
-                for (int i = 0; i < data.GetLength(0); i++)
-                {
-                    //gather inputs for compute, n-1 inputs
-                    for (int j = 0; j < colCountData - 1; j++)
-                    {
-                        input[j] = data[i, j];
-                    }
-                    testError += Math.Abs(network.Compute(input)[0] - data[i, colCountData - 1]);
-                }
-                this.errorTextBox.Text = (testError / data.GetLength(0)).ToString("F10");*/
-            }
             return new double[2]{moduleTestQuality, probabilisticTestQuality};
  
         }
@@ -437,7 +416,7 @@ namespace Neural
         //Процент ошибки при тестировании на выбранной выборке
         private void testNetButton_Click(object sender, EventArgs e)
         {
-            this.test();
+            this.testing();
         }
 
         //load data for classification
@@ -559,80 +538,6 @@ namespace Neural
             return data;
         }
 
-        //load data for regression
-        private void getDataForRegression()
-        {
-            // show file selection dialog
-          /*  if (openFileDialog2.ShowDialog() == DialogResult.OK)
-            {
-                StreamReader reader = null;
-
-                try
-                {
-                    // open selected file
-                    reader = File.OpenText(openFileDialog2.FileName);
-
-                    //get row count values
-                    String line;
-                    rowCountData = 0;
-                    colCountData = 0;
-
-                    //get input and output count
-                    line = reader.ReadLine();
-                    rowCountData++;
-                    colCountData = line.Split(';').Length;
-
-                    //must be > 1 column in training data
-                    if (colCountData == 1)
-                        throw new Exception();
-
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        rowCountData++;
-                    }
-
-                    double[,] tempData = new double[rowCountData, colCountData];
-
-                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    line = "";
-                    int i = 0;
-
-                    // read the data
-                    while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
-                    {
-                        string[] strs = line.Split(';');
-                        // parse input and output values for learning
-                        //gather all values by cols
-                        for (int j = 0; j < colCountData; j++)
-                        {
-                            tempData[i, j] = double.Parse(strs[j]);
-                        }
-
-                        i++;
-                    }
-
-                    // allocate and set data
-                    data = new double[i, colCountData];
-                    Array.Copy(tempData, 0, data, 0, i * colCountData);
-
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Ошибка чтения файла", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                finally
-                {
-                    // close file
-                    if (reader != null)
-                        reader.Close();
-                }
-
-            }
-            this.testNetButton.Invoke(new Action(() => testNetButton.Enabled = true));*/
-
-        }
-
         //Кол-во связей в сети
         private int getCountOfWeights(Network network)
         {
@@ -650,11 +555,6 @@ namespace Neural
             return i;
         }
 
-        private void FormDrawCorrectNeurons_Load(object sender, EventArgs e)
-        {
-            HelloForm form = this.Owner as HelloForm;
-            this.selectedType = form.typeLearn;
-        }
         
         //запись конфигурации подсоединение подсети к основной ИНС в файл
         private void connectingSubNetReport(List<String> inputConnected, List<String> outputConnected, String path, int connectingCount)
@@ -701,6 +601,7 @@ namespace Neural
 
         }
 
+        //проверка входящих параметров
         private void checkOptions()
         {
             
@@ -793,8 +694,9 @@ namespace Neural
                 outputNeuron++;
             }
 
-            this.currentFolder = "Evolution\\" + LogHelper.getTime();
+            this.currentFolder = "Evolution\\" + LogHelper.getTime();   
             this.connectingSubNetReport(connectedInputNeurons, connectedOutputNeurons, this.currentFolder, this.reconnectingCount);
+            this.test();
 
             this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
             this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
@@ -833,7 +735,6 @@ namespace Neural
                 if (subnets.Count == 100)
                 {
                     currentQuality = this.evolution(subnets, connectedInputNeurons, connectedOutputNeurons);
-                    this.test();
 
                     subnets.Clear();
                     zedGraphControl1.GraphPane.CurveList[0].Clear();
@@ -894,6 +795,7 @@ namespace Neural
                     }
                     else {
                         needToStop = true;
+                        this.test();
                         break;
                     }
 
@@ -1095,42 +997,6 @@ namespace Neural
             return coefficients;
         }
 
-        //изменение весов в зависимости от результатов тестирования
-        /*private void trololo(Subnet subnet)
-        {
-            Network network = subnet.Network;
-            double quality = 0.0;
-            double tempQuality = 0.0;
-            double commonQuality = this.testing(subnet);
-
-            for (int i = 0; i < network.Layers.Length; i++)
-            {
-                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
-                {
-                    for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length;)
-                    {
-                        network.Layers[i].Neurons[j].Weights[k] +=1;
-                        quality = this.testing(subnet);
-
-                        if (quality > commonQuality)
-                        {
-                            tempQuality = quality;
-                            continue;
-                        }
-                        else if (quality < commonQuality)
-                        {
-                            network.Layers[i].Neurons[j].Weights[k] -= 1;
-                            this.betterPopulationValueBox.Invoke(new Action(() => this.betterPopulationValueBox.Text = tempQuality.ToString("F6")));
-                            this.updateBarCHart(quality, k);
-                            k++;
-
-                        }
-                    }
-                }
-            }
-        }
-        */
-
         //суммирование весов двух подсетей
         private Network summarazing(Subnet net1, Subnet net2, double[] coefficients)
         {
@@ -1175,9 +1041,14 @@ namespace Neural
             String[] lines = new String[1];
             double[] res = new double[classesList.Count];
             double[] input = new double[this.network.InputsCount];
+            String filename = "";
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\SpreadSheetTest.csv"))
+            if (!this.SpreadTest)
+                filename = "SpreadSheetTestBegin";
+            else
+                filename = "SpreadSheetTestEnd";
 
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(this.currentFolder + "\\" + filename + ".csv"))
                 for (int i = 0; i < data.GetLength(0); i++)
                 {
                     //gather inputs for compute, n-1 inputs
@@ -1200,16 +1071,11 @@ namespace Neural
 
                     moduleValidateError += value;
                     probabilisticValidateError += valueP;
-       
 
-                    if (this.selectedType == "classification")
-                    {
-                        lines[0] = classes[i].ToString() + ";" + this.max(res).ToString("F8");
-
-                    }
-
+                    lines[0] = classes[i].ToString() + ";" + this.max(res).ToString("F8");
                     file.WriteLine(lines[0].ToString());
                 }
+            this.SpreadTest = true;
 
             moduleTestQuality = (1-(moduleValidateError / data.GetLength(0))) * 100;
             probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
@@ -1257,7 +1123,8 @@ namespace Neural
                 }
             }
             if (ones <= 1)
-            {              
+            {
+                tempValue = 0.0;
                 for (int i = 0; i < mass.Length; i++)
                 {
                     if (tempValue < mass[i])
@@ -1277,6 +1144,7 @@ namespace Neural
         private void button2_Click(object sender, EventArgs e)
         {
             needToStop = true;
+            this.test();
         }
 
         private void subnetTopologyBox_TextChanged(object sender, EventArgs e)

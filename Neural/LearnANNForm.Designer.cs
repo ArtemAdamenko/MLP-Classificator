@@ -14,7 +14,7 @@ namespace Neural
     /// <summary>
     /// Summary description for Form1.
     /// </summary>
-    public partial class LearnNetForm : System.Windows.Forms.Form
+    public partial class LearnANNForm : System.Windows.Forms.Form
     {
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.GroupBox groupBox3;

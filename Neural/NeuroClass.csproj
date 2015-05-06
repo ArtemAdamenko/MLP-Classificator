@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Neural.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accord.Math">
       <HintPath>.\Accord.Math.dll</HintPath>
@@ -79,17 +82,17 @@
     <Compile Include="Learning\BackPropagationLearning.cs" />
     <Compile Include="Learning\ISupervisedLearning.cs" />
     <Compile Include="Learning\ParallelResilientBackPropagationLearning.cs" />
-    <Compile Include="LearnNetForm.cs">
+    <Compile Include="LearnANNForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LearnNetForm.Designer.cs">
-      <DependentUpon>LearnNetForm.cs</DependentUpon>
+    <Compile Include="LearnANNForm.Designer.cs">
+      <DependentUpon>LearnANNForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormDrawNeurons.cs">
+    <Compile Include="ChangeANNForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormDrawNeurons.Designer.cs">
-      <DependentUpon>FormDrawNeurons.cs</DependentUpon>
+    <Compile Include="ChangeANNForm.Designer.cs">
+      <DependentUpon>ChangeANNForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HelloForm.cs">
       <SubType>Form</SubType>
@@ -105,18 +108,18 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Networks\Subnet.cs" />
-    <Compile Include="FormDrawCorrectNeurons.cs">
+    <Compile Include="CorrectANNForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormDrawCorrectNeurons.Designer.cs">
-      <DependentUpon>FormDrawCorrectNeurons.cs</DependentUpon>
+    <Compile Include="CorrectANNForm.Designer.cs">
+      <DependentUpon>CorrectANNForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Record.cs" />
-    <EmbeddedResource Include="LearnNetForm.resx">
-      <DependentUpon>LearnNetForm.cs</DependentUpon>
+    <EmbeddedResource Include="LearnANNForm.resx">
+      <DependentUpon>LearnANNForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormDrawNeurons.resx">
-      <DependentUpon>FormDrawNeurons.cs</DependentUpon>
+    <EmbeddedResource Include="ChangeANNForm.resx">
+      <DependentUpon>ChangeANNForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HelloForm.resx">
       <DependentUpon>HelloForm.cs</DependentUpon>
@@ -131,8 +134,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="FormDrawCorrectNeurons.resx">
-      <DependentUpon>FormDrawCorrectNeurons.cs</DependentUpon>
+    <EmbeddedResource Include="CorrectANNForm.resx">
+      <DependentUpon>CorrectANNForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">

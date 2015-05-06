@@ -1,6 +1,6 @@
 ﻿namespace Neural
 {
-    partial class FormDrawCorrectNeurons
+    partial class CorrectANNForm
     {
         /// <summary>
         /// Required designer variable.
@@ -542,7 +542,6 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormDrawCorrectNeurons";
             this.Text = "Корректировка сети";
-            this.Load += new System.EventHandler(this.FormDrawCorrectNeurons_Load);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.menuStrip1.ResumeLayout(false);

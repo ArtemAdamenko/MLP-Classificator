@@ -15,7 +15,7 @@ using ExcelLibrary.SpreadSheet;
 namespace Neural
 {
 
-    public partial class FormDrawNeurons : Form
+    public partial class ChangeANNForm : Form
     {
         //App options
         Network network = null;
@@ -29,7 +29,6 @@ namespace Neural
                 int colCountData = 0;
                 private int[] classes;
                 List<int> classesList = new List<int>();
-                private String selectedType = "";
                 private double offWeightsSumInput = 0.0;
                 private double offWeightsSumAbsoluteInput = 0.0;
                 private double offWeightsSumOutput = 0.0;
@@ -58,7 +57,7 @@ namespace Neural
         #endregion
 
 
-        public FormDrawNeurons()
+        public ChangeANNForm()
         {
             InitializeComponent();
         }
@@ -314,54 +313,34 @@ namespace Neural
             double validate = 0.0;
             double testQuality = 0.0;
 
-            if (this.selectedType == "classification")
+
+            for (int count = 0; count < data.GetLength(0) - 1; count++)
             {
-                for (int count = 0; count < data.GetLength(0) - 1; count++)
+                try
                 {
-                    try
+                    //gather inputs for compute, n-1 inputs
+                    for (int i = 0; i < colCountData - 1; i++)
                     {
-                        //gather inputs for compute, n-1 inputs
-                        for (int i = 0; i < colCountData - 1; i++)
-                        {
-                            input[i] = data[count, i];
-                        }
-                        res = network.Compute(input);
-                        double output = this.max(res);
-                        double value = Math.Abs(classes[count] - output);
-
-                        validate += value;
+                        input[i] = data[count, i];
                     }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
-                    }
+                    res = network.Compute(input);
+                    double output = this.max(res);
+                    double value = Math.Abs(classes[count] - output);
 
+                    validate += value;
                 }
-                testQuality = (1 - (validate / data.GetLength(0))) * 100;
-                this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F10")));
-
+                catch (Exception e)
+                {
+                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+                }
 
             }
+            testQuality = (1 - (validate / data.GetLength(0))) * 100;
+            this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F10")));
 
-            else if (this.selectedType == "regression")
-            {
-                /* double testError = 0.0;
-                 double[] input = new double[colCountData - 1];
 
-                 for (int i = 0; i < data.GetLength(0); i++)
-                 {
-                     //gather inputs for compute, n-1 inputs
-                     for (int j = 0; j < colCountData - 1; j++)
-                     {
-                         input[j] = data[i, j];
-                     }
-                     testError += Math.Abs(network.Compute(input)[0] - data[i, colCountData - 1]);
-                 }
-                 this.errorTextBox.Text = (testError / data.GetLength(0)).ToString("F10");
 
-                 */
-            }
             return testQuality;
 
         }
@@ -441,8 +420,6 @@ namespace Neural
                                 maxData[j] = tempData[i, j];
                         }
 
-                        //if (strs.Length-1 < colCountData - 1)
-                        //  continue;
                         tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
 
                         //insert class in list of classes, if not find
@@ -450,8 +427,6 @@ namespace Neural
                         {
                             classesList.Add(tempClasses[i]);
                         }
-
-                        //samplesPerClass[tempClasses[i]]++;
 
                         i++;
                     }
@@ -921,12 +896,6 @@ namespace Neural
             }
         }
 
-        //загрузка окна
-        private void FormDrawNeurons_Load(object sender, EventArgs e)
-        {
-            HelloForm form = this.Owner as HelloForm;
-            this.selectedType = form.typeLearn;
-        }
 
         //save neural net
         private void saveNetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -950,14 +919,9 @@ namespace Neural
         //выбор опции Тестирующего вектора
         private void тестToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.selectedType == "classification")
-            {
-                Worker = new Thread(getDataForClass);
-            }
-            else if (this.selectedType == "regression")
-            {
-                Worker = new Thread(getDataForRegression);
-            }
+
+            Worker = new Thread(getDataForClass);
+
             Worker.SetApartmentState(ApartmentState.STA);
             Worker.Start();
             this.testNetButton.Enabled = true;
@@ -967,14 +931,9 @@ namespace Neural
         //выбор опции Входной вектор
         private void входнойВекторToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.selectedType == "classification")
-            {
-                Worker = new Thread(getDataForClassCompute);
-            }
-            else if (this.selectedType == "regression")
-            {
-                Worker = new Thread(getDataForRegression);
-            }
+
+            Worker = new Thread(getDataForClassCompute);
+
             Worker.SetApartmentState(ApartmentState.STA);
             Worker.Start();
             this.testNetButton.Enabled = false;
@@ -1094,48 +1053,30 @@ namespace Neural
             double[] input = new double[colCountData];
 
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Test") + "\\OutVector_" + LogHelper.getTime() + ".csv"))
-                if (this.selectedType == "classification")
+
+                for (int count = 0; count < data.GetLength(0) - 1; count++)
                 {
-                    for (int count = 0; count < data.GetLength(0) - 1; count++)
+                    try
                     {
-                        try
+                        //gather inputs for compute, n-1 inputs
+                        for (int i = 0; i < colCountData; i++)
                         {
-                            //gather inputs for compute, n-1 inputs
-                            for (int i = 0; i < colCountData; i++)
-                            {
-                                input[i] = data[count, i];
-                            }
-                            res = network.Compute(input);
-                            double output = this.max(res);
-                            file.WriteLine(output.ToString() + ";");
+                            input[i] = data[count, i];
                         }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            break;
-                        }
-
+                        res = network.Compute(input);
+                        double output = this.max(res);
+                        file.WriteLine(output.ToString() + ";");
                     }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
+
                 }
 
-                else if (this.selectedType == "regression")
-                {
-                    /* double testError = 0.0;
-                     double[] input = new double[colCountData - 1];
 
-                     for (int i = 0; i < data.GetLength(0); i++)
-                     {
-                         //gather inputs for compute, n-1 inputs
-                         for (int j = 0; j < colCountData - 1; j++)
-                         {
-                             input[j] = data[i, j];
-                         }
-                         testError += Math.Abs(network.Compute(input)[0] - data[i, colCountData - 1]);
-                     }
-                     this.errorTextBox.Text = (testError / data.GetLength(0)).ToString("F10");
 
-                     */
-                }
             MessageBox.Show("Выходной вектор сформирован.");
 
         }
