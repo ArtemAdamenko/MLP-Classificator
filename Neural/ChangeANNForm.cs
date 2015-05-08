@@ -23,6 +23,7 @@ namespace Neural
 
         #region Neural Net options
                 private Boolean needToStop = false;
+                private Boolean needToSpotWeightsOff = false;
                 private double[,] data = null;
                 private double[][][][] tempWeights;
                 int rowCountData = 0;
@@ -283,7 +284,7 @@ namespace Neural
                     for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
                     {
                         tempWeights[i][j][k] = new double[1];
-                        tempWeights[i][j][k][0] = network.Layers[i].Neurons[j].Weights[k];
+                        //tempWeights[i][j][k][0] = network.Layers[i].Neurons[j].Weights[k];
                     }
                 }
             }
@@ -337,7 +338,7 @@ namespace Neural
 
             }
             testQuality = (1 - (validate / data.GetLength(0))) * 100;
-            this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F10")));
+            //this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F10")));
 
 
 
@@ -351,7 +352,8 @@ namespace Neural
             //проверка откл/вкл нейронов
             this.CheckNeurons();
             //тестирование
-            this.testing();
+            double res = this.testing();
+            this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = res.ToString("F10")));
                 
         }
 
@@ -462,82 +464,9 @@ namespace Neural
 
             }
         }
+        
 
-        //load data for regression !!OFF
-        private void getDataForRegression()
-        {
-            // show file selection dialog
-            if (openFileDialog2.ShowDialog() == DialogResult.OK)
-            {
-                StreamReader reader = null;
-
-                try
-                {
-                    // open selected file
-                    reader = File.OpenText(openFileDialog2.FileName);
-
-                    //get row count values
-                    String line;
-                    rowCountData = 0;
-                    colCountData = 0;
-
-                    //get input and output count
-                    line = reader.ReadLine();
-                    rowCountData++;
-                    colCountData = line.Split(';').Length;
-
-                    //must be > 1 column in training data
-                    if (colCountData == 1)
-                        throw new Exception();
-
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        rowCountData++;
-                    }
-
-                    double[,] tempData = new double[rowCountData, colCountData];
-
-                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    line = "";
-                    int i = 0;
-
-                    // read the data
-                    while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
-                    {
-                        string[] strs = line.Split(';');
-                        // parse input and output values for learning
-                        //gather all values by cols
-                        for (int j = 0; j < colCountData; j++)
-                        {
-                            tempData[i, j] = double.Parse(strs[j]);
-                        }
-
-                        i++;
-                    }
-
-                    // allocate and set data
-                    data = new double[i, colCountData];
-                    Array.Copy(tempData, 0, data, 0, i * colCountData);
-
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Ошибка чтения файла", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                finally
-                {
-                    // close file
-                    if (reader != null)
-                        reader.Close();
-                }
-
-            }
-            this.testNetButton.Invoke(new Action(() => testNetButton.Enabled = true));
-
-        }
-
-       //Запуск автоматическго отключения нейронов !!!!FIX
+       //Запуск автоматическго отключения нейронов
         private void startOffNeuronsButton_Click(object sender, EventArgs e)
         {
             int begin = 0;
@@ -638,7 +567,6 @@ namespace Neural
 
             //глобальный счетчик выделенных в диапазон нейронов
             int count = 0;
-            int testIterations = 0;
             //массив выделенных нейронов
             Record[] rangeNeurons = new Record[acount];
 
@@ -713,6 +641,7 @@ namespace Neural
             }
             //start clock
             DateTime t = DateTime.Now;
+            int allCombinations = 0;
 
             for (int k = 0; k < rangeNeurons.Length - 2; k++)
             {
@@ -757,11 +686,11 @@ namespace Neural
                         offWeights(network, rangeNeurons[j]);
 
                         QualityWorkSheet.Cells[combinations, j + 1] = new Cell(this.testing());
-                        testIterations++;
                         DateTime t2 = DateTime.Now;
                         System.TimeSpan diffTime = t2.Subtract(t);
+                        allCombinations++;
+                        this.CombinationsLabel.Invoke(new Action(() => this.CombinationsLabel.Text = allCombinations.ToString()));
                         this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
-                        this.iterationsBox.Invoke(new Action(() => this.iterationsBox.Text = testIterations.ToString()));
                         WeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumInput.ToString("F2"));
                         WeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumOutput.ToString("F2"));
                         AbsWeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumAbsoluteInput.ToString("F2"));
@@ -1080,6 +1009,225 @@ namespace Neural
             MessageBox.Show("Выходной вектор сформирован.");
 
         }
+
+
+        private int[] getDataOfANNProtocol(String input)
+        {
+            String[] parts = input.Split(':');
+            int[] resParts = new int[3];
+
+            resParts[0] = Int32.Parse(parts[0]);
+            resParts[1] = Int32.Parse(parts[1]);
+            resParts[2] = Int32.Parse(parts[2]);
+
+            return resParts;
+        }
+
+        private void offWeights()
+        {
+            List<String> availableWeights = getAvailableWeights(this.network);
+            List<String> tempWeightCollection = new List<String>();
+            double level = 0.0;
+            double radius = 0.0;
+            try
+            {
+                level = Math.Max(0.0, Math.Min(100, double.Parse(this.offWeightsLevelBox.Text)));
+            }
+            catch
+            {
+                level = 80;
+            }
+            try
+            {
+                radius = Math.Max(0.0, Math.Min(level, double.Parse(this.radiusBox.Text)));
+            }
+            catch
+            {
+                radius = 15;
+            }
+            this.offWeightsLevelBox.Invoke(new Action(() => this.offWeightsLevelBox.Text = level.ToString()));
+            this.radiusBox.Invoke(new Action(() => this.radiusBox.Text = radius.ToString()));
+            
+            int combinations = 0;
+            DateTime t = DateTime.Now;
+
+            while (!this.needToSpotWeightsOff)
+            {
+                for (int k = 0; k < availableWeights.Count - 2; k++)
+                {
+                    for (int i = 0; i < availableWeights.Count; i++)
+                    {
+
+                        int Layer = 0;
+                        int Neuron = 0;
+                        int Weight = 0;
+                        String currentWeight = "";
+
+                        for (int off = i; off <= i + k; off++)
+                        {
+                            //repeat around
+                            if (off > availableWeights.Count - 1)
+                            {
+                                currentWeight = availableWeights[off - availableWeights.Count];
+
+                            }
+                            else
+                            {
+                                currentWeight = availableWeights[off];
+                            }
+
+                            int[] parts = getDataOfANNProtocol(currentWeight);
+                            Layer = parts[0];
+                            Neuron = parts[1];
+                            Weight = parts[2];
+
+                            //off current weights
+                            tempWeights[Layer][Neuron][Weight][0] = network.Layers[Layer].Neurons[Neuron].Weights[Weight];
+                            network.Layers[Layer].Neurons[Neuron].Weights[Weight] = 0.0;
+
+                            tempWeightCollection.Add(currentWeight);
+
+                        }
+
+                        //del currents weights 
+                        for (int n = 0; n < tempWeightCollection.Count; n++)
+                        {
+                            availableWeights.Remove(tempWeightCollection[n]);
+                        }
+
+
+                        for (int j = 0; j < availableWeights.Count; j++)
+                        {
+                            String otherWeight = availableWeights[j];
+
+                            int[] OtherParts = getDataOfANNProtocol(otherWeight);
+                            int OtherLayer = OtherParts[0];
+                            int OtherNeuron = OtherParts[1];
+                            int OtherWeight = OtherParts[2];
+
+                            //off other weight
+                            tempWeights[OtherLayer][OtherNeuron][OtherWeight][0] = network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight];
+                            network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight] = 0.0;
+
+                            double res = this.testing();
+                            combinations++;
+                            this.CombinationsLabel.Invoke(new Action(() => this.CombinationsLabel.Text = combinations.ToString()));
+                            DateTime t2 = DateTime.Now;
+                            System.TimeSpan diffTime = t2.Subtract(t);
+                            this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
+
+                            if ((res >= (level - radius)) && (res <= level ))
+                            {
+                                //update grid
+                                network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight] = tempWeights[OtherLayer][OtherNeuron][OtherWeight][0];
+                                //on current weight
+                                for (int on = 0; on < tempWeightCollection.Count; on++)
+                                {
+
+
+                                    int[] parts = getDataOfANNProtocol(tempWeightCollection[on]);
+                                    Layer = parts[0];
+                                    Neuron = parts[1];
+                                    Weight = parts[2];
+
+                                    //on current weights    
+                                    network.Layers[Layer].Neurons[Neuron].Weights[Weight] = tempWeights[Layer][Neuron][Weight][0];
+
+                                    availableWeights.Add(tempWeightCollection[on]);
+
+                                }
+                                tempWeightCollection.Clear();
+
+                                updateGrid();
+                                return;
+                            }
+                            //on other weight
+                            network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight] = tempWeights[OtherLayer][OtherNeuron][OtherWeight][0];
+                            tempWeights[OtherLayer][OtherNeuron][OtherWeight][0] = 0.0;
+
+                            if (needToSpotWeightsOff)
+                                break;
+                        }
+
+                        //on current weight
+                        for (int on = 0; on < tempWeightCollection.Count; on++)
+                        {
+
+
+                            int[] parts = getDataOfANNProtocol(tempWeightCollection[on]);
+                            Layer = parts[0];
+                            Neuron = parts[1];
+                            Weight = parts[2];
+
+                            //on current weights    
+                            network.Layers[Layer].Neurons[Neuron].Weights[Weight] = tempWeights[Layer][Neuron][Weight][0];
+                            tempWeights[Layer][Neuron][Weight][0] = 0.0;
+
+                            availableWeights.Add(tempWeightCollection[on]);
+
+                        }
+                        tempWeightCollection.Clear();
+
+                        if (needToSpotWeightsOff)
+                            break;
+
+                        availableWeights.Sort();
+                    }
+                    if (needToSpotWeightsOff)
+                        break;
+                }
+            }
+            needToSpotWeightsOff = false;
+            return;
+        }
+        private void startOffWeightsButton_Click(object sender, EventArgs e)
+        {
+            Worker = new Thread(() => offWeights());
+            Worker.Start();
+
+        }
+
+        private void updateGrid()
+        {
+            for (int i = 0; i < this.dataGridView1.Rows.Count; i++)
+            {
+                int layer = Int32.Parse(this.dataGridView1.Rows[i].Cells[0].Value.ToString());
+                int neuron = Int32.Parse(this.dataGridView1.Rows[i].Cells[1].Value.ToString());
+                int weight = Int32.Parse(this.dataGridView1.Rows[i].Cells[2].Value.ToString());
+
+                if (tempWeights[layer][neuron][weight][0] != 0.0)
+                {
+                    this.dataGridView1.Rows[i].Cells[4].Value = "T";
+                }
+            }
+        }
+
+        //получение всех доступных связей для подсоединения(входы)   
+        private List<String> getAvailableWeights(Network net)
+        {
+            List<string> availableNeurons = new List<String>();
+
+            //add neurons for available neurons, for connected subnet inputs
+            for (int layer = 0; layer < net.Layers.Length; layer++)
+            {
+                for (int neuron = 0; neuron < net.Layers[layer].Neurons.Length; neuron++)
+                {
+                    for (int weight = 0; weight < net.Layers[layer].Neurons[neuron].Weights.Length; weight++)
+                    {
+                        availableNeurons.Add(layer.ToString() + ":" + neuron.ToString() + ":" + weight.ToString());
+                    }
+                }
+            }
+
+            return availableNeurons;
+        }
+
+        private void stopWeightsButton_Click(object sender, EventArgs e)
+        {
+            this.needToSpotWeightsOff = true;
+        }
+
+
 
     }
 
