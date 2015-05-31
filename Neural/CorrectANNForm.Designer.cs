@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CorrectANNForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.testNetButton = new System.Windows.Forms.Button();
@@ -58,6 +59,8 @@
             this.moduleErrorBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.numberSubnetsBox = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
             this.subnetTopologyBox = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.relationsLabel = new System.Windows.Forms.Label();
@@ -74,6 +77,10 @@
             this.populationLabel = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.timeLabel = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.levelVariationstextBox = new System.Windows.Forms.TextBox();
+            this.BothEqualcheckBox = new System.Windows.Forms.CheckBox();
+            this.levelVariationscheckBox = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -81,6 +88,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -89,7 +97,7 @@
             this.panel1.Controls.Add(this.pictureBox2);
             this.panel1.Location = new System.Drawing.Point(336, 27);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(714, 342);
+            this.panel1.Size = new System.Drawing.Size(714, 409);
             this.panel1.TabIndex = 1;
             // 
             // pictureBox2
@@ -98,7 +106,7 @@
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox2.Location = new System.Drawing.Point(3, 3);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(708, 336);
+            this.pictureBox2.Size = new System.Drawing.Size(708, 403);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox2.TabIndex = 0;
             this.pictureBox2.TabStop = false;
@@ -171,9 +179,9 @@
             // 
             this.panel2.AutoScroll = true;
             this.panel2.Controls.Add(this.pictureBox1);
-            this.panel2.Location = new System.Drawing.Point(336, 399);
+            this.panel2.Location = new System.Drawing.Point(336, 458);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(714, 296);
+            this.panel2.Size = new System.Drawing.Size(714, 332);
             this.panel2.TabIndex = 28;
             // 
             // pictureBox1
@@ -182,7 +190,7 @@
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(0, 6);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(705, 290);
+            this.pictureBox1.Size = new System.Drawing.Size(705, 320);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
@@ -239,7 +247,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(437, 373);
+            this.label2.Location = new System.Drawing.Point(437, 439);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(0, 13);
             this.label2.TabIndex = 39;
@@ -248,7 +256,7 @@
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.zedGraphControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.zedGraphControl1.Location = new System.Drawing.Point(12, 402);
+            this.zedGraphControl1.Location = new System.Drawing.Point(12, 497);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
             this.zedGraphControl1.ScrollMaxX = 0D;
@@ -301,9 +309,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(10, 149);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(132, 13);
+            this.label6.Size = new System.Drawing.Size(189, 13);
             this.label6.TabIndex = 47;
-            this.label6.Text = "Коэффициент вариации:";
+            this.label6.Text = "Коэффициент вариации поколения:";
             // 
             // covariationPopulationBox
             // 
@@ -332,7 +340,7 @@
             this.groupBox1.Controls.Add(this.betterBox);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.testNetButton);
-            this.groupBox1.Location = new System.Drawing.Point(9, 189);
+            this.groupBox1.Location = new System.Drawing.Point(12, 284);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(318, 207);
             this.groupBox1.TabIndex = 49;
@@ -360,6 +368,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.numberSubnetsBox);
+            this.groupBox2.Controls.Add(this.label14);
             this.groupBox2.Controls.Add(this.subnetTopologyBox);
             this.groupBox2.Controls.Add(this.label13);
             this.groupBox2.Controls.Add(this.relationsLabel);
@@ -376,10 +386,28 @@
             this.groupBox2.Controls.Add(this.populationLabel);
             this.groupBox2.Location = new System.Drawing.Point(12, 27);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(318, 156);
+            this.groupBox2.Size = new System.Drawing.Size(318, 178);
             this.groupBox2.TabIndex = 50;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Опции эволюционного обучения подсети";
+            // 
+            // numberSubnetsBox
+            // 
+            this.numberSubnetsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.numberSubnetsBox.Location = new System.Drawing.Point(224, 149);
+            this.numberSubnetsBox.Name = "numberSubnetsBox";
+            this.numberSubnetsBox.Size = new System.Drawing.Size(82, 21);
+            this.numberSubnetsBox.TabIndex = 58;
+            this.numberSubnetsBox.Text = "50";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(4, 149);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(147, 13);
+            this.label14.TabIndex = 57;
+            this.label14.Text = "Кол-во сетей в поколении: ";
             // 
             // subnetTopologyBox
             // 
@@ -388,7 +416,7 @@
             this.subnetTopologyBox.Name = "subnetTopologyBox";
             this.subnetTopologyBox.Size = new System.Drawing.Size(82, 21);
             this.subnetTopologyBox.TabIndex = 56;
-            this.subnetTopologyBox.Text = "20,30,20";
+            this.subnetTopologyBox.Text = "10,30,10";
             this.subnetTopologyBox.TextChanged += new System.EventHandler(this.subnetTopologyBox_TextChanged);
             // 
             // label13
@@ -478,7 +506,7 @@
             this.popultextBox.Name = "popultextBox";
             this.popultextBox.Size = new System.Drawing.Size(36, 21);
             this.popultextBox.TabIndex = 46;
-            this.popultextBox.Text = "3";
+            this.popultextBox.Text = "2";
             // 
             // label8
             // 
@@ -505,12 +533,12 @@
             this.populationLabel.Name = "populationLabel";
             this.populationLabel.Size = new System.Drawing.Size(103, 13);
             this.populationLabel.TabIndex = 43;
-            this.populationLabel.Text = "Кол-во популяций:";
+            this.populationLabel.Text = "Кол-во поколений:";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(336, 373);
+            this.label7.Location = new System.Drawing.Point(336, 439);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(95, 13);
             this.label7.TabIndex = 40;
@@ -519,17 +547,65 @@
             // timeLabel
             // 
             this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(569, 373);
+            this.timeLabel.Location = new System.Drawing.Point(569, 439);
             this.timeLabel.Name = "timeLabel";
             this.timeLabel.Size = new System.Drawing.Size(0, 13);
             this.timeLabel.TabIndex = 51;
             // 
-            // FormDrawCorrectNeurons
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.levelVariationstextBox);
+            this.groupBox3.Controls.Add(this.BothEqualcheckBox);
+            this.groupBox3.Controls.Add(this.levelVariationscheckBox);
+            this.groupBox3.Location = new System.Drawing.Point(11, 203);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(319, 75);
+            this.groupBox3.TabIndex = 52;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Встряхивание весов при эволюции";
+            // 
+            // levelVariationstextBox
+            // 
+            this.levelVariationstextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.levelVariationstextBox.Location = new System.Drawing.Point(225, 18);
+            this.levelVariationstextBox.Name = "levelVariationstextBox";
+            this.levelVariationstextBox.Size = new System.Drawing.Size(82, 21);
+            this.levelVariationstextBox.TabIndex = 2;
+            this.levelVariationstextBox.Text = "0,3";
+            // 
+            // BothEqualcheckBox
+            // 
+            this.BothEqualcheckBox.AutoSize = true;
+            this.BothEqualcheckBox.Checked = true;
+            this.BothEqualcheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BothEqualcheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BothEqualcheckBox.Location = new System.Drawing.Point(12, 43);
+            this.BothEqualcheckBox.Name = "BothEqualcheckBox";
+            this.BothEqualcheckBox.Size = new System.Drawing.Size(247, 17);
+            this.BothEqualcheckBox.TabIndex = 1;
+            this.BothEqualcheckBox.Text = "При скрещивании одинаковых результатов";
+            this.BothEqualcheckBox.UseVisualStyleBackColor = true;
+            // 
+            // levelVariationscheckBox
+            // 
+            this.levelVariationscheckBox.AutoSize = true;
+            this.levelVariationscheckBox.Checked = true;
+            this.levelVariationscheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.levelVariationscheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.levelVariationscheckBox.Location = new System.Drawing.Point(12, 20);
+            this.levelVariationscheckBox.Name = "levelVariationscheckBox";
+            this.levelVariationscheckBox.Size = new System.Drawing.Size(200, 17);
+            this.levelVariationscheckBox.TabIndex = 0;
+            this.levelVariationscheckBox.Text = "При уровне коэф.вариации весов :";
+            this.levelVariationscheckBox.UseVisualStyleBackColor = true;
+            // 
+            // CorrectANNForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1062, 707);
+            this.ClientSize = new System.Drawing.Size(1062, 802);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -539,8 +615,10 @@
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "FormDrawCorrectNeurons";
+            this.Name = "CorrectANNForm";
             this.Text = "Корректировка сети";
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
@@ -553,6 +631,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -605,5 +685,11 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox subnetTopologyBox;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox numberSubnetsBox;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TextBox levelVariationstextBox;
+        private System.Windows.Forms.CheckBox BothEqualcheckBox;
+        private System.Windows.Forms.CheckBox levelVariationscheckBox;
     }
 }

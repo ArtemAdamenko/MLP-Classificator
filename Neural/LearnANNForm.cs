@@ -147,6 +147,7 @@ namespace Neural
 
                     // read the data
                     classesList.Clear();
+                    //classesList.Add(0);
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
                         string[] strs = line.Trim().Split(';');
@@ -196,6 +197,9 @@ namespace Neural
                     data = new double[i, colCountData - 1];
                     Array.Copy(tempData, 0, data, 0, i * (colCountData - 1));
                     classes = new int[i];
+
+                    
+
                     this.classesBox.Text = classesList.Count.ToString();
                     Array.Copy(tempClasses, 0, classes, 0, i);
 
@@ -622,7 +626,7 @@ namespace Neural
                 validate += value;
 
             }
-            testQuality = (1 - (validate / validateInput.Length)) * 100;
+            testQuality = (1-(validate / validateInput.Length)) * 100;
             return testQuality;
         }
 

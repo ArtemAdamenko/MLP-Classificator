@@ -9,6 +9,7 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
+using ExcelLibrary.SpreadSheet;
 using ZedGraph;
 
 
@@ -21,6 +22,7 @@ namespace Neural
         Network network = null;
         Thread Worker;
         Subnet globalSubnet;
+        string currentFolder = "";
         Boolean SpreadTest = false;
         int numberSubNets = 0;
 
@@ -60,9 +62,6 @@ namespace Neural
         public CorrectANNForm()
         {
             InitializeComponent();
-            //add stop event handler
-            this.stopButton.Click += new System.EventHandler(this.StopRoutine);
-
             RollingPointPairList listErrorP = new RollingPointPairList(200);
             RollingPointPairList listError = new RollingPointPairList(200);
             GraphPane myPane = zedGraphControl1.GraphPane;
@@ -722,7 +721,7 @@ namespace Neural
 
                 subnets.Add(subnet);
 
-                LogHelper.WriteEvo( subnet, this.reconnectingCount, false );
+                LogHelper.WriteEvo( subnet, this.reconnectingCount );
                 selectionResult.Add("ID_" + subnet.ID.ToString() + "-" + subnet.quality.ToString() + "%");
 
                 //this.saveMSGToSheet("ID_" + subnet.ID.ToString() + "-" + subnet.quality.ToString() + "%", (subnets.Count - 1) + 1, 0);
@@ -734,11 +733,11 @@ namespace Neural
 
                 this.updateBarCHart(subnet.quality, subnets.Count - 1, commonNetQuality[1]);
 
-                //когда отбор окончился
+                //когда отборк окончился
                 if (subnets.Count == this.numberSubNets)
                 {
                     selectionResult.Reverse();
-                    LogHelper.saveMSGToSheet( selectionResult, 0, this.reconnectingCount );
+                    LogHelper.saveMSGToSheet(this.currentFolder, selectionResult, 0, this.reconnectingCount);
 
                     currentQuality = this.evolution(subnets, connectedInputNeurons, connectedOutputNeurons);
 
@@ -793,10 +792,7 @@ namespace Neural
                         connectedOutputNeurons.AddRange(tempNewOutputs);
                         availableRelations.AddRange(tempOlds);
 
-                        LogHelper.SubConnectReport(connectedInputNeurons, connectedOutputNeurons, ++this.reconnectingCount);
-
-                        this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
-                        this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
+                        LogHelper.SubConnectReport(this.currentFolder + "\\" + SAVE_CONNECT_DIR, connectedInputNeurons, connectedOutputNeurons, ++this.reconnectingCount);
                     }
                     else {
                         needToStop = true;
@@ -805,12 +801,12 @@ namespace Neural
                         break;
                     }
 
-                    
+                    this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
+                    this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
                 }
                 else
                     this.betterBox.Invoke(new Action(() => this.betterBox.Text = subnets.Count.ToString()));
             }
-            return;
 
         }
 
@@ -861,11 +857,11 @@ namespace Neural
 
             this.population = 1;
             
-            LogHelper.saveMediumsValuesOfWeightsIndexes( subnets, population, this.reconnectingCount );
+            LogHelper.saveMediumsValuesOfWeightsIndexes(this.currentFolder ,subnets, population, this.reconnectingCount);
 
 
             coefficients = this.coefficientVariations(subnets);
-            LogHelper.coefVariationsToFile( coefficients, population, this.reconnectingCount, "После отбора" );
+            LogHelper.coefVariationsToFile(this.currentFolder ,coefficients, population, this.reconnectingCount, "После отбора");
 
             selectionResult.Add("Скрещивание " + population);
 
@@ -898,7 +894,7 @@ namespace Neural
                 selectionResult.Add("ID_" + sub.ID.ToString() + "-P1_" + tempSub1.ID.ToString() + "-P2_" + tempSub2.ID.ToString()
                                     + "-" + sub.quality.ToString() + "%");
 
-                LogHelper.WriteEvo( sub, this.reconnectingCount, true, tempSub1.ID + "-" + tempSub2.ID, population );
+                LogHelper.WriteEvo(currentFolder + "\\Скрещивание " + this.reconnectingCount.ToString() + "\\" + population + "\\", sub, tempSub1.ID + " " + tempSub2.ID);
 
                 subnets.Add(sub);
 
@@ -913,7 +909,7 @@ namespace Neural
                 {
                     --this.cntOfPopulationsPerStep;
                     selectionResult.Reverse();
-                    LogHelper.saveMSGToSheet( selectionResult, population, this.reconnectingCount );
+                    LogHelper.saveMSGToSheet(this.currentFolder, selectionResult, population, this.reconnectingCount);
                     selectionResult.Clear();
 
                     if (this.cntOfPopulationsPerStep == 0)
@@ -956,9 +952,9 @@ namespace Neural
 
                         //коэффициенты вариации
                         coefficients = this.coefficientVariations(subnets);
-                        LogHelper.coefVariationsToFile( coefficients, population, this.reconnectingCount, "После скрещивания " + (population - 1) );
+                        LogHelper.coefVariationsToFile( this.currentFolder, coefficients, population, this.reconnectingCount, "После скрещивания " + (population - 1) );
 
-                        LogHelper.saveMediumsValuesOfWeightsIndexes( subnets, population, this.reconnectingCount );
+                        LogHelper.saveMediumsValuesOfWeightsIndexes( this.currentFolder, subnets, population, this.reconnectingCount );
 
                         cntOfPopulationsPerStep = Int32.Parse(this.popultextBox.Text); ;
                         if (population > this.cntPopulation)
@@ -1079,57 +1075,49 @@ namespace Neural
             double moduleValidateError = 0.0;
             double probabilisticValidateError = 0.0;
 
+            String[] lines = new String[1];
             double[] res = new double[classesList.Count];
             double[] input = new double[this.network.InputsCount];
-
-            double[] desireClass = new double[classes.Length];
-            double[] outputClass = new double[classes.Length];
             String filename = "";
 
             if (!this.SpreadTest)
-                filename = "ДоКорректировки";
+                filename = "SpreadSheetTestBegin";
             else
-                filename = "ПослеКорректировки";
+                filename = "SpreadSheetTestEnd";
 
-            for (int i = 0; i < data.GetLength(0); i++)
-            {
-                //gather inputs for compute, n-1 inputs
-                for (int k = 0; k < this.network.InputsCount; k++)
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(this.currentFolder + "\\" + filename + ".csv"))
+                for (int i = 0; i < data.GetLength(0); i++)
                 {
-                    input[k] = data[i, k];
+                    //gather inputs for compute, n-1 inputs
+                    for (int k = 0; k < this.network.InputsCount; k++)
+                    {
+                        input[k] = data[i, k];
+                    }
+
+                    if (this.globalSubnet != null)
+                    {
+                        res = network.Compute(input.ToArray(), this.globalSubnet, MinMaxValues);
+                    }
+                    else
+                    {
+                        res = network.Compute(input.ToArray());
+                    }
+
+                    double value = Math.Abs(classes[i] - this.max(res));
+                    double valueP = 1 - res[classes[i]];
+
+                    moduleValidateError += value;
+                    probabilisticValidateError += valueP;
+
+                    lines[0] = classes[i].ToString() + ";" + this.max(res).ToString("F8");
+                    file.WriteLine(lines[0].ToString());
                 }
-
-                if (this.globalSubnet != null)
-                {
-                    res = network.Compute(input.ToArray(), this.globalSubnet, MinMaxValues);
-                }
-                else
-                {
-                    res = network.Compute(input.ToArray());
-                }
-
-                double resClass = this.max(res);
-                desireClass[i] = classes[i];
-                outputClass[i] = resClass;
-
-
-                double value = Math.Abs(classes[i] - resClass);
-                double valueP = 1 - res[classes[i]];
-
-                moduleValidateError += value;
-                probabilisticValidateError += valueP;
-
-
-            }
-            LogHelper.InputVectorResults(filename, desireClass, outputClass);
-
             this.SpreadTest = true;
 
-            moduleTestQuality = (1 - (moduleValidateError / data.GetLength(0))) * 100;
+            moduleTestQuality = (1-(moduleValidateError / data.GetLength(0))) * 100;
             probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
             this.moduleErrorBox.Invoke(new Action(() => this.moduleErrorBox.Text = moduleTestQuality.ToString("F6")));
             this.probabilisticErrorTextBox.Invoke(new Action(() => this.probabilisticErrorTextBox.Text = probabilisticTestQuality.ToString("F6")));
-            return;
         }
         
         //обновление графика
@@ -1202,9 +1190,8 @@ namespace Neural
             this.checkTopology();
         }
 
-        private void StopRoutine(object sender, EventArgs evArgs)
-        {
-            LogHelper.Commit();
+        void StopRoutine()
+        { 
         }
     }
 

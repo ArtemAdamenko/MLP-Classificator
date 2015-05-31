@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChangeANNForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -54,10 +55,10 @@
             this.neuronsCountBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.timeLabel = new System.Windows.Forms.Label();
             this.stopButton = new System.Windows.Forms.Button();
             this.startOffNeuronsButton = new System.Windows.Forms.Button();
             this.neuronsToOffBox = new System.Windows.Forms.TextBox();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.stopWeightsButton = new System.Windows.Forms.Button();
@@ -316,14 +317,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Автоматический перебор нейронов";
             // 
-            // timeLabel
-            // 
-            this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(46, 241);
-            this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(0, 13);
-            this.timeLabel.TabIndex = 31;
-            // 
             // stopButton
             // 
             this.stopButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -353,6 +346,14 @@
             this.neuronsToOffBox.Name = "neuronsToOffBox";
             this.neuronsToOffBox.Size = new System.Drawing.Size(74, 21);
             this.neuronsToOffBox.TabIndex = 26;
+            // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(46, 241);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(0, 13);
+            this.timeLabel.TabIndex = 31;
             // 
             // groupBox3
             // 
@@ -414,9 +415,9 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(6, 40);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(54, 13);
+            this.label5.Size = new System.Drawing.Size(97, 13);
             this.label5.TabIndex = 1;
-            this.label5.Text = "Разброс :";
+            this.label5.Text = "Нижняя граница :";
             // 
             // label4
             // 
@@ -425,7 +426,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(100, 13);
             this.label4.TabIndex = 0;
-            this.label4.Text = "Желаемый порог :";
+            this.label4.Text = "Верхняя граница :";
             // 
             // CombinationsLabel
             // 
@@ -468,6 +469,8 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "ChangeANNForm";
             this.Text = "Изменение и проверка сети";

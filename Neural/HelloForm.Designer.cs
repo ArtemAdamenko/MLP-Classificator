@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HelloForm));
             this.actionsBox = new System.Windows.Forms.GroupBox();
             this.correctButton = new System.Windows.Forms.Button();
             this.changeNetbutton = new System.Windows.Forms.Button();
@@ -101,8 +102,10 @@
             this.ClientSize = new System.Drawing.Size(483, 342);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.actionsBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HelloForm";
-            this.Text = "Нейронные сети";
+            this.Text = "Нейронные сети v1.4.0.2";
             this.actionsBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);

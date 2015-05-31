@@ -50,6 +50,7 @@ namespace Neural
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LearnANNForm));
             this.label4 = new System.Windows.Forms.Label();
             this.inputCountBox = new System.Windows.Forms.TextBox();
             this.fileTextBox = new System.Windows.Forms.TextBox();
@@ -93,15 +94,6 @@ namespace Neural
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lastRunsGridView = new System.Windows.Forms.DataGridView();
-            this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.maxIterationsBox = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.maxNeuronsInLayerBox = new System.Windows.Forms.TextBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.validationLevelBox = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -111,6 +103,15 @@ namespace Neural
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.maxIterationsBox = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.maxNeuronsInLayerBox = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.validationLevelBox = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -528,6 +529,60 @@ namespace Neural
             this.lastRunsGridView.Size = new System.Drawing.Size(658, 207);
             this.lastRunsGridView.TabIndex = 0;
             // 
+            // Column5
+            // 
+            this.Column5.HeaderText = "Итерация";
+            this.Column5.Name = "Column5";
+            this.Column5.Width = 81;
+            // 
+            // Column6
+            // 
+            this.Column6.HeaderText = "Ошибка";
+            this.Column6.Name = "Column6";
+            this.Column6.Width = 72;
+            // 
+            // Column7
+            // 
+            this.Column7.HeaderText = "Валидация(модуль)";
+            this.Column7.Name = "Column7";
+            this.Column7.Width = 132;
+            // 
+            // probabilisticCol
+            // 
+            this.probabilisticCol.HeaderText = "Валидация(вер.)";
+            this.probabilisticCol.Name = "probabilisticCol";
+            this.probabilisticCol.Width = 117;
+            // 
+            // Column8
+            // 
+            this.Column8.HeaderText = "Алгоритм";
+            this.Column8.Name = "Column8";
+            this.Column8.Width = 80;
+            // 
+            // Column9
+            // 
+            this.Column9.HeaderText = "Топология";
+            this.Column9.Name = "Column9";
+            this.Column9.Width = 85;
+            // 
+            // Column10
+            // 
+            this.Column10.HeaderText = "Альфа";
+            this.Column10.Name = "Column10";
+            this.Column10.Width = 65;
+            // 
+            // Column11
+            // 
+            this.Column11.HeaderText = "Коэф.обучения";
+            this.Column11.Name = "Column11";
+            this.Column11.Width = 110;
+            // 
+            // Column12
+            // 
+            this.Column12.HeaderText = "Момент";
+            this.Column12.Name = "Column12";
+            this.Column12.Width = 70;
+            // 
             // zedGraphControl1
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -614,61 +669,7 @@ namespace Neural
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Итерация";
-            this.Column5.Name = "Column5";
-            this.Column5.Width = 81;
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Ошибка";
-            this.Column6.Name = "Column6";
-            this.Column6.Width = 72;
-            // 
-            // Column7
-            // 
-            this.Column7.HeaderText = "Валидация(модуль)";
-            this.Column7.Name = "Column7";
-            this.Column7.Width = 132;
-            // 
-            // probabilisticCol
-            // 
-            this.probabilisticCol.HeaderText = "Валидация(вер.)";
-            this.probabilisticCol.Name = "probabilisticCol";
-            this.probabilisticCol.Width = 117;
-            // 
-            // Column8
-            // 
-            this.Column8.HeaderText = "Алгоритм";
-            this.Column8.Name = "Column8";
-            this.Column8.Width = 80;
-            // 
-            // Column9
-            // 
-            this.Column9.HeaderText = "Топология";
-            this.Column9.Name = "Column9";
-            this.Column9.Width = 85;
-            // 
-            // Column10
-            // 
-            this.Column10.HeaderText = "Альфа";
-            this.Column10.Name = "Column10";
-            this.Column10.Width = 65;
-            // 
-            // Column11
-            // 
-            this.Column11.HeaderText = "Коэф.обучения";
-            this.Column11.Name = "Column11";
-            this.Column11.Width = 110;
-            // 
-            // Column12
-            // 
-            this.Column12.HeaderText = "Момент";
-            this.Column12.Name = "Column12";
-            this.Column12.Width = 70;
-            // 
-            // LearnNetForm
+            // LearnANNForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 14);
             this.ClientSize = new System.Drawing.Size(906, 621);
@@ -678,9 +679,10 @@ namespace Neural
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.menuStrip1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "LearnNetForm";
+            this.Name = "LearnANNForm";
             this.Text = "Обучение многослойного персептрона";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.Form1_Closing);
             this.Load += new System.EventHandler(this.Form1_Load);

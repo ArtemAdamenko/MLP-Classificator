@@ -402,6 +402,7 @@ namespace Neural
 
                     // read the data
                     classesList.Clear();
+                    //classesList.Add(0);
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
                         string[] strs = line.Trim().Split(';');
@@ -829,7 +830,7 @@ namespace Neural
         //save neural net
         private void saveNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.Filter = "bin files (*.bin)|*.bin";
+            saveFileDialog1.Filter = "crash bin files (*.cbin)|*.cbin";
             if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK
                     && saveFileDialog1.FileName.Length > 0)
             {
