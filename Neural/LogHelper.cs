@@ -10,8 +10,9 @@ namespace Neural
 {
     class LogHelper
     {
-        private static object sync = new object();
+        //private static object sync = new object();
         private static String time;
+        private static int netsCounter = 0;
         private static String path = AppDomain.CurrentDomain.BaseDirectory;
 
         #region CONSTS
@@ -22,6 +23,8 @@ namespace Neural
         const string SAVE_CONNECT_DIR = "Конф. соединениния подсети и основной ИНС";
         const string SELECTION_DIR = "Отбор-";
         const string CROSS_DIR = "Скрещивание-";
+        const string ALLWEIGHTS_FILE = "ВесаВсехСетей-";
+        const string DEVIATION_FILE = "СтандартноеОтклонение-";
         #endregion
 
         #region WorkBook, WorkSheets
@@ -31,13 +34,19 @@ namespace Neural
         private static ExcelWorksheet coefvariationsSheet;
         private static ExcelPackage mediumsBook;
         private static ExcelWorksheet mediumsSheet;
+        private static ExcelPackage allWeightsBook;
+        private static ExcelWorksheet allWeightsSheet;
+        private static ExcelPackage deviationBook;
+        private static ExcelWorksheet deviationSheet;
         #endregion
 
         #region files, folders
         private static String currentFolder = "";
         private static FileInfo resultsFile;
         private static FileInfo covarFile;
+        private static FileInfo deviationFile;
         private static FileInfo mediumsFile;
+        private static FileInfo allWeightsFile;
         #endregion
 
         public static String getTime()
@@ -49,9 +58,7 @@ namespace Neural
         public static void NewSessionFolder()
         {
             LogHelper.currentFolder = ROOT_FOLDER + "\\" + LogHelper.getTime();
-
-
-
+            return;
         }
         public static String getPath(String folderName)
         {
@@ -77,23 +84,15 @@ namespace Neural
         }
 
         //запись результатов после отбора или скрещивания, пачками
-        public static void saveMSGToSheet(List<String> content, int population, int reconnectingCount)
+        public static void saveMSGToSheet(List<String> content, int population)
         {
-
-            LogHelper.checkDir( LogHelper.currentFolder );
-
-            LogHelper.resultsFile = new FileInfo( LogHelper.currentFolder + "\\" + RESULT_CORRECT_FILE + reconnectingCount.ToString() + ".xlsx" );
-
-            LogHelper.results = new ExcelPackage(LogHelper.resultsFile);
-            LogHelper.resultsSheet = LogHelper.results.Workbook.Worksheets.Add("Результаты");
 
             int i = 0;
             foreach (string str in content)
             {
-                LogHelper.resultsSheet.Cells[i + 1, population + 1].Value = content[i];
+                LogHelper.resultsSheet.Cells[i + 1, population + 1].Value = str;
                 i++;
             }
-          //  LogHelper.results.Save();
 
             return;
         }
@@ -105,36 +104,55 @@ namespace Neural
             string folder = LogHelper.currentFolder + "\\" + SAVE_CONNECT_DIR;
             LogHelper.checkDir(folder);
 
-            //create two files - for inputs and outputs connects config save 
-            System.IO.StreamWriter fileInputs = new System.IO.StreamWriter(folder + "\\ТочкиДляВходов-" + connectingCount + ".csv");
-            System.IO.StreamWriter fileOutputs = new System.IO.StreamWriter(folder + "\\ТочкиДляВыходов-" + connectingCount + ".csv");
+            FileInfo fileInputs = new FileInfo(folder + "\\ТочкиДляВходов-" + connectingCount + ".xlsx");
+            ExcelPackage bookInputs = new ExcelPackage(fileInputs);
+            ExcelWorksheet sheetInputs = bookInputs.Workbook.Worksheets.Add("ТочкиДляВходов");
 
-            fileInputs.WriteLine("Индекс вх. нейрона подсети;Слой ИНС;Нейрон ИНС;Вес ИНС;");
-            fileOutputs.WriteLine("Индекс вх. нейрона подсети;Слой ИНС;Нейрон ИНС;Вес ИНС;");
+            FileInfo fileOutputs = new FileInfo(folder + "\\ТочкиДляВыходов-" + connectingCount + ".xlsx");
+            ExcelPackage bookOutputs = new ExcelPackage(fileOutputs);
+            ExcelWorksheet sheetOutputs = bookOutputs.Workbook.Worksheets.Add("ТочкиДляВыходов");
+
+            //headers
+            sheetInputs.Cells[1, 1].Value = "Индекс вх. нейрона подсети";
+            sheetOutputs.Cells[1, 1].Value = "Индекс вых. нейрона подсети";
+            sheetOutputs.Cells[1, 2].Value = sheetInputs.Cells[1, 2].Value = "Слой ИНС";
+            sheetOutputs.Cells[1, 3].Value = sheetInputs.Cells[1, 3].Value = "Нейрон ИНС";
+            sheetOutputs.Cells[1, 4].Value = sheetInputs.Cells[1, 4].Value = "Вес ИНС";
 
             //save inputs
             int i = 0;
             foreach (String connect in inputConnected)
             {
-                fileInputs.WriteLine(i.ToString() + ";" + connect.Replace(':', ';'));
+                String[] temp = connect.Split(':');
+
+                sheetInputs.Cells[i + 2, 1].Value = i;
+                sheetInputs.Cells[i + 2, 2].Value = Int32.Parse(temp[0]);
+                sheetInputs.Cells[i + 2, 3].Value = Int32.Parse(temp[1]);
+                sheetInputs.Cells[i + 2, 4].Value = Int32.Parse(temp[2]);
                 i++;
             }
-            fileInputs.Flush();
 
             //save outputs
             i = 0;
             foreach (String connect in outputConnected)
             {
-                fileOutputs.WriteLine(i.ToString() + ";" + connect.Replace(':', ';'));
+                String[] temp = connect.Split(':');
+
+                sheetOutputs.Cells[i + 2, 1].Value = i;
+                sheetOutputs.Cells[i + 2, 2].Value = Int32.Parse(temp[0]);
+                sheetOutputs.Cells[i + 2, 3].Value = Int32.Parse(temp[1]);
+                sheetOutputs.Cells[i + 2, 4].Value = Int32.Parse(temp[2]);
                 i++;
             }
-            fileOutputs.Flush();
+
+            bookInputs.Save();
+            bookOutputs.Save();
 
             return;
         }
 
         //запись весов отобранных или скрещенных сетей
-        public static void WriteEvo(Subnet net, int reconnectingCount, Boolean cross, string parents = "", int population = 0)
+        public static void SubnetToFile(Subnet net, int reconnectingCount, Boolean cross, string parents = "", int population = 0)
         {
             try
             {
@@ -152,6 +170,10 @@ namespace Neural
 
                 file.WriteLine("Layer;Neuron;Weight;Value;");
 
+                LogHelper.allWeightsSheet.Cells[ 1, netsCounter + 1].Value = net.ID + "-" + parents + "-" + net.quality;
+
+
+                int row = 0;
                 for (int i = 0; i < net.Network.Layers.Length; i++)
                 {
                     for (int j = 0; j < net.Network.Layers[i].Neurons.Length; j++)
@@ -160,11 +182,15 @@ namespace Neural
                         {
 
                             file.WriteLine(i.ToString() + ";" + j.ToString() + ";" + k.ToString() + ";" + net.Network.Layers[i].Neurons[j].Weights[k] + ";");
-
+                            
+                            LogHelper.allWeightsSheet.Cells[row + 2, netsCounter + 1].Value = net.Network.Layers[i].Neurons[j].Weights[k];
+                            row++;
                         }
                     }
                 }
                 file.Flush();
+                file.Close();
+                netsCounter++;
             }
             catch
             {
@@ -173,36 +199,23 @@ namespace Neural
         }
 
         //коэф.вариации по каждому индексу весов подсетей
-        public static void coefVariationsToFile(double[] coefficients, int population, int reconnectingCount, string msg = "")
+        public static void coefVariationsToFile(double[] coefficients, int population,  string msg = "")
         {
-            //string pathToLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, currentFolder);
-
-            LogHelper.checkDir( LogHelper.currentFolder );
-
-            LogHelper.covarFile =  new FileInfo( LogHelper.currentFolder + "\\" + VARIATIONS_FILE + reconnectingCount.ToString() + ".xlsx" );
-            LogHelper.coefvariations = new ExcelPackage(LogHelper.covarFile);
-            LogHelper.coefvariationsSheet = LogHelper.coefvariations.Workbook.Worksheets.Add("Коэф.вариации");
-
 
             LogHelper.coefvariationsSheet.Cells[ 1, population + 1].Value = msg;
             for (int i = 0; i < coefficients.Length; i++)
             {
-                LogHelper.coefvariationsSheet.Cells[i + 2, population + 1].Value = coefficients[i].ToString();
+                LogHelper.coefvariationsSheet.Cells[i + 2, population + 1].Value = coefficients[i];
             }
 
-            LogHelper.coefvariations.Save();
             return;
         }
 
         //сохранение средних значений по каждому индексу весов подсетей
-        public static void saveMediumsValuesOfWeightsIndexes( List<Subnet> subnets, int population, int reconnectingCount )
+        public static void saveMediumsValuesOfWeightsIndexes(List<Subnet> subnets, int population, string msg = "")
         {
-            LogHelper.checkDir( LogHelper.currentFolder );
-
-            LogHelper.mediumsFile = new FileInfo( LogHelper.currentFolder + "\\" + MEDIUMS_FILE + reconnectingCount.ToString() + ".xlsx" );
-            LogHelper.mediumsBook = new ExcelPackage(LogHelper.mediumsFile);
-            LogHelper.mediumsSheet = LogHelper.mediumsBook.Workbook.Worksheets.Add("Средние значения");
-            int row = 0;
+            mediumsSheet.Cells[ 1, population + 1].Value = msg;
+            int row = 1;
             for (int layer = 0; layer < subnets[0].Network.Layers.Length; layer++)
             {
                 for (int neuron = 0; neuron < subnets[0].Network.Layers[layer].Neurons.Length; neuron++)
@@ -221,7 +234,6 @@ namespace Neural
                     }
                 }
             }
-            LogHelper.mediumsBook.Save();
             return;
         }
 
@@ -229,19 +241,21 @@ namespace Neural
         public static void InputVectorResults( String filename, double[] desireClass, double[] outputClass )
         {
             LogHelper.checkDir(LogHelper.currentFolder);
-            string file = Path.Combine(LogHelper.currentFolder, filename + ".csv");
-            
 
-            System.IO.StreamWriter fileInputs = new System.IO.StreamWriter(file);
+            FileInfo file = new FileInfo(LogHelper.currentFolder + "\\" + filename + ".xlsx");
+            ExcelPackage book = new ExcelPackage(file);
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add(filename);
+
 
             if (desireClass.Length != outputClass.Length)
                 throw new Exception();
 
             for (int i = 0; i < desireClass.Length; i++)
             {
-                fileInputs.WriteLine(desireClass[i].ToString() + ";" + outputClass[i].ToString());
+                sheet.Cells[i + 1, 1].Value = desireClass[i];
+                sheet.Cells[i + 1, 2].Value = outputClass[i];
             }
-            fileInputs.Flush();
+            book.Save();
             return;
         }
 
@@ -258,7 +272,75 @@ namespace Neural
             //commit mediums file
             LogHelper.mediumsBook.Save();
 
+            //all weights file
+            LogHelper.allWeightsBook.Save();
+
+            //standart deviation file
+            LogHelper.deviationBook.Save();
+
             return;
         }
+
+        //Инициализирует папки, файлы и spreadsheets 
+        public static void InitReporting(Subnet subnet = null, int reconnectingCount = 0) 
+        {
+
+            LogHelper.checkDir(LogHelper.currentFolder);
+            LogHelper.netsCounter = 0;
+
+            //создание файла с результатами корректировки
+            LogHelper.resultsFile = new FileInfo(LogHelper.currentFolder + "\\" + RESULT_CORRECT_FILE + reconnectingCount.ToString() + ".xlsx");
+            LogHelper.results = new ExcelPackage(LogHelper.resultsFile);
+            LogHelper.resultsSheet = LogHelper.results.Workbook.Worksheets.Add("Результаты");
+
+            //создание файла с коэф.вариации
+            LogHelper.covarFile = new FileInfo(LogHelper.currentFolder + "\\" + VARIATIONS_FILE + reconnectingCount.ToString() + ".xlsx");
+            LogHelper.coefvariations = new ExcelPackage(LogHelper.covarFile);
+            LogHelper.coefvariationsSheet = LogHelper.coefvariations.Workbook.Worksheets.Add("Коэф.вариации");
+
+            //стандартное отклонение
+            LogHelper.deviationFile = new FileInfo(LogHelper.currentFolder + "\\" + DEVIATION_FILE + reconnectingCount.ToString() + ".xlsx");
+            LogHelper.deviationBook = new ExcelPackage(LogHelper.deviationFile);
+            LogHelper.deviationSheet = LogHelper.deviationBook.Workbook.Worksheets.Add("Стандартные отклонения весов");
+
+            //средние значения
+            LogHelper.mediumsFile = new FileInfo(LogHelper.currentFolder + "\\" + MEDIUMS_FILE + reconnectingCount.ToString() + ".xlsx");
+            LogHelper.mediumsBook = new ExcelPackage(LogHelper.mediumsFile);
+            LogHelper.mediumsSheet = LogHelper.mediumsBook.Workbook.Worksheets.Add("Средние значения");
+
+            //веса всех сетей
+            LogHelper.allWeightsFile = new FileInfo(LogHelper.currentFolder + "\\" + ALLWEIGHTS_FILE + reconnectingCount.ToString() + ".xlsx");
+            LogHelper.allWeightsBook = new ExcelPackage(LogHelper.allWeightsFile);
+            LogHelper.allWeightsSheet = LogHelper.allWeightsBook.Workbook.Worksheets.Add("Веса всех сетей сессии");
+            
+            if (subnet != null)
+                LogHelper.setIndexesToSheet(subnet);
+
+            return;
+        }
+
+        public static void StandartDeviationToFile(double[] deviation, int population, string msg = "")
+        {
+            LogHelper.deviationSheet.Cells[1, population + 1].Value = msg;
+            for (int i = 0; i < deviation.Length; i++)
+            {
+                LogHelper.deviationSheet.Cells[i + 2, population + 1].Value = deviation[i];
+            }
+
+            return;
+        }
+
+        private static void setIndexesToSheet(Subnet subnet)
+        {
+            int count = ANNUtils.getCountOfWeights(subnet.Network);
+
+            for (int i = 1; i <= count; i++)
+            {
+                mediumsSheet.Cells[ i + 1, 1].Value = "Вес " + (i-1).ToString();
+                coefvariationsSheet.Cells[i + 1, 1].Value = "Вес " + (i - 1).ToString();
+                deviationSheet.Cells[i + 1, 1].Value = "Вес " + (i - 1).ToString();
+            }
+        }
+    
     }
 }

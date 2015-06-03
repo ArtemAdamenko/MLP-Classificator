@@ -61,7 +61,6 @@ namespace Neural
         {
             InitializeComponent();
             //add stop event handler
-            this.stopButton.Click += new System.EventHandler(this.StopRoutine);
 
             RollingPointPairList listErrorP = new RollingPointPairList(200);
             RollingPointPairList listError = new RollingPointPairList(200);
@@ -101,26 +100,6 @@ namespace Neural
             else {
                 this.relationsLabel.Text = "(0)";
             }
-        }
-
-        //получение всех доступных связей для подсоединения(входы)   
-        private List<String> getAvailableWeights(Network net)
-        {
-            List<string> availableNeurons = new List<String>();
-
-            //add neurons for available neurons, for connected subnet inputs
-            for (int layer = 0; layer < net.Layers.Length; layer++)
-            {
-                for (int neuron = 0; neuron < net.Layers[layer].Neurons.Length; neuron++)
-                {
-                    for (int weight = 0; weight < net.Layers[layer].Neurons[neuron].Weights.Length; weight++)
-                    {
-                        availableNeurons.Add(layer.ToString() + ":" + neuron.ToString() + ":" + weight.ToString());
-                    }
-                }
-            }
-
-            return availableNeurons;
         }
 
         //Отрисовка сети     
@@ -392,7 +371,7 @@ namespace Neural
 
                     this.MinMaxRelationsValues(tempRelationsValues);
                     tempRelationsValues.Clear();
-                    //double value = Math.Abs(1 - res[classesList.IndexOf(classes[count])]);
+
                     double value = Math.Abs(classes[count] - this.max(res));
                     double valueP = 1 - res[classes[count]];
 
@@ -405,15 +384,12 @@ namespace Neural
                 {
                     MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     break;
-                }
-
-
-                moduleTestQuality = (1 - (moduleValidateError / data.GetLength(0))) * 100;
-                this.moduleErrorBox.Invoke(new Action(() => this.moduleErrorBox.Text = moduleTestQuality.ToString("F6")));
-                probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
-                this.probabilisticErrorTextBox.Invoke(new Action(() => this.probabilisticErrorTextBox.Text = probabilisticTestQuality.ToString("F6")));
-
+                }      
             }
+            moduleTestQuality = (1 - (moduleValidateError / data.GetLength(0))) * 100;
+            probabilisticTestQuality = (1 - (probabilisticValidateError / data.GetLength(0))) * 100;
+            this.moduleErrorBox.Invoke(new Action(() => moduleErrorBox.Text = moduleTestQuality.ToString("F6")));
+            this.probabilisticErrorTextBox.Invoke(new Action(() => probabilisticErrorTextBox.Text = probabilisticTestQuality.ToString("F6")));
 
             return new double[2]{moduleTestQuality, probabilisticTestQuality};
  
@@ -506,7 +482,7 @@ namespace Neural
                     }
 
                     //normalization input values
-                    tempData = this.normalization(tempData, minData, maxData, rowCountData, colCountData);
+                    tempData = ANNUtils.normalization( tempData, minData, maxData, rowCountData, colCountData );
 
                     // allocate and set data
                     data = new double[i, colCountData - 1];
@@ -528,37 +504,6 @@ namespace Neural
                 }
 
             }
-        }
-
-        //normalization data for learning
-        private double[,] normalization(double[,] data, double[] min, double[] max, int rowCountData, int colCountData)
-        {
-            for (int row = 0; row < rowCountData; row++)
-            {
-                for (int column = 0; column < colCountData - 1; column++)
-                {
-                    data[row, column] = (((data[row, column] - min[column]) * 1 / (max[column] - min[column])));
-
-                }
-            }
-            return data;
-        }
-
-        //Кол-во связей в сети
-        private int getCountOfWeights(Network network)
-        {
-            int i = 0; 
-            for (int layer = 0; layer < network.Layers.Length; layer++)
-            {
-                for (int neuron = 0; neuron < network.Layers[layer].Neurons.Length; neuron++)
-                {
-                    for (int weight = 0; weight < network.Layers[layer].Neurons[neuron].Weights.Length; weight++)
-                    {
-                        i++;
-                    }
-                }
-            }
-            return i;
         }
 
         //проверка входящих параметров
@@ -653,11 +598,13 @@ namespace Neural
             Random rnd = new Random();
 
             Subnet subnet1 = new Subnet(new ActivationNetwork(new SigmoidFunction(this.alpha), this.input, this.hidden));
+            LogHelper.NewSessionFolder();
+            LogHelper.InitReporting( subnet1 );
+
             List<Subnet> subnets = new List<Subnet>();
             
-  
             //generate connections between common net and subnet
-            List<String> availableRelations = new List<String>(this.getAvailableWeights(this.network)),
+            List<String> availableRelations = new List<String>( ANNUtils.getAvailableWeights(this.network) ),
                     connectedInputNeurons = new List<String>(),
                     inputSubNet = new List<String>();
 
@@ -688,7 +635,7 @@ namespace Neural
                 outputNeuron++;
             }
 
-            LogHelper.NewSessionFolder();
+            
 
             LogHelper.SubConnectReport( connectedInputNeurons, connectedOutputNeurons, this.reconnectingCount );
             this.test();
@@ -698,7 +645,6 @@ namespace Neural
 
             this.label2.Invoke(new Action(() => this.label2.Text = "Отбор..."));
             
-
             double currentQuality = 0.0;
             DateTime t = DateTime.Now;
 
@@ -722,11 +668,9 @@ namespace Neural
 
                 subnets.Add(subnet);
 
-                LogHelper.WriteEvo( subnet, this.reconnectingCount, false );
-                selectionResult.Add("ID_" + subnet.ID.ToString() + "-" + subnet.quality.ToString() + "%");
+                LogHelper.SubnetToFile(subnet, reconnectingCount, false);
 
-                //this.saveMSGToSheet("ID_" + subnet.ID.ToString() + "-" + subnet.quality.ToString() + "%", (subnets.Count - 1) + 1, 0);
-                
+                selectionResult.Add("ID_" + subnet.ID.ToString() + "-" + subnet.quality.ToString() + "%");
 
                 DateTime t2 = DateTime.Now;
                 System.TimeSpan diffTime = t2.Subtract(t);
@@ -737,8 +681,7 @@ namespace Neural
                 //когда отбор окончился
                 if (subnets.Count == this.numberSubNets)
                 {
-                    selectionResult.Reverse();
-                    LogHelper.saveMSGToSheet( selectionResult, 0, this.reconnectingCount );
+                    LogHelper.saveMSGToSheet( selectionResult, 0 );
 
                     currentQuality = this.evolution(subnets, connectedInputNeurons, connectedOutputNeurons);
 
@@ -793,23 +736,27 @@ namespace Neural
                         connectedOutputNeurons.AddRange(tempNewOutputs);
                         availableRelations.AddRange(tempOlds);
 
-                        LogHelper.SubConnectReport(connectedInputNeurons, connectedOutputNeurons, ++this.reconnectingCount);
+                        //увеличиваем счетчик переключений
+                        ++this.reconnectingCount;
+                        LogHelper.SubConnectReport(connectedInputNeurons, connectedOutputNeurons, this.reconnectingCount);
+                        LogHelper.Commit();
+                        LogHelper.InitReporting(subnet1, this.reconnectingCount);
 
                         this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
                         this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
                     }
-                    else {
+                    else if(!needToStop && (this.validQuality < currentQuality)) {
+
                         needToStop = true;
                         this.test();
                         SpreadTest = false;
                         break;
-                    }
-
-                    
+                    }            
                 }
                 else
                     this.betterBox.Invoke(new Action(() => this.betterBox.Text = subnets.Count.ToString()));
             }
+            LogHelper.Commit();
             return;
 
         }
@@ -824,28 +771,6 @@ namespace Neural
             Worker.Start();     
         }
 
-        //удаление заданное кол-во сетей по возрастанию
-        private List<Subnet> dropBadSubnets(List<Subnet> subnets, int count/*, double quality*/)
-        {
-            this.label2.Invoke(new Action(() => this.label2.Text = "Отбор лучших..."));
-
-            zedGraphControl1.GraphPane.CurveList[0].Clear();
-            zedGraphControl1.GraphPane.CurveList[1].Clear();
-
-            //сортировка по убыванию
-            subnets = subnets.OrderByDescending(net => net.ID).ToList();
-            subnets = subnets.OrderByDescending(net => net.quality).ToList();
-
-            for (int i = 0; i < count; i++)
-            {
-                //удаление худших с конца
-                subnets.RemoveAt(subnets.Count - 1);
-                this.betterBox.Invoke(new Action(() => this.betterBox.Text = subnets.Count.ToString()));
-            }
-
-            return subnets;
-        }
-
         //эволюция подсетей
         private double evolution(List<Subnet> subnets, List<String> connectedInputNeurons, List<String> connectedOutputNeurons)
         {
@@ -855,116 +780,119 @@ namespace Neural
 
             Random rnd = new Random();
             double[] coefficients;
+            double[] mediums;
+            double[] deviations;
             double quality = 0.0;
-
             double[] commonNetQuality = new double[2];
+            population = 1;
 
-            this.population = 1;
+            //standart deviation
+            mediums = ANNUtils.mediums(subnets);
+            deviations = ANNUtils.standartDeviation(mediums, subnets);
             
-            LogHelper.saveMediumsValuesOfWeightsIndexes( subnets, population, this.reconnectingCount );
 
-
-            coefficients = this.coefficientVariations(subnets);
-            LogHelper.coefVariationsToFile( coefficients, population, this.reconnectingCount, "После отбора" );
+            coefficients = ANNUtils.coefficientVariations( mediums, deviations );
+            LogHelper.StandartDeviationToFile(deviations, population, "После отбора");
+            LogHelper.coefVariationsToFile( coefficients, population, "После отбора" );
+            LogHelper.saveMediumsValuesOfWeightsIndexes(subnets, population, "После отбора");
 
             selectionResult.Add("Скрещивание " + population);
 
             while (localSubNets.Count > 0 && !needToStop)
             {
-                this.PopulationBox.Invoke(new Action(() => this.PopulationBox.Text = population.ToString()));
-                this.label2.Invoke(new Action(() => this.label2.Text = "Скрещивание..."));
-
-                this.betterBox.Invoke(new Action(() => this.betterBox.Text = subnets.Count.ToString()));
+                PopulationBox.Invoke(new Action(() => PopulationBox.Text = population.ToString()));
+                label2.Invoke(new Action(() => label2.Text = "Скрещивание..."));
+                betterBox.Invoke(new Action(() => betterBox.Text = subnets.Count.ToString()));
 
                 //get random pair of nets, delete after from list
                 int net = rnd.Next(0, localSubNets.Count);
-                Subnet tempSub1 = localSubNets[net];
+                Subnet parentSub1 = localSubNets[net];
                 localSubNets.RemoveAt(net);
 
                 net = rnd.Next(0, localSubNets.Count);
-                Subnet tempSub2 = localSubNets[net];
+                Subnet parentSub2 = localSubNets[net];
                 localSubNets.RemoveAt(net);
 
                 //testing and adding
-                Subnet sub = new Subnet(this.summarazing(tempSub1, tempSub2, coefficients));
+                Subnet sub = new Subnet( summarazing( parentSub1, parentSub2, coefficients ) );
 
                 sub.inputAssosiated = connectedInputNeurons;
                 sub.outputAssosiated = connectedOutputNeurons;
 
-                commonNetQuality = this.testing(sub);
+                commonNetQuality = testing(sub);
                 sub.quality = commonNetQuality[0];
                 sub.probabilistic = commonNetQuality[1];
 
-                selectionResult.Add("ID_" + sub.ID.ToString() + "-P1_" + tempSub1.ID.ToString() + "-P2_" + tempSub2.ID.ToString()
+                selectionResult.Add("ID_" + sub.ID.ToString() + "-P1_" + parentSub1.ID.ToString() + "-P2_" + parentSub2.ID.ToString()
                                     + "-" + sub.quality.ToString() + "%");
 
-                LogHelper.WriteEvo( sub, this.reconnectingCount, true, tempSub1.ID + "-" + tempSub2.ID, population );
-
+                LogHelper.SubnetToFile(sub, reconnectingCount, true, parentSub1.ID + "-" + parentSub2.ID, population);
                 subnets.Add(sub);
+                updateBarCHart(sub.quality, subnets.Count, sub.probabilistic);
 
-                this.updateBarCHart(sub.quality, subnets.Count, sub.probabilistic);
-
-                DateTime t2 = DateTime.Now;
-                System.TimeSpan diffTime = t2.Subtract(t);
-                this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
+                timeLabel.Invoke(new Action(() => timeLabel.Text = DateTime.Now.Subtract(t).ToString()));
 
                 //скрещивания окончилось
                 if (localSubNets.Count == 0)
                 {
-                    --this.cntOfPopulationsPerStep;
-                    selectionResult.Reverse();
-                    LogHelper.saveMSGToSheet( selectionResult, population, this.reconnectingCount );
-                    selectionResult.Clear();
+                    --cntOfPopulationsPerStep;
 
-                    if (this.cntOfPopulationsPerStep == 0)
+                    if (cntOfPopulationsPerStep == 0)
                     {
+                        LogHelper.saveMSGToSheet(selectionResult, population);
+                        selectionResult.Clear();
+
                         population++;
+                        double mediumErrorForPopulation = 0.0;
+                        double summ = 0.0;
+                        double coefficient = 0.0;
                         selectionResult.Add("Скрещивание " + population);
 
                         //удаляем  самых худших
-                        localSubNets = this.dropBadSubnets(subnets, (this.numberSubNets / 2) * Int32.Parse(this.popultextBox.Text));
-
-                        //начинаем заново
+                        zedGraphControl1.GraphPane.CurveList[0].Clear();
+                        zedGraphControl1.GraphPane.CurveList[1].Clear();
+                        label2.Invoke(new Action(() => label2.Text = "Отбор лучших..."));        
+                        localSubNets = ANNUtils.dropBadSubnets( subnets, (numberSubNets / 2) * Int32.Parse(popultextBox.Text) );
                         subnets = new List<Subnet>(localSubNets);
-
-                        double mediumErrorForPopulation = 0.0;
+                        betterBox.Invoke(new Action(() => betterBox.Text = localSubNets.Count.ToString()));
 
                         //отображаем лучших оставшихся на графике
-                        for (int i = 0; i < subnets.Count; i++)
+                        int i = 0;
+                        foreach (Subnet subnet in localSubNets)
                         {
-                            this.updateBarCHart(subnets[i].quality, i, subnets[i].probabilistic);
-                            mediumErrorForPopulation += subnets[i].quality;
+                            updateBarCHart( subnet.quality, i++, subnet.probabilistic );
+                            mediumErrorForPopulation += subnet.quality;
                         }
 
-                        mediumErrorForPopulation = mediumErrorForPopulation / subnets.Count;
+                        mediumErrorForPopulation /= subnets.Count;
 
-                        double summ = 0.0;
-                        double coefficient = 0.0;
-
-                        for (int i = 0; i < subnets.Count; i++)
+                        foreach (Subnet subnet in localSubNets)
                         {
-                            summ += Math.Pow((subnets[i].quality - mediumErrorForPopulation), 2);
+                            summ += Math.Pow( (subnet.quality - mediumErrorForPopulation), 2 );
                         }
-                        coefficient = Math.Sqrt(summ / subnets.Count);
+
+                        coefficient = Math.Sqrt( summ / subnets.Count );
                         coefficient = coefficient / mediumErrorForPopulation;
 
-                        this.mediumErrorPopulationBox.Invoke(new Action(() => this.mediumErrorPopulationBox.Text = mediumErrorForPopulation.ToString("F6")));
-                        this.betterPopulationValueBox.Invoke(new Action(() => this.betterPopulationValueBox.Text = subnets[0].quality.ToString("F6")));
-                        this.covariationPopulationBox.Invoke(new Action(() => this.covariationPopulationBox.Text = coefficient.ToString("F6")));
+                        //standart deviation
+                        mediums = ANNUtils.mediums(localSubNets);
+                        deviations = ANNUtils.standartDeviation(mediums, localSubNets);
 
-                        startSubnets = new List<Subnet>(subnets);
+                        coefficients = ANNUtils.coefficientVariations(mediums, deviations);
+                        LogHelper.StandartDeviationToFile( deviations, population, "После скрещивания " + (population - 1) );
+                        LogHelper.coefVariationsToFile( coefficients, population, "После скрещивания " + (population - 1) );
+                        LogHelper.saveMediumsValuesOfWeightsIndexes( localSubNets, population, "После скрещивания " + (population - 1) );
 
-                        //коэффициенты вариации
-                        coefficients = this.coefficientVariations(subnets);
-                        LogHelper.coefVariationsToFile( coefficients, population, this.reconnectingCount, "После скрещивания " + (population - 1) );
+                        cntOfPopulationsPerStep = Int32.Parse(popultextBox.Text); ;
+                        startSubnets = new List<Subnet>(localSubNets);
+                        mediumErrorPopulationBox.Invoke(new Action(() => mediumErrorPopulationBox.Text = mediumErrorForPopulation.ToString("F6")));
+                        betterPopulationValueBox.Invoke(new Action(() => betterPopulationValueBox.Text = localSubNets[0].quality.ToString("F6")));
+                        covariationPopulationBox.Invoke(new Action(() => covariationPopulationBox.Text = coefficient.ToString("F6")));
 
-                        LogHelper.saveMediumsValuesOfWeightsIndexes( subnets, population, this.reconnectingCount );
-
-                        cntOfPopulationsPerStep = Int32.Parse(this.popultextBox.Text); ;
-                        if (population > this.cntPopulation)
+                        if (population > cntPopulation)
                         {
-                            this.globalSubnet = subnets[0];
-                            this.PopulationBox.Invoke(new Action(() => this.PopulationBox.Text = "0"));
+                            globalSubnet = subnets[0];
+                            PopulationBox.Invoke(new Action(() => PopulationBox.Text = "0"));
                             return subnets[0].quality;
                         }
                     }
@@ -975,56 +903,6 @@ namespace Neural
                 }
             }
             return quality;
-        }
-
-        //коэффициент вариации для каждой позиции веса
-        private double[] coefficientVariations(List<Subnet> subnets)
-        {
-            double[] mediumWeights = new double[this.getCountOfWeights(subnets[0].Network)];
-            double[] coefficients = new double[this.getCountOfWeights(subnets[0].Network)];
-
-
-            //calculate mediums
-            int iWeight = 0;
-            for (int layer = 0; layer < subnets[0].Network.Layers.Length; layer++)
-            {
-                for (int neuron = 0; neuron < subnets[0].Network.Layers[layer].Neurons.Length; neuron++)
-                {
-                    for (int weight = 0; weight < subnets[0].Network.Layers[layer].Neurons[neuron].Weights.Length; weight++)
-                    {
-                        double summ = 0.0;
-                        for (int network = 0; network < subnets.Count; network++)
-                        {
-                            summ += Math.Abs(subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight]);
-                        }
-                        mediumWeights[iWeight] = summ / subnets.Count;
-                        iWeight++;
-                    }
-                }
-
-            }
-
-            //calculate standart deviation
-            iWeight = 0;
-            for (int layer = 0; layer < subnets[0].Network.Layers.Length; layer++)
-            {
-                for (int neuron = 0; neuron < subnets[0].Network.Layers[layer].Neurons.Length; neuron++)
-                {
-                    for (int weight = 0; weight < subnets[0].Network.Layers[layer].Neurons[neuron].Weights.Length; weight++)
-                    {
-                        double summ = 0.0;
-                        for (int network = 0; network < subnets.Count; network++)
-                        {
-                            summ += Math.Pow((subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[weight]), 2);
-                        }
-                        coefficients[iWeight] = summ / subnets.Count;
-                        coefficients[iWeight] = coefficients[iWeight] / mediumWeights[iWeight];
-                        iWeight++;
-                    }
-                }
-
-            }
-            return coefficients;
         }
 
         //суммирование весов двух подсетей
@@ -1044,27 +922,54 @@ namespace Neural
                 {
                     for (int weight = 0; weight < net1.Network.Layers[layer].Neurons[neuron].Weights.Length; weight++)
                     {
-                        //если коэф вариации позиции веса ниже порога - встряхивание
-                        if (coefficients[iWeight] < this.levelVariationsWeights)
+
+                        if (this.levelVariationscheckBox.Checked)
                         {
-                            evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
-                                (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight])/2  * rnd.Next(-100, 100);
-                            availableMutations++;
+                            //если коэф вариации позиции веса ниже порога - встряхивание
+                            if (coefficients[iWeight] < this.levelVariationsWeights)
+                            {
+                                double currWeight = evoSubNet.Layers[layer].Neurons[neuron].Weights[weight];
+
+                                currWeight =
+                                    (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
+
+
+                                currWeight *= rnd.NextDouble() * currWeight;
+                                availableMutations++;
+                            }
+                            else if ((coefficients[iWeight] > this.levelVariationsWeights))
+                            {
+                                evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
+                                    (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
+                            }
                         }
+
                         //если стоит галочка на одинаковые сети и результаты данных сетей одинаковые - встряхивание
-                        if (this.bothEqualNets && (net1.quality == net2.quality))
+                        if (this.BothEqualcheckBox.Checked)
                         {
-                            evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
-                               (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2 * rnd.Next(-100, 100);
-                            availableMutations++;
+                            if (net1.quality == net2.quality)
+                            {
+                                double currWeight = evoSubNet.Layers[layer].Neurons[neuron].Weights[weight];
+                                currWeight =
+                                   (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
+                                currWeight *= rnd.NextDouble() * currWeight;
+
+                                availableMutations++;
+                            }
+                            else
+                            {
+                                evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
+                                    (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
+                            }
 
                         }
-                        //если ни то ни то - не встряхиваем
-                        if ((coefficients[iWeight] > this.levelVariationsWeights) && !this.bothEqualNets)
+                        if (!this.levelVariationscheckBox.Checked && !this.BothEqualcheckBox.Checked)
                         {
                             evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
-                                (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
+                                   (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
                         }
+                        //если ни то ни то - не встряхиваем
+                        
                         iWeight++;
                     }
                 }
@@ -1190,21 +1095,16 @@ namespace Neural
             return classificator;
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            needToStop = true;
-            this.test();
-            SpreadTest = false;
-        }
-
         private void subnetTopologyBox_TextChanged(object sender, EventArgs e)
         {
             this.checkTopology();
         }
 
-        private void StopRoutine(object sender, EventArgs evArgs)
+        private void stopButton_Click(object sender, EventArgs e)
         {
-            LogHelper.Commit();
+            needToStop = true;
+            this.test();
+            SpreadTest = false;
         }
     }
 

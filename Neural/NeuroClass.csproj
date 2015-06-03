@@ -60,7 +60,7 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>003_neuron_neuronal_connections_neural_network_sci.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\003_neuron_neuronal_connections_neural_network_sci.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>FEB5E55688D7E69B5F68E9C9C5B05F09F7B8DD27</ManifestCertificateThumbprint>
@@ -113,6 +113,7 @@
     <Compile Include="Activation Functions\IActivationFunction.cs" />
     <Compile Include="Activation Functions\SigmoidFunction.cs" />
     <Compile Include="Activation Functions\ThresholdFunction.cs" />
+    <Compile Include="ANNUtils.cs" />
     <Compile Include="Initialization\GaussianWeights.cs" />
     <Compile Include="Initialization\NguyenWidrow.cs" />
     <Compile Include="Layers\ActivationLayer.cs" />
@@ -191,7 +192,7 @@
     <None Include="Resources\1.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="003_neuron_neuronal_connections_neural_network_sci.ico" />
+    <Content Include="Resources\003_neuron_neuronal_connections_neural_network_sci.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
