@@ -466,8 +466,6 @@ namespace Neural
                                 maxData[j] = tempData[i, j];
                         }
 
-                        //if (strs.Length-1 < colCountData - 1)
-                        //  continue;
                         tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
 
                         //insert class in list of classes, if not find
@@ -475,8 +473,6 @@ namespace Neural
                         {
                             classesList.Add(tempClasses[i]);
                         }
-
-                        //samplesPerClass[tempClasses[i]]++;
 
                         i++;
                     }
@@ -926,7 +922,7 @@ namespace Neural
                         if (this.levelVariationscheckBox.Checked)
                         {
                             //если коэф вариации позиции веса ниже порога - встряхивание
-                            if (coefficients[iWeight] < this.levelVariationsWeights)
+                            if (Math.Abs(coefficients[iWeight]) < this.levelVariationsWeights)
                             {
                                 double currWeight = evoSubNet.Layers[layer].Neurons[neuron].Weights[weight];
 
@@ -937,7 +933,7 @@ namespace Neural
                                 currWeight *= rnd.NextDouble() * currWeight;
                                 availableMutations++;
                             }
-                            else if ((coefficients[iWeight] > this.levelVariationsWeights))
+                            else if ((Math.Abs(coefficients[iWeight]) > this.levelVariationsWeights))
                             {
                                 evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
                                     (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;

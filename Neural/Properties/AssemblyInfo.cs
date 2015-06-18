@@ -1,16 +1,17 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Resources;
 
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("Neural")]
+[assembly: AssemblyTitle("ANNBuilder")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Computer")]
-[assembly: AssemblyProduct("Neural")]
-[assembly: AssemblyCopyright("Copyright © Computer 2014")]
+[assembly: AssemblyProduct("ANNBuilder")]
+[assembly: AssemblyCopyright("Copyright © Artem Adamenko 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +33,6 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номер построения и номер редакции по умолчанию, 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.4.9")]
+[assembly: AssemblyFileVersion("1.4.9")]
+[assembly: NeutralResourcesLanguageAttribute("ru-RU")]

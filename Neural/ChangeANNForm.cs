@@ -9,7 +9,7 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
-using ExcelLibrary.SpreadSheet;
+using OfficeOpenXml;
 
 
 namespace Neural
@@ -20,6 +20,7 @@ namespace Neural
         //App options
         Network network = null;
         Thread Worker;
+        int globalOffNeuronsCount = 0;
 
         #region Neural Net options
                 private Boolean needToStop = false;
@@ -43,18 +44,18 @@ namespace Neural
         #endregion
 
         #region QualityWorkBooks
-            string fileXlsNeurons;
-            Workbook QualityWorkBook;
-            Worksheet QualityWorkSheet;
+            private static FileInfo fileXlsNeurons;
+            private static ExcelPackage QualityWorkBook;
+            private static ExcelWorksheet QualityWorkSheet;
 
-            string fileXlsWeightsRel;
-            Workbook WeightsSumWorkBook;
-            Worksheet WeightsSumWorkSheet;
+            private static FileInfo fileXlsWeightsRel;
+            private static ExcelPackage WeightsSumWorkBook;
+            private static ExcelWorksheet WeightsSumWorkSheet;
 
             //store data for summ of absolutes values of weights
-            string fileXlsWeightsAbs;
-            Workbook AbsWeightsSumWorkBook;
-            Worksheet AbsWeightsSumWorkSheet;
+            private static FileInfo fileXlsWeightsAbs;
+            private static ExcelPackage AbsWeightsSumWorkBook;
+            private static ExcelWorksheet AbsWeightsSumWorkSheet;
         #endregion
 
 
@@ -81,7 +82,7 @@ namespace Neural
             if (200 * (network.Layers.Length + 1) > this.pictureBox1.Width)
                 bmp = new Bitmap(200 * (network.Layers.Length + 1), 50 * maxNeurons);
             else
-                bmp = new Bitmap(this.pictureBox1.Width, 50 * maxNeurons);
+                bmp = new Bitmap(700, 50 * maxNeurons); //700 picturebox.width
 
             formGraphics = Graphics.FromImage(bmp);
             int x = 0;
@@ -144,10 +145,14 @@ namespace Neural
                         {
                             //if weight current neuron == 0.0
                             if (network.Layers[i].Neurons[j].Weights[b] == 0.0)
+                            {
                                 _myPen.Color = Color.Red;
-                            else
-                                _myPen.Color = Color.Black;
+                                _myPen.Width = 3;
+                            } 
+                            
                             formGraphics.DrawLine(_myPen, hiddenLeftPoints[j], fisrtPoints[b]);
+                            _myPen.Color = Color.Black;
+                            _myPen.Width = 1;
                         }
                     }
                     else if (i != 0)
@@ -156,10 +161,14 @@ namespace Neural
                         {
                             //if weight current neuron == 0.0
                             if (network.Layers[i].Neurons[j].Weights[c] == 0.0)
+                            {
                                 _myPen.Color = Color.Red;
-                            else
-                                _myPen.Color = Color.Black;
+                                _myPen.Width = 3;
+                            }
+                            
                             formGraphics.DrawLine(_myPen, hiddenLeftPoints[j], tempRightPoints[c]);
+                            _myPen.Color = Color.Black;
+                            _myPen.Width = 1;
                         }
                     }
                 }
@@ -167,8 +176,8 @@ namespace Neural
                 tempRightPoints = new System.Drawing.Point[network.Layers[i].Neurons.Length];
                 tempRightPoints = hiddenRightPoints;
             }
-
-            pictureBox1.Image = bmp;
+            pictureBox1.Invoke(new Action(() => pictureBox1.Image = bmp));
+          //  pictureBox1.Image = bmp;
         }
 
         //Заполняет таблицу значениями  слоев, нейронов и весов соответственно
@@ -189,7 +198,7 @@ namespace Neural
 
         }
 
-        //Запуск сети для проверки
+        //проверка отключения/включения весов
         private void CheckNeurons()
         {
             for (int i = 0; i < this.dataGridView1.RowCount; i++)
@@ -241,18 +250,10 @@ namespace Neural
                 try
                 {
                     network = Network.Load(openFileDialog2.FileName);
-
                     //подсчет нейронов в сети
-                    int neuronsCount = 0;
-                    for (int layer = 0; layer < network.Layers.Length; layer++)
-                    {
-                        for (int neuron = 0; neuron < network.Layers[layer].Neurons.Length; neuron++)
-                        {
-                            neuronsCount++;
-                        }
-                    }
+                    int neuronsCount = ANNUtils.getNeuronsCount(network);
 
-                    this.neuronsCountBox.Invoke(new Action<String>((nCount) => neuronsCountBox.Text = nCount), neuronsCount.ToString()); 
+                    this.neuronsCountBox.Invoke(new Action(() => neuronsCountBox.Text = neuronsCount.ToString())); 
                 }
                 catch (IOException)
                 {
@@ -274,76 +275,7 @@ namespace Neural
             this.setNeuronsDataGrid();
 
             //инициализация временного массива для поддержки отключения и включения нейронов и связей
-            tempWeights = new double[network.Layers.Length][][][];
-            for (int i = 0; i < network.Layers.Length; i++)
-            {
-                tempWeights[i] = new double[network.Layers[i].Neurons.Length][][];
-                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
-                {
-                    tempWeights[i][j] = new double[network.Layers[i].Neurons[j].Weights.Length][];
-                    for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
-                    {
-                        tempWeights[i][j][k] = new double[1];
-                        //tempWeights[i][j][k][0] = network.Layers[i].Neurons[j].Weights[k];
-                    }
-                }
-            }
-        }
-
-        //поиск наиболее вероятного класса
-        private int max(double[] mass)
-        {
-            int classificator = 0;
-            double tempValue = 0.0;
-            for (int i = 0; i < mass.Length; i++)
-            {
-                if (tempValue < mass[i])
-                {
-                    tempValue = mass[i];
-                    classificator = i;
-                }
-            }
-            return classificator;
-        }
-
-        //запуск тестирования сети
-        private double testing()
-        {
-            double[] res;
-            double[] input = new double[colCountData - 1];
-            double validate = 0.0;
-            double testQuality = 0.0;
-
-
-            for (int count = 0; count < data.GetLength(0) - 1; count++)
-            {
-                try
-                {
-                    //gather inputs for compute, n-1 inputs
-                    for (int i = 0; i < colCountData - 1; i++)
-                    {
-                        input[i] = data[count, i];
-                    }
-                    res = network.Compute(input);
-                    double output = this.max(res);
-                    double value = Math.Abs(classes[count] - output);
-
-                    validate += value;
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
-                }
-
-            }
-            testQuality = (1 - (validate / data.GetLength(0))) * 100;
-            //this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = testQuality.ToString("F10")));
-
-
-
-            return testQuality;
-
+            tempWeights = ANNUtils.emptyWeightsArray(network);
         }
 
         //Запуск тестирования сети, с желаемым классом
@@ -352,7 +284,7 @@ namespace Neural
             //проверка откл/вкл нейронов
             this.CheckNeurons();
             //тестирование
-            double res = this.testing();
+            double res = ANNUtils.testing(network, data, classes);
             this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = res.ToString("F10")));
                 
         }
@@ -402,7 +334,6 @@ namespace Neural
 
                     // read the data
                     classesList.Clear();
-                    //classesList.Add(0);
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
                         string[] strs = line.Trim().Split(';');
@@ -435,14 +366,7 @@ namespace Neural
                     }
 
                     //normalization input values
-                    for (int row = 0; row < rowCountData; row++)
-                    {
-                        for (int column = 0; column < colCountData - 1; column++)
-                        {
-                            tempData[row, column] = (((tempData[row, column] - minData[column]) * 1 / (maxData[column] - minData[column])));
-
-                        }
-                    }
+                    tempData = ANNUtils.normalization(tempData, minData, maxData, rowCountData, colCountData);
 
                     // allocate and set data
                     data = new double[i, colCountData - 1];
@@ -545,7 +469,6 @@ namespace Neural
             }
             Worker = new Thread(() => offNeurons(beginLayer, endLayer, beginNeuron, endNeuron, (end - begin) + 1));
             Worker.Start();
-             //   offNeurons(beginLayer, endLayer, beginNeuron, endNeuron, (end - begin) + 1);
 
         }
 
@@ -554,17 +477,17 @@ namespace Neural
         {
             String time = LogHelper.getTime();
 
-            fileXlsNeurons = LogHelper.getPath("CrashNeurons") + "\\Neurons_" + time + ".xls";
-            QualityWorkBook = new Workbook();
-            QualityWorkSheet = new Worksheet("First Sheet");
+            fileXlsNeurons = new FileInfo(LogHelper.getPath("CrashNeurons") + "\\Результаты-" + time + ".xlsx");
+            QualityWorkBook = new ExcelPackage(fileXlsNeurons);
+            QualityWorkSheet = QualityWorkBook.Workbook.Worksheets.Add("Результаты отключения нейронов");
 
-            fileXlsWeightsRel = LogHelper.getPath("CrashNeurons") + "\\Weights_" + time + ".xls";
-            WeightsSumWorkBook = new Workbook();
-            WeightsSumWorkSheet = new Worksheet("First Sheet");
+            fileXlsWeightsRel = new FileInfo(LogHelper.getPath("CrashNeurons") + "\\СуммаЗначОтклВесов-" + time + ".xlsx");
+            WeightsSumWorkBook = new ExcelPackage(fileXlsWeightsRel);
+            WeightsSumWorkSheet = WeightsSumWorkBook.Workbook.Worksheets.Add("Относительные суммы отключенных весов");
 
-            fileXlsWeightsAbs = LogHelper.getPath("CrashNeurons") + "\\WeightsAbs_" + time + ".xls";
-            AbsWeightsSumWorkBook = new Workbook();
-            AbsWeightsSumWorkSheet = new Worksheet("First Sheet");
+            fileXlsWeightsAbs = new FileInfo(LogHelper.getPath("CrashNeurons") + "\\АбсСуммаЗначОтклВесов-" + time + ".xlsx");
+            AbsWeightsSumWorkBook = new ExcelPackage(fileXlsWeightsAbs);
+            AbsWeightsSumWorkSheet = AbsWeightsSumWorkBook.Workbook.Worksheets.Add("Абсолютные суммы отключенных весов");
 
             //глобальный счетчик выделенных в диапазон нейронов
             int count = 0;
@@ -621,9 +544,9 @@ namespace Neural
 
 
             //write headers to xls
-            QualityWorkSheet = this.setNeuronsWorkBookHeaders(QualityWorkSheet, rangeNeurons);
-            WeightsSumWorkSheet = this.setWeightsWorkBookHeaders(WeightsSumWorkSheet, rangeNeurons);
-            AbsWeightsSumWorkSheet = this.setWeightsWorkBookHeaders(AbsWeightsSumWorkSheet, rangeNeurons);
+            QualityWorkSheet = LogHelper.setNeuronsWorkBookHeaders(QualityWorkSheet, rangeNeurons);
+            WeightsSumWorkSheet = LogHelper.setWeightsWorkBookHeaders(WeightsSumWorkSheet, rangeNeurons);
+            AbsWeightsSumWorkSheet = LogHelper.setWeightsWorkBookHeaders(AbsWeightsSumWorkSheet, rangeNeurons);
 
             int combinations = 1;
             String verticalGroup = "";
@@ -670,9 +593,9 @@ namespace Neural
 
                     }
 
-                    QualityWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
-                    WeightsSumWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
-                    AbsWeightsSumWorkSheet.Cells[combinations, 0] = new Cell(verticalGroup);
+                    QualityWorkSheet.Cells[combinations + 1, 1].Value = verticalGroup;
+                    WeightsSumWorkSheet.Cells[combinations + 1, 1].Value = verticalGroup;
+                    AbsWeightsSumWorkSheet.Cells[combinations + 1, 1].Value = verticalGroup;
 
                     int step = 1;
                     for (int j = 0; j < rangeNeurons.Length; j++, step += 2)
@@ -686,16 +609,17 @@ namespace Neural
 
                         offWeights(network, rangeNeurons[j]);
 
-                        QualityWorkSheet.Cells[combinations, j + 1] = new Cell(this.testing());
+                        QualityWorkSheet.Cells[combinations + 1, j + 2].Value = ANNUtils.testing( network, data, classes );
                         DateTime t2 = DateTime.Now;
                         System.TimeSpan diffTime = t2.Subtract(t);
                         allCombinations++;
-                        this.CombinationsLabel.Invoke(new Action(() => this.CombinationsLabel.Text = allCombinations.ToString()));
-                        this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
-                        WeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumInput.ToString("F2"));
-                        WeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumOutput.ToString("F2"));
-                        AbsWeightsSumWorkSheet.Cells[combinations, step] = new Cell(this.offWeightsSumAbsoluteInput.ToString("F2"));
-                        AbsWeightsSumWorkSheet.Cells[combinations, step + 1] = new Cell(this.offWeightsSumAbsoluteOutput.ToString("F2"));
+                        CombinationsLabel.Invoke(new Action(() => CombinationsLabel.Text = allCombinations.ToString()));
+                        timeLabel.Invoke(new Action(() => timeLabel.Text = diffTime.ToString()));
+
+                        WeightsSumWorkSheet.Cells[combinations + 1, step + 1].Value = offWeightsSumInput;
+                        WeightsSumWorkSheet.Cells[combinations + 1, step + 2].Value = offWeightsSumOutput;
+                        AbsWeightsSumWorkSheet.Cells[combinations + 1, step + 1].Value = offWeightsSumAbsoluteInput;
+                        AbsWeightsSumWorkSheet.Cells[combinations + 1, step + 2].Value = offWeightsSumAbsoluteOutput;
 
                         onWeights(network, rangeNeurons[j]);
                     }
@@ -713,9 +637,9 @@ namespace Neural
                         }
                     }
 
-                    QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 1] = new Cell(fixedOffNeurons + 1);
-                    QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 2] = new Cell(((double)(fixedOffNeurons + 1) / (double)getCountNeuronsOfNet(network)).ToString());
-                    QualityWorkSheet.Cells[combinations, rangeNeurons.Length + 3] = new Cell((fixedOffNeurons + 1).ToString() + "/" + getCountNeuronsOfNet(network));
+                    QualityWorkSheet.Cells[combinations + 1, rangeNeurons.Length + 2].Value = fixedOffNeurons + 1;
+                    QualityWorkSheet.Cells[combinations + 1, rangeNeurons.Length + 3].Value = ((double)(fixedOffNeurons + 1) / (double)ANNUtils.getNeuronsCount(network));
+                    QualityWorkSheet.Cells[combinations + 1, rangeNeurons.Length + 4].Value = (fixedOffNeurons + 1).ToString() + "/" + ANNUtils.getNeuronsCount(network);
 
                     combinations++;
                     verticalGroup = "";
@@ -723,59 +647,14 @@ namespace Neural
 
                 }
             }
-            QualityWorkBook.Worksheets.Add(QualityWorkSheet);
-            QualityWorkBook.Save(fileXlsNeurons);
+            QualityWorkBook.Save();
 
-            WeightsSumWorkBook.Worksheets.Add(WeightsSumWorkSheet);
-            WeightsSumWorkBook.Save(fileXlsWeightsRel);
+            WeightsSumWorkBook.Save();
 
-            AbsWeightsSumWorkBook.Worksheets.Add(AbsWeightsSumWorkSheet);
-            AbsWeightsSumWorkBook.Save(fileXlsWeightsAbs);
+            AbsWeightsSumWorkBook.Save();
             MessageBox.Show("Перебор окончен.");
 
 
-        }
-
-        //установление заголовков для отчета по отключения нейронов в xls файл
-        private Worksheet setNeuronsWorkBookHeaders(Worksheet QualityWorkSheet, Record[] rangeNeurons)
-        {
-            for (int header = 0; header < rangeNeurons.Length; header++)
-            {
-                QualityWorkSheet.Cells[0, header + 1] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString());
-            }
-            QualityWorkSheet.Cells[0, rangeNeurons.Length + 1] = new Cell("Число отключенных нейронов");
-            QualityWorkSheet.Cells[0, rangeNeurons.Length + 2] = new Cell("ЧОН/Нейронов всего");
-            QualityWorkSheet.Cells[0, rangeNeurons.Length + 3] = new Cell("Соотношение нейронов");
-            return QualityWorkSheet;
-        }
-
-        //установление заголовков для отчета по связям нейронов в xls файл
-        private Worksheet setWeightsWorkBookHeaders(Worksheet QualityWorkSheet, Record[] rangeNeurons)
-        {
-            int step = 1;
-            for (int header = 0; header < rangeNeurons.Length; header++)
-            {
-                
-                QualityWorkSheet.Cells[0, step] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString() + "|Вх.");
-                QualityWorkSheet.Cells[0, step + 1] = new Cell(rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString() + "|Исх.");
-                step += 2;
-            }
-            return QualityWorkSheet;
- 
-        }
-
-        //получение количества нейронов в сети
-        private int getCountNeuronsOfNet(Network network)
-        {
-            int count = 0;
-            for (int i = 0; i < network.Layers.Length; i++)
-            {
-                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
-                {
-                    count++;
-                }
-            }
-            return count;
         }
 
         //включение весов
@@ -825,7 +704,6 @@ namespace Neural
                 }
             }
         }
-
 
         //save neural net
         private void saveNetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -937,15 +815,7 @@ namespace Neural
                         i++;
                     }
 
-                    //normalization input values
-                    for (int row = 0; row < rowCountData; row++)
-                    {
-                        for (int column = 0; column < colCountData; column++)
-                        {
-                            tempData[row, column] = (((tempData[row, column] - minData[column]) * 1 / (maxData[column] - minData[column])));
-
-                        }
-                    }
+                    tempData = ANNUtils.normalization(tempData, minData, maxData, rowCountData, colCountData);
 
                     // allocate and set data
                     data = new double[i, colCountData];
@@ -982,33 +852,35 @@ namespace Neural
             double[] res;
             double[] input = new double[colCountData];
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Test") + "\\OutVector_" + LogHelper.getTime() + ".csv"))
+            FileInfo file = new FileInfo(LogHelper.getPath("Test") + "\\ВыходнойВектор-" + LogHelper.getTime() + ".xlsx");
+            ExcelPackage book = new ExcelPackage(file);
+            ExcelWorksheet worksheet = book.Workbook.Worksheets.Add("Выходной вектор");
 
-                for (int count = 0; count < data.GetLength(0) - 1; count++)
+            for (int count = 0; count < data.GetLength(0) - 1; count++)
+            {
+                try
                 {
-                    try
+                    //gather inputs for compute, n-1 inputs
+                    for (int i = 0; i < colCountData; i++)
                     {
-                        //gather inputs for compute, n-1 inputs
-                        for (int i = 0; i < colCountData; i++)
-                        {
-                            input[i] = data[count, i];
-                        }
-                        res = network.Compute(input);
-                        double output = this.max(res);
-                        file.WriteLine(output.ToString() + ";");
+                        input[i] = data[count, i];
                     }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        break;
-                    }
+                    res = network.Compute(input);
 
+                    worksheet.Cells[count + 1, 1].Value = ANNUtils.max(res);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
                 }
 
-
+            }
 
             MessageBox.Show("Выходной вектор сформирован.");
 
+            book.Save();
+            return;
         }
 
 
@@ -1026,10 +898,11 @@ namespace Neural
 
         private void offWeights()
         {
-            List<String> availableWeights = getAvailableWeights(this.network);
+            List<String> availableWeights = ANNUtils.getAvailableWeights(this.network);
             List<String> tempWeightCollection = new List<String>();
             double level = 0.0;
             double radius = 0.0;
+            this.globalOffNeuronsCount = 0;
             try
             {
                 level = Math.Max(0.0, Math.Min(100, double.Parse(this.offWeightsLevelBox.Text)));
@@ -1085,9 +958,11 @@ namespace Neural
                             //off current weights
                             tempWeights[Layer][Neuron][Weight][0] = network.Layers[Layer].Neurons[Neuron].Weights[Weight];
                             network.Layers[Layer].Neurons[Neuron].Weights[Weight] = 0.0;
-
+                            draw();
+                            this.globalOffNeuronsCount++;
                             tempWeightCollection.Add(currentWeight);
 
+                            
                         }
 
                         //del currents weights 
@@ -1109,15 +984,20 @@ namespace Neural
                             //off other weight
                             tempWeights[OtherLayer][OtherNeuron][OtherWeight][0] = network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight];
                             network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight] = 0.0;
+                        //    this.dynamicDrawWeights(OtherLayer, OtherNeuron, Color.Red);
+                            draw();
+                            this.globalOffNeuronsCount++;
 
-                            double res = this.testing();
+                            double res = ANNUtils.testing(network, data, classes);
+                            this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = res.ToString("F10")));
                             combinations++;
                             this.CombinationsLabel.Invoke(new Action(() => this.CombinationsLabel.Text = combinations.ToString()));
+                            this.offCountLabel.Invoke(new Action(() => this.offCountLabel.Text = this.globalOffNeuronsCount.ToString()));
                             DateTime t2 = DateTime.Now;
                             System.TimeSpan diffTime = t2.Subtract(t);
                             this.timeLabel.Invoke(new Action(() => this.timeLabel.Text = diffTime.ToString()));
 
-                            if ((res >= (level - radius)) && (res <= level ))
+                            if ((res >= radius) && (res <= level ))
                             {
                                 //update grid
                                 network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight] = tempWeights[OtherLayer][OtherNeuron][OtherWeight][0];
@@ -1133,7 +1013,8 @@ namespace Neural
 
                                     //on current weights    
                                     network.Layers[Layer].Neurons[Neuron].Weights[Weight] = tempWeights[Layer][Neuron][Weight][0];
-
+                                  //  this.dynamicDrawWeights(Layer, Neuron, Color.Black);
+                                    draw();
                                     availableWeights.Add(tempWeightCollection[on]);
 
                                 }
@@ -1145,6 +1026,9 @@ namespace Neural
                             //on other weight
                             network.Layers[OtherLayer].Neurons[OtherNeuron].Weights[OtherWeight] = tempWeights[OtherLayer][OtherNeuron][OtherWeight][0];
                             tempWeights[OtherLayer][OtherNeuron][OtherWeight][0] = 0.0;
+                          //  this.dynamicDrawWeights(OtherLayer, OtherNeuron, Color.Black);
+                            draw();
+                            this.globalOffNeuronsCount--;
 
                             if (needToSpotWeightsOff)
                                 break;
@@ -1163,6 +1047,8 @@ namespace Neural
                             //on current weights    
                             network.Layers[Layer].Neurons[Neuron].Weights[Weight] = tempWeights[Layer][Neuron][Weight][0];
                             tempWeights[Layer][Neuron][Weight][0] = 0.0;
+                            draw();
+                            this.globalOffNeuronsCount--;
 
                             availableWeights.Add(tempWeightCollection[on]);
 
@@ -1179,6 +1065,25 @@ namespace Neural
                 }
             }
             needToSpotWeightsOff = false;
+            return;
+        }
+
+        private void dynamicDrawWeights(int Layer, int Neuron, Color color)
+        {
+            int x1 = 50 + (Layer * 200);
+            int y1 = 50 * Neuron + (50 / 2);
+
+            int x2 = 200 + (Layer * 200);
+            int y2 = 50 * Neuron + (50 / 2);
+
+            Pen pen = new Pen(color);
+            Bitmap bmp;
+            Graphics formGraphics;
+
+            bmp = new Bitmap(this.pictureBox1.Image);
+            formGraphics = Graphics.FromImage(bmp);
+            formGraphics.DrawLine(pen, new Point(x2, y2), new Point(x1, y1));
+            this.pictureBox1.Invoke(new Action(() => this.pictureBox1.Image = bmp));
             return;
         }
         private void startOffWeightsButton_Click(object sender, EventArgs e)
@@ -1201,26 +1106,6 @@ namespace Neural
                     this.dataGridView1.Rows[i].Cells[4].Value = "T";
                 }
             }
-        }
-
-        //получение всех доступных связей для подсоединения(входы)   
-        private List<String> getAvailableWeights(Network net)
-        {
-            List<string> availableNeurons = new List<String>();
-
-            //add neurons for available neurons, for connected subnet inputs
-            for (int layer = 0; layer < net.Layers.Length; layer++)
-            {
-                for (int neuron = 0; neuron < net.Layers[layer].Neurons.Length; neuron++)
-                {
-                    for (int weight = 0; weight < net.Layers[layer].Neurons[neuron].Weights.Length; weight++)
-                    {
-                        availableNeurons.Add(layer.ToString() + ":" + neuron.ToString() + ":" + weight.ToString());
-                    }
-                }
-            }
-
-            return availableNeurons;
         }
 
         private void stopWeightsButton_Click(object sender, EventArgs e)

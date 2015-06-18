@@ -61,6 +61,7 @@
             this.timeLabel = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.offCountLabel = new System.Windows.Forms.Label();
             this.stopWeightsButton = new System.Windows.Forms.Button();
             this.startOffWeightsButton = new System.Windows.Forms.Button();
             this.radiusBox = new System.Windows.Forms.TextBox();
@@ -70,6 +71,7 @@
             this.CombinationsLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -106,7 +108,7 @@
             this.groupBox1.Controls.Add(this.testNetButton);
             this.groupBox1.Controls.Add(this.errorTextBox);
             this.groupBox1.Controls.Add(this.testErrorLabel);
-            this.groupBox1.Location = new System.Drawing.Point(0, 257);
+            this.groupBox1.Location = new System.Drawing.Point(0, 277);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(320, 422);
             this.groupBox1.TabIndex = 2;
@@ -115,6 +117,7 @@
             // 
             // outputVectorButton
             // 
+            this.outputVectorButton.Enabled = false;
             this.outputVectorButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.outputVectorButton.Location = new System.Drawing.Point(8, 391);
             this.outputVectorButton.Name = "outputVectorButton";
@@ -231,20 +234,20 @@
             this.тестToolStripMenuItem,
             this.входнойВекторToolStripMenuItem});
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
-            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(118, 20);
+            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
             // 
             // тестToolStripMenuItem
             // 
             this.тестToolStripMenuItem.Name = "тестToolStripMenuItem";
-            this.тестToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.тестToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.тестToolStripMenuItem.Text = "Тест";
             this.тестToolStripMenuItem.Click += new System.EventHandler(this.тестToolStripMenuItem_Click);
             // 
             // входнойВекторToolStripMenuItem
             // 
             this.входнойВекторToolStripMenuItem.Name = "входнойВекторToolStripMenuItem";
-            this.входнойВекторToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.входнойВекторToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.входнойВекторToolStripMenuItem.Text = "Входной вектор";
             this.входнойВекторToolStripMenuItem.Click += new System.EventHandler(this.входнойВекторToolStripMenuItem_Click);
             // 
@@ -260,14 +263,14 @@
             // saveNetToolStripMenuItem
             // 
             this.saveNetToolStripMenuItem.Name = "saveNetToolStripMenuItem";
-            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.saveNetToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.saveNetToolStripMenuItem.Text = "Сохранить сеть";
             this.saveNetToolStripMenuItem.Click += new System.EventHandler(this.saveNetToolStripMenuItem_Click);
             // 
             // LoadNetToolStripMenuItem
             // 
             this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
             this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
@@ -350,13 +353,15 @@
             // timeLabel
             // 
             this.timeLabel.AutoSize = true;
-            this.timeLabel.Location = new System.Drawing.Point(46, 241);
+            this.timeLabel.Location = new System.Drawing.Point(46, 261);
             this.timeLabel.Name = "timeLabel";
             this.timeLabel.Size = new System.Drawing.Size(0, 13);
             this.timeLabel.TabIndex = 31;
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Controls.Add(this.offCountLabel);
             this.groupBox3.Controls.Add(this.stopWeightsButton);
             this.groupBox3.Controls.Add(this.startOffWeightsButton);
             this.groupBox3.Controls.Add(this.radiusBox);
@@ -365,15 +370,23 @@
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Location = new System.Drawing.Point(0, 133);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(320, 94);
+            this.groupBox3.Size = new System.Drawing.Size(320, 125);
             this.groupBox3.TabIndex = 27;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Автоматическое отключение связей";
             // 
+            // offCountLabel
+            // 
+            this.offCountLabel.AutoSize = true;
+            this.offCountLabel.Location = new System.Drawing.Point(236, 70);
+            this.offCountLabel.Name = "offCountLabel";
+            this.offCountLabel.Size = new System.Drawing.Size(0, 13);
+            this.offCountLabel.TabIndex = 6;
+            // 
             // stopWeightsButton
             // 
             this.stopWeightsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.stopWeightsButton.Location = new System.Drawing.Point(239, 65);
+            this.stopWeightsButton.Location = new System.Drawing.Point(239, 96);
             this.stopWeightsButton.Name = "stopWeightsButton";
             this.stopWeightsButton.Size = new System.Drawing.Size(75, 23);
             this.stopWeightsButton.TabIndex = 5;
@@ -384,7 +397,7 @@
             // startOffWeightsButton
             // 
             this.startOffWeightsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.startOffWeightsButton.Location = new System.Drawing.Point(158, 65);
+            this.startOffWeightsButton.Location = new System.Drawing.Point(158, 96);
             this.startOffWeightsButton.Name = "startOffWeightsButton";
             this.startOffWeightsButton.Size = new System.Drawing.Size(75, 23);
             this.startOffWeightsButton.TabIndex = 4;
@@ -395,7 +408,7 @@
             // radiusBox
             // 
             this.radiusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.radiusBox.Location = new System.Drawing.Point(240, 37);
+            this.radiusBox.Location = new System.Drawing.Point(240, 42);
             this.radiusBox.Name = "radiusBox";
             this.radiusBox.Size = new System.Drawing.Size(74, 21);
             this.radiusBox.TabIndex = 3;
@@ -404,7 +417,7 @@
             // offWeightsLevelBox
             // 
             this.offWeightsLevelBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.offWeightsLevelBox.Location = new System.Drawing.Point(240, 10);
+            this.offWeightsLevelBox.Location = new System.Drawing.Point(240, 15);
             this.offWeightsLevelBox.Name = "offWeightsLevelBox";
             this.offWeightsLevelBox.Size = new System.Drawing.Size(74, 21);
             this.offWeightsLevelBox.TabIndex = 2;
@@ -413,7 +426,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 40);
+            this.label5.Location = new System.Drawing.Point(6, 44);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(97, 13);
             this.label5.TabIndex = 1;
@@ -431,7 +444,7 @@
             // CombinationsLabel
             // 
             this.CombinationsLabel.AutoSize = true;
-            this.CombinationsLabel.Location = new System.Drawing.Point(229, 241);
+            this.CombinationsLabel.Location = new System.Drawing.Point(229, 261);
             this.CombinationsLabel.Name = "CombinationsLabel";
             this.CombinationsLabel.Size = new System.Drawing.Size(0, 13);
             this.CombinationsLabel.TabIndex = 32;
@@ -439,7 +452,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 241);
+            this.label3.Location = new System.Drawing.Point(3, 261);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(37, 13);
             this.label3.TabIndex = 33;
@@ -448,18 +461,27 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(155, 241);
+            this.label6.Location = new System.Drawing.Point(155, 261);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(68, 13);
             this.label6.TabIndex = 34;
             this.label6.Text = "Комбинации";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(5, 70);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(204, 13);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Кол-во одновременно откл. нейронов:";
             // 
             // ChangeANNForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1062, 680);
+            this.ClientSize = new System.Drawing.Size(1062, 711);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.CombinationsLabel);
@@ -473,7 +495,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "ChangeANNForm";
-            this.Text = "Изменение и проверка сети";
+            this.Text = "ANNBuilder: Изменение и проверка ИНС";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -534,5 +556,7 @@
         private System.Windows.Forms.Label CombinationsLabel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label offCountLabel;
+        private System.Windows.Forms.Label label7;
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Linq;
+using System.Windows.Forms;
 using System.Threading.Tasks;
 
 namespace Neural
@@ -113,10 +114,10 @@ namespace Neural
                         double summ = 0.0;
                         for (int network = 0; network < subnets.Count; network++)
                         {
-                            summ += Math.Pow((subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[weight]), 2);
+                            summ += (subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[iWeight]) * (subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[iWeight]);
                         }
-                        standartDeviation[iWeight] =  Math.Sqrt(summ / subnets.Count);
-
+                        
+                        standartDeviation[iWeight] =  Math.Sqrt(summ / (subnets.Count - 1));
                         iWeight++;
                     }
                 }
@@ -125,7 +126,7 @@ namespace Neural
             return standartDeviation;
         }
 
-        //удаление заданное кол-во сетей по возрастанию
+        //удаление заданного кол-ва сетей по возрастанию
         public static List<Subnet> dropBadSubnets(List<Subnet> subnets, int count)
         {
             //сортировка по убыванию
@@ -139,6 +140,92 @@ namespace Neural
             }
 
             return subnets;
+        }
+   
+        //подсчитывает количество нейронов заданной сети
+        public static int getNeuronsCount(Network network)
+        {
+            int i = 0;
+            for (int layer = 0; layer < network.Layers.Length; layer++)
+            {
+                for (int neuron = 0; neuron < network.Layers[layer].Neurons.Length; neuron++)
+                {
+                    i++;
+                }
+            }
+            return i;
+        }
+
+        //инициализация временного массива для поддержки отключения и включения нейронов и связей
+        public static double[][][][] emptyWeightsArray(Network network)
+        {   
+            double[][][][] tempWeights = new double[network.Layers.Length][][][];
+            for (int i = 0; i < network.Layers.Length; i++)
+            {
+                tempWeights[i] = new double[network.Layers[i].Neurons.Length][][];
+                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
+                {
+                    tempWeights[i][j] = new double[network.Layers[i].Neurons[j].Weights.Length][];
+                    for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
+                    {
+                        tempWeights[i][j][k] = new double[1];
+                    }
+                }
+            }
+            return tempWeights;
+        }
+
+        //поиск наиболее вероятного класса
+        public static int max(double[] mass)
+        {
+            int classificator = 0;
+            double tempValue = 0.0;
+            for (int i = 0; i < mass.Length; i++)
+            {
+                if (tempValue < mass[i])
+                {
+                    tempValue = mass[i];
+                    classificator = i;
+                }
+            }
+            return classificator;
+        }
+
+        //запуск тестирования сети с желаемым классом
+        public static double testing(Network network, double[,] data, int[] classes)
+        {
+            double[] res;
+            int colCountData = network.InputsCount;
+            double[] input = new double[colCountData];
+            double validate = 0.0;
+            double testQuality = 0.0;
+
+
+            for (int count = 0; count < data.GetLength(0) - 1; count++)
+            {
+                try
+                {
+                    //gather inputs for compute, n-1 inputs
+                    for (int i = 0; i < colCountData ; i++)
+                    {
+                        input[i] = data[count, i];
+                    }
+                    res = network.Compute(input);
+                    double output = ANNUtils.max(res);
+                    double value = Math.Abs(classes[count] - output);
+
+                    validate += value;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+                }
+
+            }
+            testQuality = (1 - (validate / data.GetLength(0))) * 100;
+
+            return testQuality;
         }
     }
 }

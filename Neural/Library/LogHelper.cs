@@ -341,6 +341,34 @@ namespace Neural
                 deviationSheet.Cells[i + 1, 1].Value = "Вес " + (i - 1).ToString();
             }
         }
-    
+
+        //установление заголовков для отчета по отключения нейронов в xlsx файл
+        public static ExcelWorksheet setNeuronsWorkBookHeaders(ExcelWorksheet QualityWorkSheet, Record[] rangeNeurons)
+        {
+            for (int header = 0; header < rangeNeurons.Length; header++)
+            {
+                QualityWorkSheet.Cells[1, header + 2].Value = rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString();
+            }
+            QualityWorkSheet.Cells[1, rangeNeurons.Length + 2].Value = "Число отключенных нейронов";
+            QualityWorkSheet.Cells[1, rangeNeurons.Length + 3].Value = "ЧОН/Нейронов всего";
+            QualityWorkSheet.Cells[1, rangeNeurons.Length + 4].Value = "Соотношение нейронов";
+
+            return QualityWorkSheet;
+        }
+
+        //установление заголовков для отчета по связям нейронов в xls файл
+        public static ExcelWorksheet setWeightsWorkBookHeaders(ExcelWorksheet QualityWorkSheet, Record[] rangeNeurons)
+        {
+            int step = 1;
+            for (int header = 0; header < rangeNeurons.Length; header++)
+            {
+
+                QualityWorkSheet.Cells[1, step + 1].Value = rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString() + "|Вх.";
+                QualityWorkSheet.Cells[1, step + 2].Value = rangeNeurons[header].numberLayer.ToString() + ":" + rangeNeurons[header].numberNeuron.ToString() + "|Исх.";
+                step += 2;
+            }
+            return QualityWorkSheet;
+
+        }
     }
 }

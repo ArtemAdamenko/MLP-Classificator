@@ -12,7 +12,7 @@ using Accord.Neuro;
 using Accord.Math;
 using Accord.Neuro.Learning;
 using ZedGraph;
-
+using OfficeOpenXml;
 
 namespace Neural
 {
@@ -147,7 +147,7 @@ namespace Neural
 
                     // read the data
                     classesList.Clear();
-                    //classesList.Add(0);
+
                     while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
                     {
                         string[] strs = line.Trim().Split(';');
@@ -168,8 +168,6 @@ namespace Neural
                                 maxData[j] = tempData[i, j];
                         }
 
-                        //if (strs.Length-1 < colCountData - 1)
-                          //  continue;
                         tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
 
                         //insert class in list of classes, if not find
@@ -178,20 +176,10 @@ namespace Neural
                             classesList.Add(tempClasses[i]);
                         }
 
-                        //samplesPerClass[tempClasses[i]]++;
-
                         i++;
                     }
 
-                    //normalization input values
-                    for (int row = 0; row < rowCountData; row++)
-                    {
-                        for (int column = 0; column < colCountData - 1; column++)
-                        {
-                            tempData[row, column] = (((tempData[row, column] - minData[column]) * 1 / (maxData[column] - minData[column])));
-                            
-                        }
-                    }
+                    tempData = ANNUtils.normalization(tempData, minData, maxData, rowCountData, colCountData);
 
                     // allocate and set data
                     data = new double[i, colCountData - 1];
@@ -603,7 +591,7 @@ namespace Neural
             for (int count = 0; count < validateInput.Length; count++)
             {
                 res = network.Compute(validateInput[count]);
-                double value = Math.Abs(validClasses[count] - this.max(res));
+                double value = Math.Abs(validClasses[count] - ANNUtils.max(res));
 
                 validate += value;
        
@@ -643,96 +631,96 @@ namespace Neural
             }
         }
 
-        //тестирование сети(80%) с записью результата в файл
+        //тестирование сети с записью результата в файл
         private void TestNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            String[] lines = new String[1];
             double[] res = new double[classesList.Count];
 		    double[] input = new double[colCountData - 1];
 
-            using(System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\Test_" + LogHelper.getTime() + ".csv"))
-            //file.WriteLine("Желаемый ответ; Результат");
+            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Тестирование-" + LogHelper.getTime() + ".xlsx");
+            ExcelPackage book = new ExcelPackage(file);
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Тестирование всей обучающей выборки");
 
-                for (int i = 0; i < data.GetLength(0); i++)
-                {
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
                     //gather inputs for compute, n-1 inputs
-                    for (int k = 0; k < colCountData - 1; k++)
-                    {
-                        input[k] = data[i, k];
-                    }
-
-                    res = network.Compute(input);
-
-                    int classificator = this.max(res);
-                    lines[0] = classes[i].ToString() + ";" + classificator.ToString("F8");
-
-                    file.WriteLine(lines[0].ToString());
+                for (int k = 0; k < colCountData - 1; k++)
+                {
+                    input[k] = data[i, k];
                 }
-                MessageBox.Show("Тестирование пройдено");
 
+                res = network.Compute(input);
+
+                int classificator = ANNUtils.max(res);
+                sheet.Cells[i + 1, 1].Value = classes[i];
+                sheet.Cells[i + 1, 2].Value = classificator;
+
+            }
+            MessageBox.Show("Тестирование пройдено");
+            book.Save();
+            return;
         }
-
 
         //кросс-валидация(20%) сети с записью результата в файл
         private void crossValid()
         {
-            String[] lines = new String[1];
             double[] res = new double[classesList.Count];
             double[] input = new double[colCountData - 1];
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\SpreadSHeetValid" + LogHelper.getTime() + ".csv"))
+            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Валидация-" + LogHelper.getTime() + ".xlsx");
+            ExcelPackage book = new ExcelPackage(file);
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Тестирование 20% валидационной выборки");
 
-                for (int i = 0; i < validateInput.GetLength(0)-1; i++)
-                {
-                    //gather inputs for compute, n-1 inputs
-                    for (int k = 0; k < colCountData - 1; k++)
-                    {
-                        input[k] = validateInput[i][k];
-                    }
-
-                    res = network.Compute(input);
-
-                    int classificator = this.max(res);
-                    lines[0] = validClasses[i].ToString() + ";" + classificator.ToString("F8");
-
-                    file.WriteLine(lines[0].ToString());
-                }
-            MessageBox.Show("Кросс-валидация пройдена.");
-        }
-
-        //поиcк наиболее вероятного класса
-        private int max(double[] mass)
-        {
-            int classificator = 0;
-            double tempValue = 0.0;
-            for (int i = 0; i < mass.Length; i++)
+            for (int i = 0; i < validateInput.GetLength(0)-1; i++)
             {
-                if (tempValue < mass[i])
+                    //gather inputs for compute, n-1 inputs
+                for (int k = 0; k < colCountData - 1; k++)
                 {
-                    tempValue = mass[i];
-                    classificator = i;
+                    input[k] = validateInput[i][k];
                 }
+
+                res = network.Compute(input);
+
+                int classificator = ANNUtils.max(res);
+                sheet.Cells[i + 1, 1].Value = validClasses[i];
+                sheet.Cells[i + 1, 2].Value = classificator;
             }
-            return classificator;
+            MessageBox.Show("Кросс-валидация пройдена.");
+            book.Save();
+            return;
         }
 
         //сохранение весов текущей ИНС в файл
         private void SaveWeightsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(LogHelper.getPath("Learn") + "\\Weights_" + LogHelper.getTime() + ".csv"))
+            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Веса-" + LogHelper.getTime() + ".xlsx");
+            ExcelPackage book = new ExcelPackage(file);
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Значения весов всей обученной сети");
+          
+            sheet.Cells[1, 1].Value = "Слой";
+            sheet.Cells[1, 2].Value = "Нейрон";
+            sheet.Cells[1, 3].Value = "Вес";
+            sheet.Cells[1, 4].Value = "Значение";
+
+            int row = 2;
             for (int i = 0; i < network.Layers.Length; i++)
             {
                 for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
                 {
                     for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
                     {
-                        
-                        file.WriteLine("L[" + i.ToString() + "]N[" + j.ToString() + "]W[" + k.ToString() + "];" + network.Layers[i].Neurons[j].Weights[k] + ";");
-                        
+                        sheet.Cells[row, 1].Value = i;
+                        sheet.Cells[row, 2].Value = j;
+                        sheet.Cells[row, 3].Value = k;
+                        sheet.Cells[row, 4].Value = network.Layers[i].Neurons[j].Weights[k];
+                           
+                        row++;
                     }
                 }
             }
             MessageBox.Show("Веса сохранены");
+            book.Save();
+            return;
         }
 
         //выбор алгоритма обучения

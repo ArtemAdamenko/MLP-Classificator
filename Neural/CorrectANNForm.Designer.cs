@@ -576,8 +576,6 @@
             // BothEqualcheckBox
             // 
             this.BothEqualcheckBox.AutoSize = true;
-            this.BothEqualcheckBox.Checked = true;
-            this.BothEqualcheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.BothEqualcheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.BothEqualcheckBox.Location = new System.Drawing.Point(12, 43);
             this.BothEqualcheckBox.Name = "BothEqualcheckBox";
@@ -589,8 +587,6 @@
             // levelVariationscheckBox
             // 
             this.levelVariationscheckBox.AutoSize = true;
-            this.levelVariationscheckBox.Checked = true;
-            this.levelVariationscheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.levelVariationscheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.levelVariationscheckBox.Location = new System.Drawing.Point(12, 20);
             this.levelVariationscheckBox.Name = "levelVariationscheckBox";
@@ -619,7 +615,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "CorrectANNForm";
-            this.Text = "Корректировка сети";
+            this.Text = "ANNBuilder: Корректировка ИНС";
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.menuStrip1.ResumeLayout(false);
