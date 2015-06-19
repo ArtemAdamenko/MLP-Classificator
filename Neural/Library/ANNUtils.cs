@@ -192,7 +192,7 @@ namespace Neural
         }
 
         //запуск тестирования сети с желаемым классом
-        public static double testing(Network network, double[,] data, int[] classes)
+        public static double testing(Network network, double[,] data, int[] classes, List<int> classesList)
         {
             double[] res;
             int colCountData = network.InputsCount;
@@ -211,7 +211,7 @@ namespace Neural
                         input[i] = data[count, i];
                     }
                     res = network.Compute(input);
-                    double output = ANNUtils.max(res);
+                    double output = classesList[ANNUtils.max(res)];
                     double value = Math.Abs(classes[count] - output);
 
                     validate += value;

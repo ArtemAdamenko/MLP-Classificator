@@ -61,6 +61,7 @@
             this.timeLabel = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.offCountLabel = new System.Windows.Forms.Label();
             this.stopWeightsButton = new System.Windows.Forms.Button();
             this.startOffWeightsButton = new System.Windows.Forms.Button();
@@ -71,7 +72,6 @@
             this.CombinationsLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -375,6 +375,15 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Автоматическое отключение связей";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(5, 70);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(190, 13);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Кол-во одновременно откл. связей:";
+            // 
             // offCountLabel
             // 
             this.offCountLabel.AutoSize = true;
@@ -466,15 +475,6 @@
             this.label6.Size = new System.Drawing.Size(68, 13);
             this.label6.TabIndex = 34;
             this.label6.Text = "Комбинации";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(5, 70);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(204, 13);
-            this.label7.TabIndex = 7;
-            this.label7.Text = "Кол-во одновременно откл. нейронов:";
             // 
             // ChangeANNForm
             // 

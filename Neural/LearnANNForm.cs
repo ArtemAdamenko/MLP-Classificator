@@ -588,15 +588,15 @@ namespace Neural
             double testQuality = 0.0;
             double validate = 0.0;
             double[] res;
-            for (int count = 0; count < validateInput.Length; count++)
+            for (int count = 0; count < input.Length; count++)
             {
-                res = network.Compute(validateInput[count]);
-                double value = Math.Abs(validClasses[count] - ANNUtils.max(res));
+                res = network.Compute(input[count]);
+                double value = Math.Abs(trainClasses[count] - classesList[ANNUtils.max(res)]);
 
                 validate += value;
        
             }
-            testQuality = (1 - (validate / validateInput.Length)) * 100;
+            testQuality = (1 - (validate / input.Length)) * 100;
             return testQuality;
         }
 
@@ -606,15 +606,15 @@ namespace Neural
             double testQuality = 0.0;
             double validate = 0.0;
             double[] res;
-            for (int count = 0; count < validateInput.Length; count++)
+            for (int count = 0; count < input.Length; count++)
             {
-                res = network.Compute(validateInput[count]);
-                double value = 1 - res[validClasses[count]];
+                res = network.Compute(input[count]);
+                double value = 1 - res[classesList.IndexOf(trainClasses[count])];
 
                 validate += value;
 
             }
-            testQuality = (1-(validate / validateInput.Length)) * 100;
+            testQuality = (1 - (validate / input.Length)) * 100;
             return testQuality;
         }
 
@@ -651,7 +651,7 @@ namespace Neural
 
                 res = network.Compute(input);
 
-                int classificator = ANNUtils.max(res);
+                int classificator = classesList[ANNUtils.max(res)];
                 sheet.Cells[i + 1, 1].Value = classes[i];
                 sheet.Cells[i + 1, 2].Value = classificator;
 
@@ -681,7 +681,7 @@ namespace Neural
 
                 res = network.Compute(input);
 
-                int classificator = ANNUtils.max(res);
+                int classificator = classesList[ANNUtils.max(res)];
                 sheet.Cells[i + 1, 1].Value = validClasses[i];
                 sheet.Cells[i + 1, 2].Value = classificator;
             }

@@ -372,8 +372,8 @@ namespace Neural
                     this.MinMaxRelationsValues(tempRelationsValues);
                     tempRelationsValues.Clear();
 
-                    double value = Math.Abs(classes[count] - this.max(res));
-                    double valueP = 1 - res[classes[count]];
+                    double value = Math.Abs(classes[count] - classesList[this.max(res)]);
+                    double valueP = 1 - res[classesList.IndexOf(classes[count])];
 
 
                     probabilisticValidateError += valueP;
@@ -1009,13 +1009,13 @@ namespace Neural
                     res = network.Compute(input.ToArray());
                 }
 
-                double resClass = this.max(res);
+                double resClass = classesList[this.max(res)];
                 desireClass[i] = classes[i];
                 outputClass[i] = resClass;
 
 
                 double value = Math.Abs(classes[i] - resClass);
-                double valueP = 1 - res[classes[i]];
+                double valueP = 1 - res[classesList.IndexOf(classes[i])];
 
                 moduleValidateError += value;
                 probabilisticValidateError += valueP;
@@ -1059,11 +1059,11 @@ namespace Neural
         }
 
         //индекс максимального значения в массиве
-        private double max(double[] mass)
+        private int max(double[] mass)
         {
-            double classificator = 0;
+            int classificator = 0;
             double tempValue = 0.0;
-            int ones = 0;
+            /*int ones = 0;
             for (int i = 0; i < mass.Length; i++)
             {
                 if (mass[i] == 1.0)
@@ -1073,7 +1073,7 @@ namespace Neural
                 }
             }
             if (ones <= 1)
-            {
+            {*/
                 tempValue = 0.0;
                 for (int i = 0; i < mass.Length; i++)
                 {
@@ -1083,11 +1083,11 @@ namespace Neural
                         classificator = i;
                     }
                 }
-            }
+          /*  }
             else
             {
                 classificator = tempValue / ones;
-            }
+            }*/
             return classificator;
         }
 

@@ -284,7 +284,7 @@ namespace Neural
             //проверка откл/вкл нейронов
             this.CheckNeurons();
             //тестирование
-            double res = ANNUtils.testing(network, data, classes);
+            double res = ANNUtils.testing(network, data, classes, classesList);
             this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = res.ToString("F10")));
                 
         }
@@ -609,7 +609,7 @@ namespace Neural
 
                         offWeights(network, rangeNeurons[j]);
 
-                        QualityWorkSheet.Cells[combinations + 1, j + 2].Value = ANNUtils.testing( network, data, classes );
+                        QualityWorkSheet.Cells[combinations + 1, j + 2].Value = ANNUtils.testing( network, data, classes, classesList );
                         DateTime t2 = DateTime.Now;
                         System.TimeSpan diffTime = t2.Subtract(t);
                         allCombinations++;
@@ -867,7 +867,7 @@ namespace Neural
                     }
                     res = network.Compute(input);
 
-                    worksheet.Cells[count + 1, 1].Value = ANNUtils.max(res);
+                    worksheet.Cells[count + 1, 1].Value = classesList[ANNUtils.max(res)];
                 }
                 catch (Exception e)
                 {
@@ -988,7 +988,7 @@ namespace Neural
                             draw();
                             this.globalOffNeuronsCount++;
 
-                            double res = ANNUtils.testing(network, data, classes);
+                            double res = ANNUtils.testing(network, data, classes, classesList);
                             this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = res.ToString("F10")));
                             combinations++;
                             this.CombinationsLabel.Invoke(new Action(() => this.CombinationsLabel.Text = combinations.ToString()));
