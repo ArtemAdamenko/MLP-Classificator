@@ -73,6 +73,18 @@ namespace Neural
             myPane.XAxis.Title.Text = "Итерации";
             myPane.YAxis.Title.Text = "Изменение ошибки обучения";
             myPane.XAxis.Scale.MajorStep = 10;
+            myPane.YAxis.Scale.MajorStep = 10;
+            myPane.XAxis.MajorGrid.Color = Color.Black;
+            myPane.YAxis.MajorGrid.Color = Color.Black;
+            myPane.Chart.Fill = new Fill(Color.White, Color.LightGray, 45.0f);
+            myPane.YAxis.Scale.Max = 100;
+
+            curve.Line.Width = 2.0F;
+            curve2.Line.Width = 2.0F;
+            curve3.Line.Width = 2.0F;
+            myPane.XAxis.MajorGrid.IsVisible = true;
+            myPane.YAxis.MajorGrid.IsVisible = true;
+
             // init controls
             UpdateSettings();
 

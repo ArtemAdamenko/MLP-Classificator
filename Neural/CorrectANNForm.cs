@@ -23,6 +23,8 @@ namespace Neural
         Subnet globalSubnet;
         Boolean SpreadTest = false;
         int numberSubNets = 0;
+        String commonNetFileName = "";
+        String dataFileName = "";
 
         private List<Record> MinMaxValues;
         private List<Record> relationsValues = new List<Record>();
@@ -71,6 +73,16 @@ namespace Neural
             myPane.XAxis.Title.Text = "Корректирующие подсети";
             myPane.YAxis.Title.Text = "Процент правильных ответов";
             myPane.XAxis.Scale.MajorStep = 10;
+            myPane.YAxis.Scale.MajorStep = 10;
+            myPane.XAxis.MajorGrid.Color = Color.Black;
+            myPane.YAxis.MajorGrid.Color = Color.Black;
+            myPane.Chart.Fill = new Fill(Color.White, Color.LightGray, 45.0f);
+            myPane.YAxis.Scale.Max = 100;
+
+            curve.Line.Width = 2.0F;
+            curve2.Line.Width = 2.0F;
+            myPane.XAxis.MajorGrid.IsVisible = true;
+            myPane.YAxis.MajorGrid.IsVisible = true;
 
             this.checkTopology();
 
@@ -286,6 +298,7 @@ namespace Neural
                 try
                 {
                     network = Network.Load(openFileDialog1.FileName);
+                    commonNetFileName = openFileDialog1.SafeFileName;
 
                 }
                 catch (IOException)
@@ -413,7 +426,7 @@ namespace Neural
                 {
                     // open selected file
                     reader = File.OpenText(openFileDialog2.FileName);
-
+                    dataFileName = openFileDialog2.SafeFileName;
                     //get row count values
                     String line;
                     rowCountData = 0;
@@ -594,7 +607,7 @@ namespace Neural
             Random rnd = new Random();
 
             Subnet subnet1 = new Subnet(new ActivationNetwork(new SigmoidFunction(this.alpha), this.input, this.hidden));
-            LogHelper.NewSessionFolder();
+            LogHelper.NewSessionFolder(commonNetFileName, dataFileName);
             LogHelper.InitReporting( subnet1 );
 
             List<Subnet> subnets = new List<Subnet>();
@@ -878,6 +891,7 @@ namespace Neural
                         LogHelper.StandartDeviationToFile( deviations, population, "После скрещивания " + (population - 1) );
                         LogHelper.coefVariationsToFile( coefficients, population, "После скрещивания " + (population - 1) );
                         LogHelper.saveMediumsValuesOfWeightsIndexes( localSubNets, population, "После скрещивания " + (population - 1) );
+                        LogHelper.commonCorrectResults( mediumErrorForPopulation, localSubNets[0].quality, coefficient, (population - 1));
 
                         cntOfPopulationsPerStep = Int32.Parse(popultextBox.Text); ;
                         startSubnets = new List<Subnet>(localSubNets);

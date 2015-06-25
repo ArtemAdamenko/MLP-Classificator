@@ -25,6 +25,7 @@ namespace Neural
         const string CROSS_DIR = "Скрещивание-";
         const string ALLWEIGHTS_FILE = "ВесаВсехСетей-";
         const string DEVIATION_FILE = "СтандартноеОтклонение-";
+        const string PARAMS_CORRECT_FILE = "ПараметрыКоррекции-";
         #endregion
 
         #region WorkBook, WorkSheets
@@ -38,6 +39,8 @@ namespace Neural
         private static ExcelWorksheet allWeightsSheet;
         private static ExcelPackage deviationBook;
         private static ExcelWorksheet deviationSheet;
+        private static ExcelPackage correctParamsBook;
+        private static ExcelWorksheet correctParamsSheet;
         #endregion
 
         #region files, folders
@@ -47,6 +50,7 @@ namespace Neural
         private static FileInfo deviationFile;
         private static FileInfo mediumsFile;
         private static FileInfo allWeightsFile;
+        private static FileInfo correctParamsFile;
         #endregion
 
         public static String getTime()
@@ -55,9 +59,9 @@ namespace Neural
         }
 
         //создание новой папки для новой сессии
-        public static void NewSessionFolder()
+        public static void NewSessionFolder(String commonNetFileName, String dataFileName)
         {
-            LogHelper.currentFolder = ROOT_FOLDER + "\\" + LogHelper.getTime();
+            LogHelper.currentFolder = ROOT_FOLDER + "\\" + LogHelper.getTime() + " (" + commonNetFileName + " - " + dataFileName + ")";
             return;
         }
         public static String getPath(String folderName)
@@ -259,6 +263,16 @@ namespace Neural
             return;
         }
 
+        //сохранение показателей корректировки по поколениям
+        public static void commonCorrectResults(double medium, double better, double coefVariation, int population)
+        {
+            LogHelper.correctParamsSheet.Cells[population + 1, 1].Value = "Поколение " + population;
+            LogHelper.correctParamsSheet.Cells[population + 1, 2].Value = medium;
+            LogHelper.correctParamsSheet.Cells[population + 1, 3].Value = better;
+            LogHelper.correctParamsSheet.Cells[population + 1, 4].Value = coefVariation;
+            return;
+        }
+
         public static void Commit()
         {
             //commit Results File
@@ -277,6 +291,9 @@ namespace Neural
 
             //standart deviation file
             LogHelper.deviationBook.Save();
+
+            //correct params book
+            LogHelper.correctParamsBook.Save();
 
             return;
         }
@@ -312,7 +329,13 @@ namespace Neural
             LogHelper.allWeightsFile = new FileInfo(LogHelper.currentFolder + "\\" + ALLWEIGHTS_FILE + reconnectingCount.ToString() + ".xlsx");
             LogHelper.allWeightsBook = new ExcelPackage(LogHelper.allWeightsFile);
             LogHelper.allWeightsSheet = LogHelper.allWeightsBook.Workbook.Worksheets.Add("Веса всех сетей сессии");
-            
+
+            //параметры коррекции по поколениям
+            LogHelper.correctParamsFile = new FileInfo(LogHelper.currentFolder + "\\" + PARAMS_CORRECT_FILE + reconnectingCount.ToString() + ".xlsx");
+            LogHelper.correctParamsBook = new ExcelPackage(LogHelper.correctParamsFile);
+            LogHelper.correctParamsSheet = LogHelper.correctParamsBook.Workbook.Worksheets.Add("Показатели коррекции по поколениям");
+            LogHelper.correctParamsSheet = LogHelper.setCommonCorrectParamsSheetHeaders(correctParamsSheet);
+
             if (subnet != null)
                 LogHelper.setIndexesToSheet(subnet);
 
@@ -341,7 +364,16 @@ namespace Neural
                 deviationSheet.Cells[i + 1, 1].Value = "Вес " + (i - 1).ToString();
             }
         }
+        //установление заголовков для фала параметров корректирования
+        public static ExcelWorksheet setCommonCorrectParamsSheetHeaders(ExcelWorksheet commonCorrectParamsSheet)
+        {
+            commonCorrectParamsSheet.Cells[1, 2].Value = "Среднее значение поколения";
+            commonCorrectParamsSheet.Cells[1, 3].Value = "Лучшее значение поколения";
+            commonCorrectParamsSheet.Cells[1, 4].Value = "Коэф.вариации значений поколения";
 
+            return commonCorrectParamsSheet;
+
+        }
         //установление заголовков для отчета по отключения нейронов в xlsx файл
         public static ExcelWorksheet setNeuronsWorkBookHeaders(ExcelWorksheet QualityWorkSheet, Record[] rangeNeurons)
         {
