@@ -30,6 +30,13 @@ namespace Neural
         private List<Record> relationsValues = new List<Record>();
         private List<Record> tempRelationsValues = new List<Record>();
 
+        List<String> availableRelations = new List<String>(),
+                    connectedInputNeurons = new List<String>(),
+                    inputSubNet = new List<String>();
+
+        List<String> outputSubnet = new List<String>(),
+               connectedOutputNeurons = new List<String>();
+
 
         #region Neural Net options
             int input = 0;
@@ -591,6 +598,77 @@ namespace Neural
             this.alphaBox.Invoke(new Action(() => this.alphaBox.Text = this.alpha.ToString()));
             this.validLevelBox.Invoke(new Action(() => this.validLevelBox.Text = this.validQuality.ToString()));
         }
+
+        private void sortConnects(Subnet subnet1)
+        {
+            //Random rnd = new Random();
+            //generate connections between common net and subnet
+            this.availableRelations = new List<String>(ANNUtils.getAvailableWeights(this.network));
+            this.connectedInputNeurons = new List<String>();
+            this.inputSubNet = new List<String>();
+
+            for (int i = 0; i < input; )
+            {
+
+                //int rndRelation = rnd.Next(0, availableRelations.Count);
+                String connect = this.availableRelations[i];
+                //availableRelations.Remove(connect);
+                this.connectedInputNeurons.Add(connect);
+                this.inputSubNet.Add("-1:" + i.ToString());
+                i++;
+
+            }
+
+            //connected last layer of subnet to last layer of common net
+            this.outputSubnet = new List<String>();
+            this.connectedOutputNeurons = new List<String>();
+
+            for (int outputNeuron = 0; outputNeuron < this.hidden[this.hidden.Length - 1]; )
+            {
+
+                //int rndRelation = rnd.Next(0, availableRelations.Count);
+                String connect = this.availableRelations[(this.availableRelations.Count - 1) - outputNeuron];
+                //availableRelations.Remove(connect);
+                this.connectedOutputNeurons.Add(connect);
+                this.outputSubnet.Add(subnet1.Network.Layers.Length - 1 + ":" + outputNeuron.ToString());
+                outputNeuron++;
+            }
+        }
+
+        private void randomConnects(Subnet subnet1)
+        {
+            Random rnd = new Random();
+            this.availableRelations = new List<String>(ANNUtils.getAvailableWeights(this.network));
+            this.connectedInputNeurons = new List<String>();
+            this.inputSubNet = new List<String>();
+
+            for (int i = 0; i < input; )
+            {
+
+                int rndRelation = rnd.Next(0, this.availableRelations.Count);
+                String connect = this.availableRelations[rndRelation];
+                this.availableRelations.Remove(connect);
+                this.connectedInputNeurons.Add(connect);
+                this.inputSubNet.Add("-1:" + i.ToString());
+                i++;
+
+            }
+
+            //connected last layer of subnet to last layer of common net
+            outputSubnet = new List<String>();
+            connectedOutputNeurons = new List<String>();
+
+            for (int outputNeuron = 0; outputNeuron < this.hidden[this.hidden.Length - 1]; )
+            {
+
+                int rndRelation = rnd.Next(0, this.availableRelations.Count);
+                String connect = this.availableRelations[rndRelation];
+                this.availableRelations.Remove(connect);
+                this.connectedOutputNeurons.Add(connect);
+                this.outputSubnet.Add(subnet1.Network.Layers.Length - 1 + ":" + outputNeuron.ToString());
+                outputNeuron++;
+            }
+        }
         //генерация подсетей
         private void GenerateSubNets()
         {
@@ -611,46 +689,21 @@ namespace Neural
             LogHelper.InitReporting( subnet1 );
 
             List<Subnet> subnets = new List<Subnet>();
-            
-            //generate connections between common net and subnet
-            List<String> availableRelations = new List<String>( ANNUtils.getAvailableWeights(this.network) ),
-                    connectedInputNeurons = new List<String>(),
-                    inputSubNet = new List<String>();
 
-            for (int i = 0; i < input; )
+            if (this.sortConnectBox.Checked)
             {
-
-                int rndRelation = rnd.Next(0, availableRelations.Count);
-                String connect = availableRelations[rndRelation];
-                availableRelations.Remove(connect);
-                connectedInputNeurons.Add(connect);
-                inputSubNet.Add("-1:" + i.ToString());
-                i++;
-
-            }
-
-            //connected last layer of subnet to last layer of common net
-            List<String> outputSubnet = new List<String>(),
-                connectedOutputNeurons = new List<String>();
-
-            for (int outputNeuron = 0; outputNeuron < this.hidden[this.hidden.Length-1]; )
+                this.sortConnects(subnet1); 
+            }else
             {
+                this.randomConnects(subnet1);
+            }       
 
-                int rndRelation = rnd.Next(0, availableRelations.Count);
-                String connect = availableRelations[rndRelation];
-                availableRelations.Remove(connect);
-                connectedOutputNeurons.Add(connect);
-                outputSubnet.Add(subnet1.Network.Layers.Length-1 + ":" + outputNeuron.ToString());
-                outputNeuron++;
-            }
 
-            
-
-            LogHelper.SubConnectReport( connectedInputNeurons, connectedOutputNeurons, this.reconnectingCount );
+            LogHelper.SubConnectReport(this.connectedInputNeurons, this.connectedOutputNeurons, this.reconnectingCount);
             this.test();
 
-            this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
-            this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
+            this.draw(subnet1.Network, pictureBox2, this.inputSubNet, this.outputSubnet);
+            this.draw(this.network, pictureBox1, this.connectedInputNeurons, this.connectedOutputNeurons);
 
             this.label2.Invoke(new Action(() => this.label2.Text = "Отбор..."));
             
@@ -669,8 +722,8 @@ namespace Neural
                 initializer.Randomize(0);
 
                 Subnet subnet = new Subnet(network);
-                subnet.inputAssosiated = connectedInputNeurons;
-                subnet.outputAssosiated = connectedOutputNeurons;
+                subnet.inputAssosiated = this.connectedInputNeurons;
+                subnet.outputAssosiated = this.connectedOutputNeurons;
 
                 commonNetQuality = this.testing(subnet);
                 subnet.quality = commonNetQuality[0];
@@ -692,67 +745,81 @@ namespace Neural
                 {
                     LogHelper.saveMSGToSheet( selectionResult, 0 );
 
-                    currentQuality = this.evolution(subnets, connectedInputNeurons, connectedOutputNeurons);
+                    currentQuality = this.evolution(subnets, this.connectedInputNeurons, this.connectedOutputNeurons);
 
                     subnets.Clear();
                     zedGraphControl1.GraphPane.CurveList[0].Clear();
                     zedGraphControl1.GraphPane.CurveList[1].Clear();
 
                     if ((this.validQuality > currentQuality) && !needToStop)
-                    {                     //get one connection and set one random new connection for find optimization connecteds
-                        int reconnected = Int32.Parse(reconnectBox.Text);
-                        Random random = new Random();
-
-                        List<String> tempNewInputs = new List<String>();
-                        List<String> tempNewOutputs = new List<String>();
-                        List<String> tempOlds = new List<String>();
-
-                        for (int k = 0; k < reconnected; k++)
+                    {
+                        //if random option check
+                        if (!this.sortConnectBox.Checked)
                         {
-                            int temp = random.Next(0, 2);
-                            //or input conn reconn, or output conn reconn  - random
-                            if (temp == 0 && (connectedInputNeurons.Count >= 1))
-                            {
-                                int oldOutput = rnd.Next(0, connectedInputNeurons.Count);
-                                String oldValue = connectedInputNeurons[oldOutput];
-                                connectedInputNeurons.RemoveAt(oldOutput);
-                                tempOlds.Add(oldValue);
+                            //get one connection and set one random new connection for find optimization connecteds
+                            int reconnected = Int32.Parse(reconnectBox.Text);
+                            Random random = new Random();
 
-                                //new connection output
-                                int newOutput = rnd.Next(0, availableRelations.Count);
-                                String newValue = availableRelations[newOutput];
-                                availableRelations.RemoveAt(newOutput);
-                                tempNewInputs.Add(newValue);
+                            List<String> tempNewInputs = new List<String>();
+                            List<String> tempNewOutputs = new List<String>();
+                            List<String> tempOlds = new List<String>();
+
+                            for (int k = 0; k < reconnected; k++)
+                            {
+                                int temp = random.Next(0, 2);
+                                //or input conn reconn, or output conn reconn  - random
+                                if (temp == 0 && (this.connectedInputNeurons.Count >= 1))
+                                {
+                                    int oldOutput = rnd.Next(0, this.connectedInputNeurons.Count);
+                                    String oldValue = this.connectedInputNeurons[oldOutput];
+                                    this.connectedInputNeurons.RemoveAt(oldOutput);
+                                    tempOlds.Add(oldValue);
+
+                                    //new connection output
+                                    int newOutput = rnd.Next(0, this.availableRelations.Count);
+                                    String newValue = this.availableRelations[newOutput];
+                                    this.availableRelations.RemoveAt(newOutput);
+                                    tempNewInputs.Add(newValue);
+
+                                }
+                                else if (temp == 1 && (this.connectedOutputNeurons.Count >= 1))
+                                {
+                                    int oldOutput = rnd.Next(0, this.connectedOutputNeurons.Count);
+                                    String oldValue = this.connectedOutputNeurons[oldOutput];
+                                    this.connectedOutputNeurons.RemoveAt(oldOutput);
+                                    tempOlds.Add(oldValue);
+
+                                    //new connection output
+                                    int newOutput = rnd.Next(0, this.availableRelations.Count);
+                                    String newValue = this.availableRelations[newOutput];
+                                    this.availableRelations.RemoveAt(newOutput);
+                                    tempNewOutputs.Add(newValue);
+
+                                }
 
                             }
-                            else if (temp == 1 && (connectedOutputNeurons.Count >= 1))
-                            {
-                                int oldOutput = rnd.Next(0, connectedOutputNeurons.Count);
-                                String oldValue = connectedOutputNeurons[oldOutput];
-                                connectedOutputNeurons.RemoveAt(oldOutput);
-                                tempOlds.Add(oldValue);
+                            connectedInputNeurons.AddRange(tempNewInputs);
+                            connectedOutputNeurons.AddRange(tempNewOutputs);
+                            availableRelations.AddRange(tempOlds);
 
-                                //new connection output
-                                int newOutput = rnd.Next(0, availableRelations.Count);
-                                String newValue = availableRelations[newOutput];
-                                availableRelations.RemoveAt(newOutput);
-                                tempNewOutputs.Add(newValue);
+                            //увеличиваем счетчик переключений
+                            ++this.reconnectingCount;
+                            LogHelper.SubConnectReport(this.connectedInputNeurons, this.connectedOutputNeurons, this.reconnectingCount);
+                            LogHelper.Commit();
+                            LogHelper.InitReporting(subnet1, this.reconnectingCount);
 
-                            }
-
+                            this.draw(subnet1.Network, pictureBox2, this.inputSubNet, this.outputSubnet);
+                            this.draw(this.network, pictureBox1, this.connectedInputNeurons, this.connectedOutputNeurons);
                         }
-                        connectedInputNeurons.AddRange(tempNewInputs);
-                        connectedOutputNeurons.AddRange(tempNewOutputs);
-                        availableRelations.AddRange(tempOlds);
-
-                        //увеличиваем счетчик переключений
-                        ++this.reconnectingCount;
-                        LogHelper.SubConnectReport(connectedInputNeurons, connectedOutputNeurons, this.reconnectingCount);
-                        LogHelper.Commit();
-                        LogHelper.InitReporting(subnet1, this.reconnectingCount);
-
-                        this.draw(subnet1.Network, pictureBox2, inputSubNet, outputSubnet);
-                        this.draw(this.network, pictureBox1, connectedInputNeurons, connectedOutputNeurons);
+                        //if sort connectn option check
+                        else
+                        {
+                            //LogHelper.Commit();
+                            needToStop = true;
+                            this.test();
+                            SpreadTest = false;
+                            break;
+                        }
                     }
                     else if(!needToStop && (this.validQuality < currentQuality)) {
 
@@ -1115,6 +1182,14 @@ namespace Neural
             needToStop = true;
             this.test();
             SpreadTest = false;
+        }
+
+        private void sortConnectBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sortConnectBox.Checked)
+                this.reconnectBox.Enabled = false;
+            else
+                this.reconnectBox.Enabled = true;
         }
     }
 

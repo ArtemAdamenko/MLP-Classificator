@@ -105,7 +105,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "HelloForm";
-            this.Text = "ANNBuilder v1.5.2";
+            this.Text = "ANNBuilder v1.5.3";
             this.actionsBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);

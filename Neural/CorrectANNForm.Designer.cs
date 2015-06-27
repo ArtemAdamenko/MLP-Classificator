@@ -81,6 +81,7 @@
             this.levelVariationstextBox = new System.Windows.Forms.TextBox();
             this.BothEqualcheckBox = new System.Windows.Forms.CheckBox();
             this.levelVariationscheckBox = new System.Windows.Forms.CheckBox();
+            this.sortConnectBox = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -160,14 +161,14 @@
             // LoadNetToolStripMenuItem
             // 
             this.LoadNetToolStripMenuItem.Name = "LoadNetToolStripMenuItem";
-            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(97, 20);
+            this.LoadNetToolStripMenuItem.Size = new System.Drawing.Size(99, 20);
             this.LoadNetToolStripMenuItem.Text = "Загрузить сеть";
             this.LoadNetToolStripMenuItem.Click += new System.EventHandler(this.LoadNetToolStripMenuItem_Click);
             // 
             // LoadDataToolStripMenuItem
             // 
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
-            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(118, 20);
+            this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
             this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
@@ -256,7 +257,7 @@
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.zedGraphControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.zedGraphControl1.Location = new System.Drawing.Point(12, 497);
+            this.zedGraphControl1.Location = new System.Drawing.Point(4, 519);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
             this.zedGraphControl1.ScrollMaxX = 0D;
@@ -340,7 +341,7 @@
             this.groupBox1.Controls.Add(this.betterBox);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.testNetButton);
-            this.groupBox1.Location = new System.Drawing.Point(12, 284);
+            this.groupBox1.Location = new System.Drawing.Point(4, 306);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(318, 207);
             this.groupBox1.TabIndex = 49;
@@ -384,7 +385,7 @@
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.populationtextBox);
             this.groupBox2.Controls.Add(this.populationLabel);
-            this.groupBox2.Location = new System.Drawing.Point(12, 27);
+            this.groupBox2.Location = new System.Drawing.Point(4, 27);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(318, 178);
             this.groupBox2.TabIndex = 50;
@@ -554,12 +555,13 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.sortConnectBox);
             this.groupBox3.Controls.Add(this.levelVariationstextBox);
             this.groupBox3.Controls.Add(this.BothEqualcheckBox);
             this.groupBox3.Controls.Add(this.levelVariationscheckBox);
-            this.groupBox3.Location = new System.Drawing.Point(11, 203);
+            this.groupBox3.Location = new System.Drawing.Point(3, 211);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(319, 75);
+            this.groupBox3.Size = new System.Drawing.Size(319, 89);
             this.groupBox3.TabIndex = 52;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Встряхивание весов при эволюции";
@@ -595,12 +597,24 @@
             this.levelVariationscheckBox.Text = "При уровне коэф.вариации весов :";
             this.levelVariationscheckBox.UseVisualStyleBackColor = true;
             // 
+            // sortConnectBox
+            // 
+            this.sortConnectBox.AutoSize = true;
+            this.sortConnectBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.sortConnectBox.Location = new System.Drawing.Point(12, 66);
+            this.sortConnectBox.Name = "sortConnectBox";
+            this.sortConnectBox.Size = new System.Drawing.Size(176, 17);
+            this.sortConnectBox.TabIndex = 3;
+            this.sortConnectBox.Text = "Упорядоченное подключение";
+            this.sortConnectBox.UseVisualStyleBackColor = true;
+            this.sortConnectBox.CheckedChanged += new System.EventHandler(this.sortConnectBox_CheckedChanged);
+            // 
             // CorrectANNForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1062, 802);
+            this.ClientSize = new System.Drawing.Size(1062, 815);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.groupBox2);
@@ -687,5 +701,6 @@
         private System.Windows.Forms.TextBox levelVariationstextBox;
         private System.Windows.Forms.CheckBox BothEqualcheckBox;
         private System.Windows.Forms.CheckBox levelVariationscheckBox;
+        private System.Windows.Forms.CheckBox sortConnectBox;
     }
 }
