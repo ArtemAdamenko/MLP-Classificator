@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
-using System.Collections;
-using Accord.Neuro;
-using Accord.Math;
-using Accord.Neuro.Learning;
 using ZedGraph;
 using OfficeOpenXml;
 

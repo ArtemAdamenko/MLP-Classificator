@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
@@ -626,9 +623,7 @@ namespace Neural
             for (int outputNeuron = 0; outputNeuron < this.hidden[this.hidden.Length - 1]; )
             {
 
-                //int rndRelation = rnd.Next(0, availableRelations.Count);
                 String connect = this.availableRelations[(this.availableRelations.Count - 1) - outputNeuron];
-                //availableRelations.Remove(connect);
                 this.connectedOutputNeurons.Add(connect);
                 this.outputSubnet.Add(subnet1.Network.Layers.Length - 1 + ":" + outputNeuron.ToString());
                 outputNeuron++;
@@ -814,7 +809,6 @@ namespace Neural
                         //if sort connectn option check
                         else
                         {
-                            //LogHelper.Commit();
                             needToStop = true;
                             this.test();
                             SpreadTest = false;
@@ -1144,17 +1138,7 @@ namespace Neural
         {
             int classificator = 0;
             double tempValue = 0.0;
-            /*int ones = 0;
-            for (int i = 0; i < mass.Length; i++)
-            {
-                if (mass[i] == 1.0)
-                {
-                    ones++;
-                    tempValue += i;
-                }
-            }
-            if (ones <= 1)
-            {*/
+
                 tempValue = 0.0;
                 for (int i = 0; i < mass.Length; i++)
                 {
@@ -1164,11 +1148,6 @@ namespace Neural
                         classificator = i;
                     }
                 }
-          /*  }
-            else
-            {
-                classificator = tempValue / ones;
-            }*/
             return classificator;
         }
 

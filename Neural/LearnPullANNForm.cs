@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
@@ -47,7 +46,6 @@ namespace Neural
 
         ActivationNetwork network;
         IActivationFunction activationFunc = null;
-        //ISupervisedLearning teacher = null;
         #endregion
 
         // Constructor
@@ -268,7 +266,6 @@ namespace Neural
             }
 
             randomWeightsCount = Int32.Parse(randomCountWeightsBox.Text);
-            //weightChange = Double.Parse(weightsChangeBox.Text);
             maxWeightValue = Double.Parse(maxWeightValueBox.Text);
             minWeightValue = Double.Parse(minWeightValueBox.Text);
             loops = Int32.Parse(limitRepeatBox.Text);
@@ -487,8 +484,10 @@ namespace Neural
 
 
 
-                //current weights != old weight
+#pragma warning disable CS0252 // Possible unintended reference comparison; left hand side needs cast
+                              //current weights != old weight
                 if (weightsView.Rows[currentWeight].Cells[0].Value != trainingWeights[currentWeight])
+#pragma warning restore CS0252 // Possible unintended reference comparison; left hand side needs cast
                 {
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[0].Value = trainingWeights[currentWeight]));
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[1].Value = value));
@@ -918,7 +917,6 @@ namespace Neural
         {
             randomCountWeightsBox.Enabled = !randomCountWeightsBox.Enabled;
             repeatPullBox.Enabled = !repeatPullBox.Enabled;
-            //sortByNumBox.Enabled = !sortByNumBox.Enabled;
             sortByLayersBox.Enabled = !sortByLayersBox.Enabled;
         }
 
