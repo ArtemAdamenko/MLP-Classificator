@@ -105,16 +105,60 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LearnGeneticANNForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LearnGeneticANNForm.designer.cs">
+      <DependentUpon>LearnGeneticANNForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LearnPullANNForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LearnPullANNForm.designer.cs">
+      <DependentUpon>LearnPullANNForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Library\Activation Functions\BipolarSigmoidFunction.cs" />
     <Compile Include="Library\Activation Functions\IActivationFunction.cs" />
     <Compile Include="Library\Activation Functions\SigmoidFunction.cs" />
     <Compile Include="Library\Activation Functions\ThresholdFunction.cs" />
     <Compile Include="Library\ANNUtils.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\BinaryChromosome.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\ChromosomeBase.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\DoubleArrayChromosome.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\GP\ExtendedGeneFunction.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\GP\GEPChromosome.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\GP\GPTreeChromosome.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\GP\GPTreeNode.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\GP\IGPGene.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\GP\SimpleGeneFunction.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\IChromosome.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\PermutationChromosome.cs" />
+    <Compile Include="Library\Genetic\Chromosomes\ShortArrayChromosome.cs" />
+    <Compile Include="Library\Genetic\Fitness Functions\IFitnessFunction.cs" />
+    <Compile Include="Library\Genetic\Fitness Functions\OptimizationFunction1D.cs" />
+    <Compile Include="Library\Genetic\Fitness Functions\OptimizationFunction2D.cs" />
+    <Compile Include="Library\Genetic\Fitness Functions\SymbolicRegressionFitness.cs" />
+    <Compile Include="Library\Genetic\Fitness Functions\TimeSeriesPredictionFitness.cs" />
+    <Compile Include="Library\Genetic\Population.cs" />
+    <Compile Include="Library\Genetic\Properties\AssemblyInfo.cs" />
+    <Compile Include="Library\Genetic\Random\ExponentialGenerator.cs" />
+    <Compile Include="Library\Genetic\Random\GaussianGenerator.cs" />
+    <Compile Include="Library\Genetic\Random\IRandomNumberGenerator.cs" />
+    <Compile Include="Library\Genetic\Random\StandardGenerator.cs" />
+    <Compile Include="Library\Genetic\Random\UniformGenerator.cs" />
+    <Compile Include="Library\Genetic\Random\UniformOneGenerator.cs" />
+    <Compile Include="Library\Genetic\Selection Algorithms\EliteSelection.cs" />
+    <Compile Include="Library\Genetic\Selection Algorithms\ISelectionMethod.cs" />
+    <Compile Include="Library\Genetic\Selection Algorithms\RankSelection.cs" />
+    <Compile Include="Library\Genetic\Selection Algorithms\RouletteWheelSelection.cs" />
     <Compile Include="Library\Initialization\GaussianWeights.cs" />
     <Compile Include="Library\Initialization\NguyenWidrow.cs" />
+    <Compile Include="Library\IntRange.cs" />
     <Compile Include="Library\Layers\ActivationLayer.cs" />
     <Compile Include="Library\Layers\Layer.cs" />
     <Compile Include="Library\Learning\BackPropagationLearning.cs" />
+    <Compile Include="Library\Learning\EvolutionaryFitness.cs" />
+    <Compile Include="Library\Learning\GeneticLearning.cs" />
     <Compile Include="Library\Learning\ISupervisedLearning.cs" />
     <Compile Include="Library\Learning\ParallelResilientBackPropagationLearning.cs" />
     <Compile Include="LearnANNForm.cs">
@@ -140,6 +184,14 @@
     <Compile Include="Library\Networks\Network.cs" />
     <Compile Include="Library\Neurons\ActivationNeuron.cs" />
     <Compile Include="Library\Neurons\Neuron.cs" />
+    <Compile Include="Library\Random\ExponentialGenerator.cs" />
+    <Compile Include="Library\Random\GaussianGenerator.cs" />
+    <Compile Include="Library\Random\IRandomNumberGenerator.cs" />
+    <Compile Include="Library\Random\StandardGenerator.cs" />
+    <Compile Include="Library\Random\UniformGenerator.cs" />
+    <Compile Include="Library\Random\UniformOneGenerator.cs" />
+    <Compile Include="Library\Range.cs" />
+    <Compile Include="Library\ThreadSafeRandom.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Library\Networks\Subnet.cs" />
@@ -159,6 +211,12 @@
     <EmbeddedResource Include="HelloForm.resx">
       <DependentUpon>HelloForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LearnGeneticANNForm.resx">
+      <DependentUpon>LearnGeneticANNForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LearnPullANNForm.resx">
+      <DependentUpon>LearnPullANNForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -173,6 +231,7 @@
       <DependentUpon>CorrectANNForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="Library\Genetic\AForge.Genetic.snk" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -187,6 +246,10 @@
     <None Include="Resources\1.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Library\Genetic\Genetic %28mono%29.csproj" />
+    <Content Include="Library\Genetic\Genetic %28mono%29.sln" />
+    <Content Include="Library\Genetic\Genetic.csproj" />
+    <Content Include="Library\Genetic\Genetic.sln" />
     <Content Include="Resources\003_neuron_neuronal_connections_neural_network_sci.ico" />
   </ItemGroup>
   <ItemGroup>

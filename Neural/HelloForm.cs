@@ -37,5 +37,17 @@ namespace Neural
             form.Show(this);
 
         }
+
+        private void pullWeightsButton_Click(object sender, EventArgs e)
+        {
+            LearnPullANNForm form = new LearnPullANNForm();
+            form.Show(this);
+        }
+
+        private void GeneticButton_Click(object sender, EventArgs e)
+        {
+            LearnGeneticANNForm form = new LearnGeneticANNForm();
+            form.Show(this);
+        }
     }
 }

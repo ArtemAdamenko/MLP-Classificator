@@ -36,7 +36,8 @@ namespace Neural
             {
                 for (int column = 0; column < colCountData - 1; column++)
                 {
-                    data[row, column] = (((data[row, column] - min[column]) * 1 / (max[column] - min[column])));
+                    data[row, column] = (2 * data[row, column] - (max[column] + min[column])) / (max[column] - min[column]);
+                    //data[row, column] = (((data[row, column] - min[column]) * 1 / (max[column] - min[column])));
 
                 }
             }
