@@ -32,7 +32,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.outputVectorButton = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Layer = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Neuron = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -41,12 +40,9 @@
             this.Check = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.testNetButton = new System.Windows.Forms.Button();
             this.errorTextBox = new System.Windows.Forms.TextBox();
-            this.testErrorLabel = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.LoadDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.тестToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.входнойВекторToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.NetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LoadNetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,6 +68,7 @@
             this.CombinationsLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.saveBox = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -103,29 +100,16 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.outputVectorButton);
+            this.groupBox1.Controls.Add(this.saveBox);
             this.groupBox1.Controls.Add(this.dataGridView1);
             this.groupBox1.Controls.Add(this.testNetButton);
             this.groupBox1.Controls.Add(this.errorTextBox);
-            this.groupBox1.Controls.Add(this.testErrorLabel);
             this.groupBox1.Location = new System.Drawing.Point(0, 277);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(320, 422);
+            this.groupBox1.Size = new System.Drawing.Size(320, 396);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Изменение сети";
-            // 
-            // outputVectorButton
-            // 
-            this.outputVectorButton.Enabled = false;
-            this.outputVectorButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.outputVectorButton.Location = new System.Drawing.Point(8, 391);
-            this.outputVectorButton.Name = "outputVectorButton";
-            this.outputVectorButton.Size = new System.Drawing.Size(112, 23);
-            this.outputVectorButton.TabIndex = 9;
-            this.outputVectorButton.Text = "Выходной вектор";
-            this.outputVectorButton.UseVisualStyleBackColor = true;
-            this.outputVectorButton.Click += new System.EventHandler(this.outputVectorButton_Click);
             // 
             // dataGridView1
             // 
@@ -204,15 +188,6 @@
             this.errorTextBox.Size = new System.Drawing.Size(100, 21);
             this.errorTextBox.TabIndex = 8;
             // 
-            // testErrorLabel
-            // 
-            this.testErrorLabel.AutoSize = true;
-            this.testErrorLabel.Location = new System.Drawing.Point(121, 367);
-            this.testErrorLabel.Name = "testErrorLabel";
-            this.testErrorLabel.Size = new System.Drawing.Size(93, 13);
-            this.testErrorLabel.TabIndex = 7;
-            this.testErrorLabel.Text = "% обученности: ";
-            // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
@@ -230,26 +205,10 @@
             // 
             // LoadDataToolStripMenuItem
             // 
-            this.LoadDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.тестToolStripMenuItem,
-            this.входнойВекторToolStripMenuItem});
             this.LoadDataToolStripMenuItem.Name = "LoadDataToolStripMenuItem";
             this.LoadDataToolStripMenuItem.Size = new System.Drawing.Size(124, 20);
             this.LoadDataToolStripMenuItem.Text = "Загрузить выборку";
-            // 
-            // тестToolStripMenuItem
-            // 
-            this.тестToolStripMenuItem.Name = "тестToolStripMenuItem";
-            this.тестToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.тестToolStripMenuItem.Text = "Тест";
-            this.тестToolStripMenuItem.Click += new System.EventHandler(this.тестToolStripMenuItem_Click);
-            // 
-            // входнойВекторToolStripMenuItem
-            // 
-            this.входнойВекторToolStripMenuItem.Name = "входнойВекторToolStripMenuItem";
-            this.входнойВекторToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.входнойВекторToolStripMenuItem.Text = "Входной вектор";
-            this.входнойВекторToolStripMenuItem.Click += new System.EventHandler(this.входнойВекторToolStripMenuItem_Click);
+            this.LoadDataToolStripMenuItem.Click += new System.EventHandler(this.LoadDataToolStripMenuItem_Click);
             // 
             // NetToolStripMenuItem
             // 
@@ -476,12 +435,23 @@
             this.label6.TabIndex = 34;
             this.label6.Text = "Комбинации";
             // 
+            // saveBox
+            // 
+            this.saveBox.AutoSize = true;
+            this.saveBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveBox.Location = new System.Drawing.Point(108, 365);
+            this.saveBox.Name = "saveBox";
+            this.saveBox.Size = new System.Drawing.Size(78, 17);
+            this.saveBox.TabIndex = 9;
+            this.saveBox.Text = "Сохранить";
+            this.saveBox.UseVisualStyleBackColor = true;
+            // 
             // ChangeANNForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1062, 711);
+            this.ClientSize = new System.Drawing.Size(1062, 674);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.CombinationsLabel);
@@ -524,7 +494,6 @@
         private System.Windows.Forms.ToolStripMenuItem LoadDataToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog2;
         private System.Windows.Forms.Button testNetButton;
-        private System.Windows.Forms.Label testErrorLabel;
         private System.Windows.Forms.TextBox errorTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn Layer;
         private System.Windows.Forms.DataGridViewTextBoxColumn Neuron;
@@ -543,9 +512,6 @@
         private System.Windows.Forms.ToolStripMenuItem LoadNetToolStripMenuItem;
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.Label timeLabel;
-        private System.Windows.Forms.ToolStripMenuItem тестToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem входнойВекторToolStripMenuItem;
-        private System.Windows.Forms.Button outputVectorButton;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button stopWeightsButton;
         private System.Windows.Forms.Button startOffWeightsButton;
@@ -558,5 +524,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label offCountLabel;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.CheckBox saveBox;
     }
 }

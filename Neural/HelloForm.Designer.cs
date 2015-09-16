@@ -30,12 +30,13 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HelloForm));
             this.actionsBox = new System.Windows.Forms.GroupBox();
+            this.GeneticButton = new System.Windows.Forms.Button();
             this.pullWeightsButton = new System.Windows.Forms.Button();
             this.correctButton = new System.Windows.Forms.Button();
             this.changeNetbutton = new System.Windows.Forms.Button();
             this.createButton = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.GeneticButton = new System.Windows.Forms.Button();
+            this.evolutionLearnButton = new System.Windows.Forms.Button();
             this.actionsBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -54,6 +55,17 @@
             this.actionsBox.TabIndex = 1;
             this.actionsBox.TabStop = false;
             this.actionsBox.Text = "Операции";
+            // 
+            // GeneticButton
+            // 
+            this.GeneticButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.GeneticButton.Location = new System.Drawing.Point(6, 109);
+            this.GeneticButton.Name = "GeneticButton";
+            this.GeneticButton.Size = new System.Drawing.Size(273, 38);
+            this.GeneticButton.TabIndex = 6;
+            this.GeneticButton.Text = "Создать сеть(Genetic)";
+            this.GeneticButton.UseVisualStyleBackColor = true;
+            this.GeneticButton.Click += new System.EventHandler(this.GeneticButton_Click);
             // 
             // pullWeightsButton
             // 
@@ -110,22 +122,22 @@
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
             // 
-            // GeneticButton
+            // evolutionLearnButton
             // 
-            this.GeneticButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.GeneticButton.Location = new System.Drawing.Point(6, 109);
-            this.GeneticButton.Name = "GeneticButton";
-            this.GeneticButton.Size = new System.Drawing.Size(273, 38);
-            this.GeneticButton.TabIndex = 6;
-            this.GeneticButton.Text = "Создать сеть(Genetic)";
-            this.GeneticButton.UseVisualStyleBackColor = true;
-            this.GeneticButton.Click += new System.EventHandler(this.GeneticButton_Click);
+            this.evolutionLearnButton.Location = new System.Drawing.Point(98, 427);
+            this.evolutionLearnButton.Name = "evolutionLearnButton";
+            this.evolutionLearnButton.Size = new System.Drawing.Size(279, 33);
+            this.evolutionLearnButton.TabIndex = 4;
+            this.evolutionLearnButton.Text = "Эволюционный алгоритм обучения";
+            this.evolutionLearnButton.UseVisualStyleBackColor = true;
+            this.evolutionLearnButton.Click += new System.EventHandler(this.evolutionLearnButton_Click);
             // 
             // HelloForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(483, 433);
+            this.ClientSize = new System.Drawing.Size(483, 483);
+            this.Controls.Add(this.evolutionLearnButton);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.actionsBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -147,5 +159,6 @@
         private System.Windows.Forms.Button correctButton;
         private System.Windows.Forms.Button pullWeightsButton;
         private System.Windows.Forms.Button GeneticButton;
+        private System.Windows.Forms.Button evolutionLearnButton;
     }
 }

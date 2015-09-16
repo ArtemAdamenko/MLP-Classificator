@@ -105,6 +105,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EvolutionLearnForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EvolutionLearnForm.Designer.cs">
+      <DependentUpon>EvolutionLearnForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LearnGeneticANNForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -177,6 +183,9 @@
       <DependentUpon>CorrectANNForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Library\Record.cs" />
+    <EmbeddedResource Include="EvolutionLearnForm.resx">
+      <DependentUpon>EvolutionLearnForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LearnANNForm.resx">
       <DependentUpon>LearnANNForm.cs</DependentUpon>
     </EmbeddedResource>

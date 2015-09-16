@@ -707,14 +707,16 @@ namespace Neural
 
             --Subnet._ID;
 
+           // ActivationNetwork network = new ActivationNetwork(new SigmoidFunction(this.alpha), input, hidden);
+
             selectionResult.Add("Отбор");
 
             while (!needToStop)
             {
                 ActivationNetwork network = new ActivationNetwork(new SigmoidFunction(this.alpha), input, hidden);
 
-                NguyenWidrow initializer = new NguyenWidrow(network);
-                initializer.Randomize(0);
+                //NguyenWidrow initializer = new NguyenWidrow(network);
+                //initializer.Randomize(0);
 
                 Subnet subnet = new Subnet(network);
                 subnet.inputAssosiated = this.connectedInputNeurons;
@@ -815,7 +817,7 @@ namespace Neural
                             break;
                         }
                     }
-                    else if(!needToStop && (this.validQuality < currentQuality)) {
+                    else if(!needToStop && (this.validQuality <= currentQuality)) {
 
                         needToStop = true;
                         this.test();
@@ -984,8 +986,6 @@ namespace Neural
             Random rnd = new Random();
 
             ActivationNetwork evoSubNet = new ActivationNetwork(new SigmoidFunction(this.alpha), net1.Network.InputsCount, net1.topology);
-            NguyenWidrow ng = new NguyenWidrow(evoSubNet);
-            ng.Randomize(0);
 
             for (int layer = 0; layer < net1.Network.Layers.Length; layer++)
             {
@@ -997,18 +997,18 @@ namespace Neural
                         if (this.levelVariationscheckBox.Checked)
                         {
                             //если коэф вариации позиции веса ниже порога - встряхивание
-                            if (Math.Abs(coefficients[iWeight]) < this.levelVariationsWeights)
+                            if (Math.Abs(coefficients[iWeight]) <= this.levelVariationsWeights)
                             {
-                                double currWeight = evoSubNet.Layers[layer].Neurons[neuron].Weights[weight];
 
-                                currWeight =
+                                double currWeight =
                                     (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
 
 
                                 currWeight *= rnd.NextDouble() * currWeight;
+                                evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] = currWeight;
                                 availableMutations++;
                             }
-                            else if ((Math.Abs(coefficients[iWeight]) > this.levelVariationsWeights))
+                            else
                             {
                                 evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] =
                                     (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
@@ -1020,11 +1020,10 @@ namespace Neural
                         {
                             if (net1.quality == net2.quality)
                             {
-                                double currWeight = evoSubNet.Layers[layer].Neurons[neuron].Weights[weight];
-                                currWeight =
+                                double currWeight =
                                    (net1.Network.Layers[layer].Neurons[neuron].Weights[weight] + net2.Network.Layers[layer].Neurons[neuron].Weights[weight]) / 2;
                                 currWeight *= rnd.NextDouble() * currWeight;
-
+                                evoSubNet.Layers[layer].Neurons[neuron].Weights[weight] = currWeight;
                                 availableMutations++;
                             }
                             else

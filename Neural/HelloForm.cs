@@ -43,5 +43,11 @@ namespace Neural
             LearnGeneticANNForm form = new LearnGeneticANNForm();
             form.Show(this);
         }
+
+        private void evolutionLearnButton_Click(object sender, EventArgs e)
+        {
+            EvolutionLearnForm form = new EvolutionLearnForm();
+            form.Show(this);
+        }
     }
 }

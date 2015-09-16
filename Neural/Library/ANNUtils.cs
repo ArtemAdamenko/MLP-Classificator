@@ -98,6 +98,63 @@ namespace Neural
             return mediumWeights;
         }
 
+        //средние значения для каждой позиции веса
+        public static double[] mediums(List<ActivationNetwork> nets)
+        {
+            ActivationNetwork templateNet = nets[0];
+            double[] mediumWeights = new double[ANNUtils.getCountOfWeights(templateNet)];
+            
+
+            int iWeight = 0;
+            for (int layer = 0; layer < templateNet.Layers.Length; layer++)
+            {
+                for (int neuron = 0; neuron < templateNet.Layers[layer].Neurons.Length; neuron++)
+                {
+                    for (int weight = 0; weight < templateNet.Layers[layer].Neurons[neuron].Weights.Length; weight++)
+                    {
+                        double summ = 0.0;
+                        for (int network = 0; network < nets.Count; network++)
+                        {
+                            summ += nets[network].Layers[layer].Neurons[neuron].Weights[weight];
+                        }
+                        mediumWeights[iWeight] = summ / nets.Count;
+                        iWeight++;
+                    }
+                }
+
+            }
+
+            return mediumWeights;
+        }
+
+        //среднеквадратичное отклонение
+        public static double[] standartDeviation(double[] mediumWeights, List<ActivationNetwork> nets)
+        {
+            ActivationNetwork templateNet = nets[0];
+            double[] standartDeviation = new double[ANNUtils.getCountOfWeights(templateNet)];
+            //calculate standart deviation
+            int iWeight = 0;
+            for (int layer = 0; layer < templateNet.Layers.Length; layer++)
+            {
+                for (int neuron = 0; neuron < templateNet.Layers[layer].Neurons.Length; neuron++)
+                {
+                    for (int weight = 0; weight < templateNet.Layers[layer].Neurons[neuron].Weights.Length; weight++)
+                    {
+                        double summ = 0.0;
+                        for (int network = 0; network < nets.Count; network++)
+                        {
+                            summ += (nets[network].Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[iWeight]) * (nets[network].Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[iWeight]);
+                        }
+                        
+                        standartDeviation[iWeight] =  Math.Sqrt(summ / (nets.Count - 1));
+                        iWeight++;
+                    }
+                }
+
+            }
+            return standartDeviation;
+        }
+
         //среднеквадратичное отклонение
         public static double[] standartDeviation(double[] mediumWeights, List<Subnet> subnets)
         {
@@ -115,8 +172,8 @@ namespace Neural
                         {
                             summ += (subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[iWeight]) * (subnets[network].Network.Layers[layer].Neurons[neuron].Weights[weight] - mediumWeights[iWeight]);
                         }
-                        
-                        standartDeviation[iWeight] =  Math.Sqrt(summ / (subnets.Count - 1));
+
+                        standartDeviation[iWeight] = Math.Sqrt(summ / (subnets.Count - 1));
                         iWeight++;
                     }
                 }
@@ -140,7 +197,21 @@ namespace Neural
 
             return subnets;
         }
-   
+
+        //удаление заданного кол-ва сетей по возрастанию
+        public static List<ActivationNetwork> dropBadSubnets(List<ActivationNetwork> nets, int count)
+        {
+            nets = nets.OrderByDescending(net => net.moduleResult).ToList();
+
+            for (int i = 0; i < count; i++)
+            {
+                //удаление худших с конца
+                nets.RemoveAt(nets.Count - 1);
+            }
+
+            return nets;
+        }
+
         //подсчитывает количество нейронов заданной сети
         public static int getNeuronsCount(Network network)
         {
@@ -199,8 +270,7 @@ namespace Neural
             double validate = 0.0;
             double testQuality = 0.0;
 
-
-            for (int count = 0; count < data.GetLength(0) - 1; count++)
+            for (int count = 0; count < data.GetLength(0); count++)
             {
                 try
                 {
@@ -226,5 +296,41 @@ namespace Neural
 
             return testQuality;
         }
+
+        //запуск тестирования сети с желаемым классом
+        public static double[] compute(Network network, double[,] data, int[] classes, List<int> classesList)
+        {
+            double[] res;
+            int colCountData = network.InputsCount;
+            double[] input = new double[colCountData];
+            double[] testQuality = new double[data.GetLength(0)];
+
+
+            for (int count = 0; count < data.GetLength(0); count++)
+            {
+                try
+                {
+                    //gather inputs for compute, n-1 inputs
+                    for (int i = 0; i < colCountData; i++)
+                    {
+                        input[i] = data[count, i];
+                    }
+                    res = network.Compute(input);
+                    double output = classesList[ANNUtils.max(res)];
+                    
+                    testQuality[count] = output;
+
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    break;
+                }
+
+            }
+
+            return testQuality;
+        }
+
     }
 }

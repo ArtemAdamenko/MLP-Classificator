@@ -432,7 +432,7 @@ namespace Neural
             this.TestNetToolStripMenuItem,
             this.crossValidToolStripMenuItem});
             this.нейроннаяСетьToolStripMenuItem.Name = "нейроннаяСетьToolStripMenuItem";
-            this.нейроннаяСетьToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
+            this.нейроннаяСетьToolStripMenuItem.Size = new System.Drawing.Size(107, 20);
             this.нейроннаяСетьToolStripMenuItem.Text = "Нейронная сеть";
             // 
             // SaveToolStripMenuItem
@@ -441,7 +441,7 @@ namespace Neural
             this.SaveNetToolStripMenuItem,
             this.SaveWeightsToolStripMenuItem});
             this.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
-            this.SaveToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.SaveToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.SaveToolStripMenuItem.Text = "Сохранить";
             // 
             // SaveNetToolStripMenuItem
@@ -461,14 +461,14 @@ namespace Neural
             // TestNetToolStripMenuItem
             // 
             this.TestNetToolStripMenuItem.Name = "TestNetToolStripMenuItem";
-            this.TestNetToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.TestNetToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.TestNetToolStripMenuItem.Text = "Тестировать";
             this.TestNetToolStripMenuItem.Click += new System.EventHandler(this.TestNetToolStripMenuItem_Click);
             // 
             // crossValidToolStripMenuItem
             // 
             this.crossValidToolStripMenuItem.Name = "crossValidToolStripMenuItem";
-            this.crossValidToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.crossValidToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.crossValidToolStripMenuItem.Text = "Кросс-валидация";
             this.crossValidToolStripMenuItem.Click += new System.EventHandler(this.crossValidToolStripMenuItem_Click);
             // 
@@ -477,13 +477,13 @@ namespace Neural
             this.выборкаToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadTrainDataButton});
             this.выборкаToolStripMenuItem.Name = "выборкаToolStripMenuItem";
-            this.выборкаToolStripMenuItem.Size = new System.Drawing.Size(63, 20);
+            this.выборкаToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
             this.выборкаToolStripMenuItem.Text = "Выборка";
             // 
             // loadTrainDataButton
             // 
             this.loadTrainDataButton.Name = "loadTrainDataButton";
-            this.loadTrainDataButton.Size = new System.Drawing.Size(124, 22);
+            this.loadTrainDataButton.Size = new System.Drawing.Size(129, 22);
             this.loadTrainDataButton.Text = "Обучения";
             this.loadTrainDataButton.Click += new System.EventHandler(this.loadTrainDataButton_Click);
             // 

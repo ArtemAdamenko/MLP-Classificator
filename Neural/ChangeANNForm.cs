@@ -279,9 +279,23 @@ namespace Neural
             //проверка откл/вкл нейронов
             this.CheckNeurons();
             //тестирование
+            if (saveBox.Checked == true)
+            {
+                FileInfo file = new FileInfo(LogHelper.getPath("Test") + "\\ВыходнойВектор-" + LogHelper.getTime() + ".xlsx");
+                ExcelPackage book = new ExcelPackage(file);
+                ExcelWorksheet worksheet = book.Workbook.Worksheets.Add("Выходной вектор");
+
+                double[] results = ANNUtils.compute(network, data, classes, classesList);
+                for (int i = 0; i < results.Length; i++)
+                {
+                    worksheet.Cells[i + 1, 1].Value = results[i];
+                }
+                book.Save();
+            }
+
             double res = ANNUtils.testing(network, data, classes, classesList);
             this.errorTextBox.Invoke(new Action(() => this.errorTextBox.Text = res.ToString("F10")));
-                
+      
         }
 
         //load data for classification
@@ -719,30 +733,6 @@ namespace Neural
             needToStop = true;
         }
 
-        //выбор опции Тестирующего вектора
-        private void тестToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-            Worker = new Thread(getDataForClass);
-
-            Worker.SetApartmentState(ApartmentState.STA);
-            Worker.Start();
-            this.testNetButton.Enabled = true;
-            this.outputVectorButton.Enabled = false;
-        }
-
-        //выбор опции Входной вектор
-        private void входнойВекторToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-            Worker = new Thread(getDataForClassCompute);
-
-            Worker.SetApartmentState(ApartmentState.STA);
-            Worker.Start();
-            this.testNetButton.Enabled = false;
-            this.outputVectorButton.Enabled = true;
-
-        }
 
         //загрузка входного вектора без желаемого класса
         private void getDataForClassCompute()
@@ -830,52 +820,6 @@ namespace Neural
                 }
 
             }
-        }
-
-        //запуск просчет выходного вектора
-        private void outputVectorButton_Click(object sender, EventArgs e)
-        {
-            //проверка откл/вкл нейронов
-            this.CheckNeurons();
-            //тестирование
-            this.getOutputVector();
-        }
-
-        //просчет выходного вектора на основе входного, не используется желаемый класс
-        private void getOutputVector()
-        {
-            double[] res;
-            double[] input = new double[colCountData];
-
-            FileInfo file = new FileInfo(LogHelper.getPath("Test") + "\\ВыходнойВектор-" + LogHelper.getTime() + ".xlsx");
-            ExcelPackage book = new ExcelPackage(file);
-            ExcelWorksheet worksheet = book.Workbook.Worksheets.Add("Выходной вектор");
-
-            for (int count = 0; count < data.GetLength(0) - 1; count++)
-            {
-                try
-                {
-                    //gather inputs for compute, n-1 inputs
-                    for (int i = 0; i < colCountData; i++)
-                    {
-                        input[i] = data[count, i];
-                    }
-                    res = network.Compute(input);
-
-                    worksheet.Cells[count + 1, 1].Value = classesList[ANNUtils.max(res)];
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Ошибка тестирования сети." + e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
-                }
-
-            }
-
-            MessageBox.Show("Выходной вектор сформирован.");
-
-            book.Save();
-            return;
         }
 
 
@@ -1108,8 +1052,14 @@ namespace Neural
             this.needToSpotWeightsOff = true;
         }
 
+        private void LoadDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Worker = new Thread(getDataForClass);
 
-
+            Worker.SetApartmentState(ApartmentState.STA);
+            Worker.Start();
+            this.testNetButton.Enabled = true;
+        }
     }
 
 }

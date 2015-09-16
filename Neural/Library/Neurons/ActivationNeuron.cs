@@ -102,9 +102,9 @@ namespace Neural
                             max = elem.max;
                         }
                     }
-                    double normValue = (((subnet.res[0] - (-1)) * (max - min)) / (1 - (-1))) + min;
-                    sum += (weights[i] * normValue ) * input[i];
-
+                    //double normValue = (((subnet.res[0] - (-1)) * (max - min)) / (1 - (-1))) + min;
+                    //sum += (weights[i] * normValue ) * input[i];
+                    sum += weights[i] + input[i];
                     subnet.res.RemoveAt(0);
                 }
                 else sum += weights[i] * input[i];

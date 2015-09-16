@@ -15,6 +15,8 @@ namespace Neural
             get { return relationsValues; }
         }
 
+        public double moduleResult;
+
         protected int inputsCount;
 
 
@@ -94,9 +96,9 @@ namespace Neural
 
                 weights[i] = layers[layer].Neurons[neuron].Weights[weight];
                 if (layer >= 1)
-                    weights[i] *= layers[layer - 1].Neurons[weight].Output;
+                    weights[i] += layers[layer - 1].Neurons[weight].Output;
                 else
-                    weights[i] *= input[weight];
+                    weights[i] += input[weight];
 
                 i++;
 

@@ -78,10 +78,10 @@
             this.label7 = new System.Windows.Forms.Label();
             this.timeLabel = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.sortConnectBox = new System.Windows.Forms.CheckBox();
             this.levelVariationstextBox = new System.Windows.Forms.TextBox();
             this.BothEqualcheckBox = new System.Windows.Forms.CheckBox();
             this.levelVariationscheckBox = new System.Windows.Forms.CheckBox();
-            this.sortConnectBox = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -566,6 +566,18 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Встряхивание весов при эволюции";
             // 
+            // sortConnectBox
+            // 
+            this.sortConnectBox.AutoSize = true;
+            this.sortConnectBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.sortConnectBox.Location = new System.Drawing.Point(12, 66);
+            this.sortConnectBox.Name = "sortConnectBox";
+            this.sortConnectBox.Size = new System.Drawing.Size(176, 17);
+            this.sortConnectBox.TabIndex = 3;
+            this.sortConnectBox.Text = "Упорядоченное подключение";
+            this.sortConnectBox.UseVisualStyleBackColor = true;
+            this.sortConnectBox.CheckedChanged += new System.EventHandler(this.sortConnectBox_CheckedChanged);
+            // 
             // levelVariationstextBox
             // 
             this.levelVariationstextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -596,18 +608,6 @@
             this.levelVariationscheckBox.TabIndex = 0;
             this.levelVariationscheckBox.Text = "При уровне коэф.вариации весов :";
             this.levelVariationscheckBox.UseVisualStyleBackColor = true;
-            // 
-            // sortConnectBox
-            // 
-            this.sortConnectBox.AutoSize = true;
-            this.sortConnectBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sortConnectBox.Location = new System.Drawing.Point(12, 66);
-            this.sortConnectBox.Name = "sortConnectBox";
-            this.sortConnectBox.Size = new System.Drawing.Size(176, 17);
-            this.sortConnectBox.TabIndex = 3;
-            this.sortConnectBox.Text = "Упорядоченное подключение";
-            this.sortConnectBox.UseVisualStyleBackColor = true;
-            this.sortConnectBox.CheckedChanged += new System.EventHandler(this.sortConnectBox_CheckedChanged);
             // 
             // CorrectANNForm
             // 
