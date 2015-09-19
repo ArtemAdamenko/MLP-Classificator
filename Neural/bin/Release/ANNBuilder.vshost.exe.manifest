@@ -91,14 +91,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ANNBuilder.exe" size="480184">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ANNBuilder.exe" size="481208">
       <assemblyIdentity name="ANNBuilder" version="1.6.3.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>0hB4GMUtYgrgTeug0k6zAHGb2mWUiL1BufpJa4o0720=</dsig:DigestValue>
+        <dsig:DigestValue>kPtmaMgyaZIwSn4gPffmREVkG0gW02i/zVLhneFVnlE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

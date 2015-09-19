@@ -32,28 +32,23 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lastRunsGridView = new System.Windows.Forms.DataGridView();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.probabilisticCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.population = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.mutation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.netsInPopulation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.meanError = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.betterResult = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.startButton = new System.Windows.Forms.Button();
             this.stopButton = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.pLabel = new System.Windows.Forms.Label();
-            this.probabilisticValidBox = new System.Windows.Forms.TextBox();
+            this.labelProcess = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.mLabel = new System.Windows.Forms.Label();
             this.moduleValidBox = new System.Windows.Forms.TextBox();
-            this.errorPercent = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.currentIterationBox = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.neuronsBox = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -83,11 +78,9 @@
             this.populationLabel = new System.Windows.Forms.Label();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.mediumErrorPopulationBox = new System.Windows.Forms.TextBox();
-            this.covariationPopulationBox = new System.Windows.Forms.TextBox();
             this.betterPopulationValueBox = new System.Windows.Forms.TextBox();
             this.PopulationBox = new System.Windows.Forms.TextBox();
             this.betterBox = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -130,52 +123,28 @@
             // 
             this.lastRunsGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.lastRunsGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
+            this.lastRunsGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.lastRunsGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.lastRunsGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column5,
-            this.Column6,
             this.Column7,
-            this.probabilisticCol,
-            this.Column8,
             this.Column9,
             this.Column10,
-            this.Column11,
-            this.Column12});
+            this.population,
+            this.mutation,
+            this.netsInPopulation,
+            this.meanError,
+            this.betterResult});
             this.lastRunsGridView.Location = new System.Drawing.Point(6, 17);
             this.lastRunsGridView.Name = "lastRunsGridView";
             this.lastRunsGridView.RowHeadersVisible = false;
             this.lastRunsGridView.Size = new System.Drawing.Size(658, 207);
             this.lastRunsGridView.TabIndex = 0;
             // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Итерация";
-            this.Column5.Name = "Column5";
-            this.Column5.Width = 81;
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Ошибка";
-            this.Column6.Name = "Column6";
-            this.Column6.Width = 72;
-            // 
             // Column7
             // 
             this.Column7.HeaderText = "Валидация(модуль)";
             this.Column7.Name = "Column7";
             this.Column7.Width = 132;
-            // 
-            // probabilisticCol
-            // 
-            this.probabilisticCol.HeaderText = "Валидация(вер.)";
-            this.probabilisticCol.Name = "probabilisticCol";
-            this.probabilisticCol.Width = 117;
-            // 
-            // Column8
-            // 
-            this.Column8.HeaderText = "Алгоритм";
-            this.Column8.Name = "Column8";
-            this.Column8.Width = 80;
             // 
             // Column9
             // 
@@ -189,22 +158,39 @@
             this.Column10.Name = "Column10";
             this.Column10.Width = 65;
             // 
-            // Column11
+            // population
             // 
-            this.Column11.HeaderText = "Коэф.обучения";
-            this.Column11.Name = "Column11";
-            this.Column11.Width = 110;
+            this.population.HeaderText = "Популяций";
+            this.population.Name = "population";
+            this.population.Width = 87;
             // 
-            // Column12
+            // mutation
             // 
-            this.Column12.HeaderText = "Момент";
-            this.Column12.Name = "Column12";
-            this.Column12.Width = 70;
+            this.mutation.HeaderText = "Скрещиваний в каждом";
+            this.mutation.Name = "mutation";
+            this.mutation.Width = 105;
+            // 
+            // netsInPopulation
+            // 
+            this.netsInPopulation.HeaderText = "Сетей в поколении";
+            this.netsInPopulation.Name = "netsInPopulation";
+            this.netsInPopulation.Width = 118;
+            // 
+            // meanError
+            // 
+            this.meanError.HeaderText = "Средняя ошибка";
+            this.meanError.Name = "meanError";
+            this.meanError.Width = 107;
+            // 
+            // betterResult
+            // 
+            this.betterResult.HeaderText = "Лучший результат";
+            this.betterResult.Name = "betterResult";
+            this.betterResult.Width = 116;
             // 
             // zedGraphControl1
             // 
             this.zedGraphControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.zedGraphControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.zedGraphControl1.Location = new System.Drawing.Point(6, 14);
             this.zedGraphControl1.Name = "zedGraphControl1";
             this.zedGraphControl1.ScrollGrace = 0D;
@@ -221,7 +207,7 @@
             // 
             this.groupBox5.Controls.Add(this.startButton);
             this.groupBox5.Controls.Add(this.stopButton);
-            this.groupBox5.Location = new System.Drawing.Point(695, 558);
+            this.groupBox5.Location = new System.Drawing.Point(695, 469);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(195, 57);
             this.groupBox5.TabIndex = 24;
@@ -231,7 +217,6 @@
             // startButton
             // 
             this.startButton.Enabled = false;
-            this.startButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startButton.Location = new System.Drawing.Point(6, 20);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(105, 25);
@@ -242,7 +227,6 @@
             // stopButton
             // 
             this.stopButton.Enabled = false;
-            this.stopButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.stopButton.Location = new System.Drawing.Point(108, 20);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(81, 25);
@@ -252,42 +236,38 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.pLabel);
-            this.groupBox4.Controls.Add(this.probabilisticValidBox);
+            this.groupBox4.Controls.Add(this.labelProcess);
+            this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.mLabel);
             this.groupBox4.Controls.Add(this.moduleValidBox);
-            this.groupBox4.Controls.Add(this.errorPercent);
-            this.groupBox4.Controls.Add(this.label3);
-            this.groupBox4.Controls.Add(this.currentIterationBox);
-            this.groupBox4.Controls.Add(this.label5);
-            this.groupBox4.Location = new System.Drawing.Point(695, 424);
+            this.groupBox4.Location = new System.Drawing.Point(695, 391);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(195, 128);
+            this.groupBox4.Size = new System.Drawing.Size(195, 72);
             this.groupBox4.TabIndex = 23;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Текущая итерация";
             // 
-            // pLabel
+            // labelProcess
             // 
-            this.pLabel.AutoSize = true;
-            this.pLabel.Location = new System.Drawing.Point(5, 76);
-            this.pLabel.Name = "pLabel";
-            this.pLabel.Size = new System.Drawing.Size(86, 13);
-            this.pLabel.TabIndex = 8;
-            this.pLabel.Text = "% Вероятности";
+            this.labelProcess.AutoSize = true;
+            this.labelProcess.Location = new System.Drawing.Point(120, 45);
+            this.labelProcess.Name = "labelProcess";
+            this.labelProcess.Size = new System.Drawing.Size(0, 13);
+            this.labelProcess.TabIndex = 52;
             // 
-            // probabilisticValidBox
+            // label7
             // 
-            this.probabilisticValidBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.probabilisticValidBox.Location = new System.Drawing.Point(120, 74);
-            this.probabilisticValidBox.Name = "probabilisticValidBox";
-            this.probabilisticValidBox.Size = new System.Drawing.Size(66, 21);
-            this.probabilisticValidBox.TabIndex = 7;
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(11, 45);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(95, 13);
+            this.label7.TabIndex = 41;
+            this.label7.Text = "Текущий процесс";
             // 
             // mLabel
             // 
             this.mLabel.AutoSize = true;
-            this.mLabel.Location = new System.Drawing.Point(5, 104);
+            this.mLabel.Location = new System.Drawing.Point(6, 17);
             this.mLabel.Name = "mLabel";
             this.mLabel.Size = new System.Drawing.Size(77, 13);
             this.mLabel.TabIndex = 6;
@@ -295,43 +275,10 @@
             // 
             // moduleValidBox
             // 
-            this.moduleValidBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.moduleValidBox.Location = new System.Drawing.Point(120, 101);
+            this.moduleValidBox.Location = new System.Drawing.Point(123, 15);
             this.moduleValidBox.Name = "moduleValidBox";
             this.moduleValidBox.Size = new System.Drawing.Size(66, 21);
             this.moduleValidBox.TabIndex = 5;
-            // 
-            // errorPercent
-            // 
-            this.errorPercent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.errorPercent.Location = new System.Drawing.Point(120, 20);
-            this.errorPercent.Name = "errorPercent";
-            this.errorPercent.Size = new System.Drawing.Size(66, 21);
-            this.errorPercent.TabIndex = 4;
-            // 
-            // label3
-            // 
-            this.label3.Location = new System.Drawing.Point(5, 22);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(85, 21);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "% Обучения:";
-            // 
-            // currentIterationBox
-            // 
-            this.currentIterationBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.currentIterationBox.Location = new System.Drawing.Point(120, 47);
-            this.currentIterationBox.Name = "currentIterationBox";
-            this.currentIterationBox.Size = new System.Drawing.Size(66, 21);
-            this.currentIterationBox.TabIndex = 1;
-            // 
-            // label5
-            // 
-            this.label5.Location = new System.Drawing.Point(6, 49);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(70, 17);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Итерация:";
             // 
             // groupBox3
             // 
@@ -355,7 +302,6 @@
             // 
             // neuronsBox
             // 
-            this.neuronsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.neuronsBox.Location = new System.Drawing.Point(99, 125);
             this.neuronsBox.Name = "neuronsBox";
             this.neuronsBox.Size = new System.Drawing.Size(87, 21);
@@ -372,7 +318,6 @@
             // 
             // alphaBox
             // 
-            this.alphaBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.alphaBox.Location = new System.Drawing.Point(100, 98);
             this.alphaBox.Name = "alphaBox";
             this.alphaBox.Size = new System.Drawing.Size(86, 21);
@@ -389,7 +334,6 @@
             // 
             // classesBox
             // 
-            this.classesBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.classesBox.Location = new System.Drawing.Point(100, 70);
             this.classesBox.Name = "classesBox";
             this.classesBox.ReadOnly = true;
@@ -425,7 +369,6 @@
             // 
             // inputCountBox
             // 
-            this.inputCountBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.inputCountBox.Location = new System.Drawing.Point(100, 42);
             this.inputCountBox.Name = "inputCountBox";
             this.inputCountBox.ReadOnly = true;
@@ -434,7 +377,6 @@
             // 
             // fileTextBox
             // 
-            this.fileTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.fileTextBox.Location = new System.Drawing.Point(100, 14);
             this.fileTextBox.Name = "fileTextBox";
             this.fileTextBox.ReadOnly = true;
@@ -474,14 +416,14 @@
             // SaveNetToolStripMenuItem
             // 
             this.SaveNetToolStripMenuItem.Name = "SaveNetToolStripMenuItem";
-            this.SaveNetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.SaveNetToolStripMenuItem.Size = new System.Drawing.Size(99, 22);
             this.SaveNetToolStripMenuItem.Text = "Сеть";
             this.SaveNetToolStripMenuItem.Click += new System.EventHandler(this.SaveNetToolStripMenuItem_Click);
             // 
             // SaveWeightsToolStripMenuItem
             // 
             this.SaveWeightsToolStripMenuItem.Name = "SaveWeightsToolStripMenuItem";
-            this.SaveWeightsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.SaveWeightsToolStripMenuItem.Size = new System.Drawing.Size(99, 22);
             this.SaveWeightsToolStripMenuItem.Text = "Веса";
             this.SaveWeightsToolStripMenuItem.Click += new System.EventHandler(this.SaveWeightsToolStripMenuItem_Click);
             // 
@@ -510,7 +452,7 @@
             // loadTrainDataButton
             // 
             this.loadTrainDataButton.Name = "loadTrainDataButton";
-            this.loadTrainDataButton.Size = new System.Drawing.Size(152, 22);
+            this.loadTrainDataButton.Size = new System.Drawing.Size(129, 22);
             this.loadTrainDataButton.Text = "Обучения";
             this.loadTrainDataButton.Click += new System.EventHandler(this.loadTrainDataButton_Click);
             // 
@@ -531,7 +473,6 @@
             // 
             // numberNetsBox
             // 
-            this.numberNetsBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.numberNetsBox.Location = new System.Drawing.Point(147, 67);
             this.numberNetsBox.Name = "numberNetsBox";
             this.numberNetsBox.Size = new System.Drawing.Size(37, 21);
@@ -549,7 +490,6 @@
             // 
             // popultextBox
             // 
-            this.popultextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.popultextBox.Location = new System.Drawing.Point(147, 40);
             this.popultextBox.Name = "popultextBox";
             this.popultextBox.Size = new System.Drawing.Size(37, 21);
@@ -567,7 +507,6 @@
             // 
             // populationtextBox
             // 
-            this.populationtextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.populationtextBox.Location = new System.Drawing.Point(147, 15);
             this.populationtextBox.Name = "populationtextBox";
             this.populationtextBox.Size = new System.Drawing.Size(37, 21);
@@ -586,42 +525,29 @@
             // groupBox7
             // 
             this.groupBox7.Controls.Add(this.mediumErrorPopulationBox);
-            this.groupBox7.Controls.Add(this.covariationPopulationBox);
             this.groupBox7.Controls.Add(this.betterPopulationValueBox);
             this.groupBox7.Controls.Add(this.PopulationBox);
             this.groupBox7.Controls.Add(this.betterBox);
-            this.groupBox7.Controls.Add(this.label7);
             this.groupBox7.Controls.Add(this.label9);
             this.groupBox7.Controls.Add(this.label10);
             this.groupBox7.Controls.Add(this.label12);
             this.groupBox7.Location = new System.Drawing.Point(695, 291);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(195, 127);
+            this.groupBox7.Size = new System.Drawing.Size(195, 94);
             this.groupBox7.TabIndex = 29;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Эволюция";
             // 
             // mediumErrorPopulationBox
             // 
-            this.mediumErrorPopulationBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.mediumErrorPopulationBox.Location = new System.Drawing.Point(147, 41);
             this.mediumErrorPopulationBox.Name = "mediumErrorPopulationBox";
             this.mediumErrorPopulationBox.ReadOnly = true;
             this.mediumErrorPopulationBox.Size = new System.Drawing.Size(42, 21);
             this.mediumErrorPopulationBox.TabIndex = 54;
             // 
-            // covariationPopulationBox
-            // 
-            this.covariationPopulationBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.covariationPopulationBox.Location = new System.Drawing.Point(147, 93);
-            this.covariationPopulationBox.Name = "covariationPopulationBox";
-            this.covariationPopulationBox.ReadOnly = true;
-            this.covariationPopulationBox.Size = new System.Drawing.Size(42, 21);
-            this.covariationPopulationBox.TabIndex = 56;
-            // 
             // betterPopulationValueBox
             // 
-            this.betterPopulationValueBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.betterPopulationValueBox.Location = new System.Drawing.Point(147, 67);
             this.betterPopulationValueBox.Name = "betterPopulationValueBox";
             this.betterPopulationValueBox.ReadOnly = true;
@@ -630,7 +556,6 @@
             // 
             // PopulationBox
             // 
-            this.PopulationBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.PopulationBox.Location = new System.Drawing.Point(99, 11);
             this.PopulationBox.Name = "PopulationBox";
             this.PopulationBox.ReadOnly = true;
@@ -639,21 +564,11 @@
             // 
             // betterBox
             // 
-            this.betterBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.betterBox.Location = new System.Drawing.Point(147, 11);
             this.betterBox.Name = "betterBox";
             this.betterBox.ReadOnly = true;
             this.betterBox.Size = new System.Drawing.Size(42, 21);
             this.betterBox.TabIndex = 52;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(4, 94);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(132, 13);
-            this.label7.TabIndex = 51;
-            this.label7.Text = "Коэффициент вариации:";
             // 
             // label9
             // 
@@ -704,7 +619,7 @@
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Name = "EvolutionLearnForm";
-            this.Text = "evolutionLearnForm";
+            this.Text = "ANNBuilder: эволюционный алгоритм";
             this.groupBox2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.lastRunsGridView)).EndInit();
@@ -728,28 +643,13 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridView lastRunsGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
-        private System.Windows.Forms.DataGridViewTextBoxColumn probabilisticCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
         private ZedGraph.ZedGraphControl zedGraphControl1;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Label pLabel;
-        private System.Windows.Forms.TextBox probabilisticValidBox;
         private System.Windows.Forms.Label mLabel;
         private System.Windows.Forms.TextBox moduleValidBox;
-        private System.Windows.Forms.TextBox errorPercent;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox currentIterationBox;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.TextBox neuronsBox;
         private System.Windows.Forms.Label label11;
@@ -778,17 +678,25 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox numberNetsBox;
         private System.Windows.Forms.GroupBox groupBox7;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox mediumErrorPopulationBox;
-        private System.Windows.Forms.TextBox covariationPopulationBox;
         private System.Windows.Forms.TextBox betterPopulationValueBox;
         private System.Windows.Forms.TextBox PopulationBox;
         private System.Windows.Forms.TextBox betterBox;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label labelProcess;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
+        private System.Windows.Forms.DataGridViewTextBoxColumn population;
+        private System.Windows.Forms.DataGridViewTextBoxColumn mutation;
+        private System.Windows.Forms.DataGridViewTextBoxColumn netsInPopulation;
+        private System.Windows.Forms.DataGridViewTextBoxColumn meanError;
+        private System.Windows.Forms.DataGridViewTextBoxColumn betterResult;
     }
 }

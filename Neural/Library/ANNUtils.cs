@@ -41,7 +41,22 @@ namespace Neural
             }
             return data;
         }
-        
+
+        //normalization data for learning
+        public static double[][] normalization(double[][] data, double[] min, double[] max, int rowCountData, int colCountData)
+        {
+            for (int row = 0; row < rowCountData; row++)
+            {
+                for (int column = 0; column < colCountData - 1; column++)
+                {
+                    data[row][column] = (2 * data[row][column] - (max[column] + min[column])) / (max[column] - min[column]);
+                    //data[row, column] = (((data[row, column] - min[column]) * 1 / (max[column] - min[column])));
+
+                }
+            }
+            return data;
+        }
+
         //Кол-во связей в сети
         public static int getCountOfWeights(Network network)
         {

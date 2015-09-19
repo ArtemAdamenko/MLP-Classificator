@@ -48,7 +48,7 @@ namespace Neural
             int reconnectingCount = 0; 
             int population = 0;
 
-            private double[,] data = null;
+            private double[][] data = null;
             private int[] classes;
             List<int> classesList = new List<int>();
             private bool needToStop = false;
@@ -94,8 +94,8 @@ namespace Neural
 
         private void checkTopology()
         {
-            //if string not empty and if string topology contain minimum 2 not empty values
-            if ((this.subnetTopologyBox.Text != "") && (this.subnetTopologyBox.Text.Split(',').Where(n => !string.IsNullOrEmpty(n)).ToArray().Length > 1))
+            // if string topology contain minimum 2 not empty values
+            if (this.subnetTopologyBox.Text.Split(',').Where(n => !string.IsNullOrEmpty(n)).ToArray().Length > 1)
             {
                 string[] topology = this.subnetTopologyBox.Text.Split(',').Where(n => !string.IsNullOrEmpty(n)).ToArray();
                 int input = Int32.Parse(topology[0]);
@@ -372,14 +372,9 @@ namespace Neural
             {
                 try
                 {
-                    //gather inputs for compute, n-1 inputs
-                    for (int i = 0; i < this.network.InputsCount; i++)
-                    {
-                        input[i] = data[count, i];
-                    }
 
                     if (thisSubnet != null)
-                        res = this.network.Compute(input, thisSubnet, MinMaxValues);
+                        res = this.network.Compute(data[count], thisSubnet, MinMaxValues);
                     else
                     {
                         res = this.network.Compute(input);
@@ -455,7 +450,8 @@ namespace Neural
                         rowCountData++;
                     }
 
-                    double[,] tempData = new double[rowCountData, colCountData - 1];
+                    double[][] tempData = new double[rowCountData][];
+                    data = new double[rowCountData][];
                     int[] tempClasses = new int[rowCountData];
 
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
@@ -470,17 +466,19 @@ namespace Neural
 
                         //del empty values in the end
                         inputVals.RemoveAll(str => String.IsNullOrEmpty(str));
-
+                        tempData[i] = new double[colCountData - 1];
+                        // allocate and set data
+                        //data[i] = new double[colCountData - 1];
                         // parse input and output values for learning
                         for (int j = 0; j < colCountData - 1; j++)
                         {
-                            tempData[i, j] = double.Parse(inputVals[j]);
+                            tempData[i][j] = double.Parse(inputVals[j]);
 
                             //search min/max values for each column
-                            if (tempData[i, j] < minData[j])
-                                minData[j] = tempData[i, j];
-                            if (tempData[i, j] > maxData[j])
-                                maxData[j] = tempData[i, j];
+                            if (tempData[i][j] < minData[j])
+                                minData[j] = tempData[i][j];
+                            if (tempData[i][j] > maxData[j])
+                                maxData[j] = tempData[i][j];
                         }
 
                         tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
@@ -495,11 +493,9 @@ namespace Neural
                     }
 
                     //normalization input values
-                    tempData = ANNUtils.normalization( tempData, minData, maxData, rowCountData, colCountData );
+                    tempData = ANNUtils.normalization(tempData, minData, maxData, rowCountData, colCountData);
+                    data = tempData;
 
-                    // allocate and set data
-                    data = new double[i, colCountData - 1];
-                    Array.Copy(tempData, 0, data, 0, i * (colCountData - 1));
                     classes = new int[i];
                     Array.Copy(tempClasses, 0, classes, 0, i);
 
@@ -1069,14 +1065,14 @@ namespace Neural
             for (int i = 0; i < data.GetLength(0); i++)
             {
                 //gather inputs for compute, n-1 inputs
-                for (int k = 0; k < this.network.InputsCount; k++)
+               /* for (int k = 0; k < this.network.InputsCount; k++)
                 {
                     input[k] = data[i, k];
-                }
+                }*/
 
                 if (this.globalSubnet != null)
                 {
-                    res = network.Compute(input.ToArray(), this.globalSubnet, MinMaxValues);
+                    res = network.Compute(data[i].ToArray(), this.globalSubnet, MinMaxValues);
                 }
                 else
                 {

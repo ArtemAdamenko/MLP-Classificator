@@ -14,32 +14,26 @@ namespace Neural
     public partial class LearnPullANNForm : Form
     {
         #region ANN Options
-        int samples = 0;
-        double[][] input;
-        double[][] output;
-        double[][] validateInput;
-        double[][] validateOutput;
-        int[] trainClasses;
-        int[] validClasses;
+        private double[][] validateInput;
+        private int[] trainClasses;
+        private int[] validClasses;
         private double[,] data = null;
-        int rowCountData = 0;
-        int colCountData = 0;
+        private int rowCountData = 0;
+        private int colCountData = 0;
 
         private double alpha = 2.0;
         private int iterations = 0;
         private int loops = 1;
-        private double weightChange = 0;
         private int randomWeightsCount = 0;
         private double maxWeightValue = 0;
         private double minWeightValue = 0;
 
-        private double error = 0.0;
         private double moduleValidateError = 0.0;
         private double probabilisticValidateError = 0.0;
 
         private int[] neuronsAndLayers;
         private int[] classes;
-        List<int> classesList = new List<int>();
+        private List<int> classesList = new List<int>();
 
         private Thread workerThread = null;
         private bool needToStop = false;
@@ -55,11 +49,10 @@ namespace Neural
             // Required for Windows Form Designer support
             //
             InitializeComponent();
-            RollingPointPairList listError = new RollingPointPairList(300);
             RollingPointPairList listValidate = new RollingPointPairList(300);
             RollingPointPairList listValidateP = new RollingPointPairList(300);
             GraphPane myPane = zedGraphControl1.GraphPane;
-            LineItem curve = myPane.AddCurve("Качество обучения", listError, Color.Blue, SymbolType.Plus);
+         
             LineItem curve2 = myPane.AddCurve("Кросс-валидация (вероятность)", listValidateP, Color.Green, SymbolType.Triangle);
             LineItem curve3 = myPane.AddCurve("Кросс-валидация (модуль)", listValidate, Color.Goldenrod, SymbolType.XCross);
             myPane.Title.Text = "Обучение нейронной сети";
@@ -72,7 +65,6 @@ namespace Neural
             myPane.Chart.Fill = new Fill(Color.White, Color.LightGray, 45.0f);
             myPane.YAxis.Scale.Max = 100;
 
-            curve.Line.Width = 2.0F;
             curve2.Line.Width = 2.0F;
             curve3.Line.Width = 2.0F;
             myPane.XAxis.MajorGrid.IsVisible = true;
@@ -80,7 +72,6 @@ namespace Neural
 
             // init controls
             UpdateSettings();
-
 
         }
 
@@ -100,7 +91,6 @@ namespace Neural
         {
             this.alphaBox.Text = alpha.ToString();
             this.randomCountWeightsBox.Text = randomWeightsCount.ToString();
-            //this.weightsChangeBox.Text = weightChange.ToString();
             this.maxWeightValueBox.Text = maxWeightValue.ToString();
             this.minWeightValueBox.Text = minWeightValue.ToString();
             this.limitRepeatBox.Text = loops.ToString();
@@ -122,38 +112,41 @@ namespace Neural
 
                     //get row count values
                     String line;
-                    rowCountData = 0;
-                    colCountData = 0;
+
+                    int row = 0;
+                    int col = 0;
 
                     //get input and output count
                     line = reader.ReadLine();
-                    rowCountData++;
+                    row++;
                     //-1 last element empty
-                    colCountData = line.Trim().Split(';').Length;
+                    col = line.Trim().Split(';').Length;
 
                     //mass for new normalization cols input data
-                    double[] minData = new double[colCountData - 1];
-                    double[] maxData = new double[colCountData - 1];
+                    double[] minData = new double[col - 1];
+                    double[] maxData = new double[col - 1];
 
                     //must be > 1 column in training data
-                    if (colCountData == 1)
+                    if (col == 1)
                         throw new Exception();
 
                     while ((line = reader.ReadLine()) != null)
                     {
-                        rowCountData++;
+                        row++;
                     }
+                    this.rowCountData = row;
+                    this.colCountData = col;
 
-                    double[,] tempData = new double[rowCountData, colCountData - 1];
-                    int[] tempClasses = new int[rowCountData];
+                    double[,] tempData = new double[row, col - 1];
+                    int[] tempClasses = new int[row];
 
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     line = "";
 
                     // read the data
-                    classesList.Clear();
+                    this.classesList.Clear();
 
-                    while ((i < rowCountData) && ((line = reader.ReadLine()) != null))
+                    while ((i < row) && ((line = reader.ReadLine()) != null))
                     {
                         string[] strs = line.Trim().Split(';');
                         List<String> inputVals = new List<String>(strs);
@@ -162,7 +155,7 @@ namespace Neural
                         inputVals.RemoveAll(str => String.IsNullOrEmpty(str));
 
                         // parse input and output values for learning
-                        for (int j = 0; j < colCountData - 1; j++)
+                        for (int j = 0; j < col - 1; j++)
                         {
                             tempData[i, j] = double.Parse(inputVals[j]);
 
@@ -173,36 +166,34 @@ namespace Neural
                                 maxData[j] = tempData[i, j];
                         }
 
-                        tempClasses[i] = int.Parse(inputVals[colCountData - 1]);
+                        tempClasses[i] = int.Parse(inputVals[col - 1]);
 
                         //insert class in list of classes, if not find
-                        if (classesList.IndexOf(tempClasses[i]) == -1)
+                        if (this.classesList.IndexOf(tempClasses[i]) == -1)
                         {
-                            classesList.Add(tempClasses[i]);
+                            this.classesList.Add(tempClasses[i]);
                         }
 
                         i++;
                     }
 
-                    tempData = ANNUtils.normalization(tempData, minData, maxData, rowCountData, colCountData);
+                    tempData = ANNUtils.normalization(tempData, minData, maxData, row, col);
 
                     // allocate and set data
-                    data = new double[i, colCountData - 1];
-                    Array.Copy(tempData, 0, data, 0, i * (colCountData - 1));
-                    classes = new int[i];
+                    this.data = new double[i, col - 1];
+                    Array.Copy(tempData, 0, this.data, 0, i * (col - 1));
+                    this.classes = new int[i];
 
+                    this.classesBox.Text = this.classesList.Count.ToString();
+                    Array.Copy(tempClasses, 0, this.classes, 0, i);
 
-
-                    this.classesBox.Text = classesList.Count.ToString();
-                    Array.Copy(tempClasses, 0, classes, 0, i);
-
-                    inputCountBox.Invoke(new Action(() => inputCountBox.Text = (colCountData - 1).ToString()));
+                    inputCountBox.Invoke(new Action(() => inputCountBox.Text = (col - 1).ToString()));
                     fileTextBox.Invoke(new Action(() => fileTextBox.Text = openFileDialog.SafeFileName.ToString()));
 
                 }
                 catch (Exception exc)
                 {
-                    MessageBox.Show(exc.Message, "Ошибка на  " + i.ToString() + " строке", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(exc.Message, "?????? ??  " + i.ToString() + " ??????", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 finally
@@ -238,11 +229,11 @@ namespace Neural
             // get alpha
             try
             {
-                alpha = Math.Max(0, Math.Min(2.0, double.Parse(alphaBox.Text)));
+                this.alpha = Math.Max(0, Math.Min(2.0, double.Parse(alphaBox.Text)));
             }
             catch
             {
-                alpha = 2.0;
+                this.alpha = 2.0;
             }
             // get neurons count in first layer
             try
@@ -250,25 +241,25 @@ namespace Neural
                 String[] temp = neuronsBox.Text.Split(',');
                 if (temp.Length < 1)
                     throw new Exception();
-                neuronsAndLayers = new int[temp.Length + 1];
+                this.neuronsAndLayers = new int[temp.Length + 1];
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    neuronsAndLayers[i] = Math.Max(1, Math.Min(1000, int.Parse(temp[i])));
+                    this.neuronsAndLayers[i] = Math.Max(1, Math.Min(1000, int.Parse(temp[i])));
                 }
 
-                neuronsAndLayers[temp.Length] = classesList.Count;
+                this.neuronsAndLayers[temp.Length] = this.classesList.Count;
 
             }
             catch
             {
-                neuronsAndLayers = new int[1];
-                neuronsAndLayers[0] = 2;
+                this.neuronsAndLayers = new int[1];
+                this.neuronsAndLayers[0] = 2;
             }
 
-            randomWeightsCount = Int32.Parse(randomCountWeightsBox.Text);
-            maxWeightValue = Double.Parse(maxWeightValueBox.Text);
-            minWeightValue = Double.Parse(minWeightValueBox.Text);
-            loops = Int32.Parse(limitRepeatBox.Text);
+            this.randomWeightsCount = Int32.Parse(randomCountWeightsBox.Text);
+            this.maxWeightValue = Double.Parse(maxWeightValueBox.Text);
+            this.minWeightValue = Double.Parse(minWeightValueBox.Text);
+            this.loops = Int32.Parse(limitRepeatBox.Text);
             // update settings controls
             UpdateSettings();
 
@@ -287,12 +278,12 @@ namespace Neural
         {
             // stop worker thread
             needToStop = true;
-            recordNeuroNet();
+            this.recordNeuroNet(this.network, this.iterations, this.moduleValidateError, this.probabilisticValidateError, this.alpha);
 
         }
 
-        //Запись результата очередного обучения в таблицу
-        private void recordNeuroNet()
+        private void recordNeuroNet(ActivationNetwork network,
+            int iterations, double moduleValidateError, double probabilisticValidateError, double alpha)
         {
             String topology = "";
 
@@ -303,50 +294,72 @@ namespace Neural
 
             topology += network.Layers[network.Layers.Length - 1].Neurons.Length;
 
-
             this.lastRunsGridView.Invoke(
-                            new Action(() =>
-                                lastRunsGridView.Rows.Add(this.iterations.ToString(), (this.moduleValidateError).ToString(), (this.probabilisticValidateError).ToString(),
-                                topology, this.alpha.ToString())
-                                ));
+                            new Action(() => lastRunsGridView.Rows.Add(iterations.ToString(), moduleValidateError.ToString()
+                            , probabilisticValidateError.ToString()
+                            , topology, alpha.ToString())));
         }
 
         //создание сети для обучения и учителя по топологии
-        private void createLearn(int[] topology)
+        private ActivationNetwork createLearn(int[] topology, int colCountData)
         {
             if (this.alphaBox.Text != "")
-                activationFunc = new BipolarSigmoidFunction(Double.Parse(this.alphaBox.Text));
+                activationFunc = new SigmoidFunction(Double.Parse(this.alphaBox.Text));
             else
-                activationFunc = new BipolarSigmoidFunction();
+                activationFunc = new SigmoidFunction();
 
-            network = new ActivationNetwork(activationFunc,
+            ActivationNetwork network = new ActivationNetwork(activationFunc,
             colCountData - 1, topology);
-            //ActivationLayer layer = network.Layers[0] as ActivationLayer;
 
             NguyenWidrow initializer = new NguyenWidrow(network);
             initializer.Randomize();
-            // create teacher
-            /*GeneticLearning genetic = new GeneticLearning(network, chromosomes);
-            teacher = genetic;*/
 
+            return network;
         }
 
+        private List<String> checkWeights(List<String> trainingWeights)
+        {
+            //SORT BY INDEX
+            if (sortByNumBox.Checked == true)
+            {
+                trainingWeights.Sort();
+                if (sortSignNumSortBox.Text == "-1")
+                {
+                    trainingWeights.Reverse();
+                }
+
+            }
+            //SORT BY ABS VALUE
+            else if (sortByModuleAscBox.Checked == true)
+            {
+                trainingWeights = sortByModuleAsc(trainingWeights, network);
+                if (sortSignAbsSortBox.Text == "-1")
+                {
+                    trainingWeights.Reverse();
+                }
+            }
+            //SORT BY LAYERS
+            else if (sortByLayersBox.Checked == true && allWeightsBox.Checked == true)
+            {
+                trainingWeights = sortByLayers(trainingWeights, network);
+            }
+
+            return trainingWeights;
+        }
         // Worker thread
         void SearchSolution()
         {
 
             // number of learning samples
-            samples = data.GetLength(0);
+           int samples = data.GetLength(0);
 
             // prepare learning data
             //80% training, 20% for validate data
-            this.input = new double[(samples * 4) / 5][];
-            this.output = new double[(samples * 4) / 5][];
-            trainClasses = new int[(samples * 4) / 5];
+            double[][] input = new double[(samples * 4) / 5][];
+            this.trainClasses = new int[(samples * 4) / 5];
 
-            validateInput = new double[samples / 5][];
-            validateOutput = new double[samples / 5][];
-            validClasses = new int[samples / 5];
+            this.validateInput = new double[samples / 5][];
+            this.validClasses = new int[samples / 5];
 
             // create multi-layer neural network
 
@@ -360,84 +373,55 @@ namespace Neural
                 {
                     if (this.validateInput.GetLength(0) > K)
                     {
-                        validateInput[K] = new double[colCountData - 1];
+                        this.validateInput[K] = new double[this.colCountData - 1];
 
-                        for (int c = 0; c < colCountData - 1; c++)
+                        for (int c = 0; c < this.colCountData - 1; c++)
                         {
-                            validateInput[K][c] = data[i, c];
+                            this.validateInput[K][c] = this.data[i, c];
                         }
-
-                        validateOutput[K] = new double[classesList.Count];
-                        validateOutput[K][classesList.IndexOf(classes[i])] = 1;
-                        validClasses[K] = classes[i];
+                        this.validClasses[K] = this.classes[i];
                         K++;
                     }
                 }
                 else //forward input 80 %
                 {
                     // input data
-                    if (this.input.GetLength(0) > J)
+                    if (input.GetLength(0) > J)
                     {
-                        this.input[J] = new double[colCountData - 1];
+                        input[J] = new double[this.colCountData - 1];
 
-                        for (int c = 0; c < colCountData - 1; c++)
+                        for (int c = 0; c < this.colCountData - 1; c++)
                         {
-                            this.input[J][c] = data[i, c];
+                            input[J][c] = this.data[i, c];
                         }
 
-                        //output data
-                        this.output[J] = new double[classesList.Count];
-                        this.output[J][classesList.IndexOf(classes[i])] = 1;
-                        trainClasses[J] = classes[i];
+                        this.trainClasses[J] = this.classes[i];
                         J++;
                     }
                 }
             }
 
-
-            createLearn(neuronsAndLayers);
-            // iterations
-            this.error = 0.0;
-            this.moduleValidateError = 0.0;
-            this.probabilisticValidateError = 0.0;
-
             zedGraphControl1.GraphPane.CurveList[0].Clear();
             zedGraphControl1.GraphPane.CurveList[1].Clear();
-            zedGraphControl1.GraphPane.CurveList[2].Clear();
             zedGraphControl1.AxisChange();
+
+            // Get the first CurveItem in the graph
+            CurveItem curve2 = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
+            CurveItem curve3 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
+            // Get the PointPairList
+            IPointListEdit listValidatesP = curve2.Points as IPointListEdit;
+            IPointListEdit listValidates = curve3.Points as IPointListEdit;
 
             Random rnd = new Random();
 
-            List<String> trainingWeights = createListWeights();
-            //SORT BY INDEX
-            if (sortByNumBox.Checked == true)
-            {
-                trainingWeights.Sort();
-                if (sortSignNumSortBox.Text == "-1")
-                {
-                    trainingWeights.Reverse();
-                }
-                
-            }
-            //SORT BY ABS VALUE
-            else if(sortByModuleAscBox.Checked == true)
-            {
-                trainingWeights = sortByModuleAsc(trainingWeights, network);
-                if (sortSignAbsSortBox.Text == "-1")
-                {
-                    trainingWeights.Reverse();
-                }
-            }
-            //SORT BY LAYERS
-            else if(sortByLayersBox.Checked == true && allWeightsBox.Checked == true)
-            {
-                trainingWeights = sortByLayers(trainingWeights, network);
-            }
+            this.network = this.createLearn(this.neuronsAndLayers, this.colCountData);
+            List<String> trainingWeights = this.createListWeights(this.network);
+            trainingWeights = this.checkWeights(trainingWeights);
 
-            if (weightsChangeBox.Text.Length != 0)
-            {
-                weightChange = Math.Abs(Double.Parse(weightsChangeBox.Text));
-            }
+            // iterations
+            this.moduleValidateError = 0.0;
+            this.probabilisticValidateError = 0.0;
+            double weightChange = 0;
             int currentWeight = 0;
             String[] signature = new String[3];
             int layer = 0;
@@ -446,10 +430,15 @@ namespace Neural
             int order = 1;
             int check = 0;
             int currentIteration = 1;
-            double lastValidation = 0;
+            double lastValidation = -1000;
             double lastValue = 0;
             double value = 0;
             double initialValue = 0;
+            double[] results = new double[2];
+            if (weightsChangeBox.Text.Length != 0)
+            {
+                weightChange = Math.Abs(Double.Parse(weightsChangeBox.Text));
+            }
             // loop
             while (!needToStop)
             {
@@ -465,8 +454,8 @@ namespace Neural
                     layer = Int32.Parse(signature[0]);
                     neuron = Int32.Parse(signature[1]);
                     weight = Int32.Parse(signature[2]);
-                    value = network.Layers[layer].Neurons[neuron].Weights[weight];
-                    initialValue = network.Layers[layer].Neurons[neuron].Weights[weight];
+                    value = this.network.Layers[layer].Neurons[neuron].Weights[weight];
+                    initialValue = this.network.Layers[layer].Neurons[neuron].Weights[weight];
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[3].Value = initialValue));
 
                     if (percentChangeBox.Text.Length != 0)
@@ -476,18 +465,14 @@ namespace Neural
                     }
                 }
                 //new value better the old
-                if (lastValidation <= moduleValidateError)
+                if (lastValidation <= this.moduleValidateError)
                 {
-                    lastValidation = moduleValidateError;
+                    lastValidation = this.moduleValidateError;
                     lastValue = value;
                 }
 
-
-
-#pragma warning disable CS0252 // Possible unintended reference comparison; left hand side needs cast
-                              //current weights != old weight
+                //current weights != old weight
                 if (weightsView.Rows[currentWeight].Cells[0].Value != trainingWeights[currentWeight])
-#pragma warning restore CS0252 // Possible unintended reference comparison; left hand side needs cast
                 {
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[0].Value = trainingWeights[currentWeight]));
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[1].Value = value));
@@ -503,6 +488,7 @@ namespace Neural
                 //limit sum
                 else if (value >= maxWeightValue)
                 {
+                    value = initialValue;
                     order = -1;
                     ++check;
                 }
@@ -526,7 +512,7 @@ namespace Neural
                         lastValue = initialValue;
 
                     }
-                    network.Layers[layer].Neurons[neuron].Weights[weight] = lastValue;
+                    this.network.Layers[layer].Neurons[neuron].Weights[weight] = lastValue;
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[1].Value = lastValue));
                     weightsView.Invoke(new Action(() => weightsView.Rows[currentWeight].Cells[2].Value = lastValidation));
 
@@ -539,26 +525,9 @@ namespace Neural
                     {
                         if (currentIteration < this.loops)
                         {
-                            trainingWeights = createListWeights(trainingWeights);
-                            if (sortByNumBox.Checked == true && repeatPullBox.Checked != true)
-                            {
-                                trainingWeights.Sort();
-                                if (sortSignNumSortBox.Text == "-1")
-                                {
-                                    trainingWeights.Reverse();
-                                }
-                            }else if(sortByModuleAscBox.Checked == true)
-                            {
-                                trainingWeights = sortByModuleAsc(trainingWeights, network);
-                                if (sortSignAbsSortBox.Text == "-1")
-                                {
-                                    trainingWeights.Reverse();
-                                }
-                            }
-                            else if (sortByLayersBox.Checked == true && allWeightsBox.Checked == true)
-                            {
-                                trainingWeights = sortByLayers(trainingWeights, network);
-                            }
+                            trainingWeights = this.createListWeights(this.network, trainingWeights);
+                            trainingWeights = this.checkWeights(trainingWeights);
+
                             currentWeight = 0;
                             currentIteration++;
                         }
@@ -577,41 +546,13 @@ namespace Neural
                 //changes weights value
                 else
                 {
-                    network.Layers[layer].Neurons[neuron].Weights[weight] = value;
+                    this.network.Layers[layer].Neurons[neuron].Weights[weight] = value;
                 }
 
-                moduleValidateError = this.moduleValidation();
-                probabilisticValidateError = this.probabilisticValidation();
+                results = this.Validation(this.network, input, trainClasses, this.classesList);
+                this.moduleValidateError = results[0];
+                this.probabilisticValidateError = results[1];
 
-
-
-                // Make sure that the curvelist has at least one curve
-                if (zedGraphControl1.GraphPane.CurveList.Count <= 0)
-                    return;
-
-                // Get the first CurveItem in the graph
-                CurveItem curve = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
-                CurveItem curve2 = zedGraphControl1.GraphPane.CurveList[1] as LineItem;
-                CurveItem curve3 = zedGraphControl1.GraphPane.CurveList[2] as LineItem;
-                if (curve == null)
-                    return;
-                if (curve2 == null)
-                    return;
-                if (curve3 == null)
-                    return;
-                // Get the PointPairList
-                IPointListEdit listErrors = curve.Points as IPointListEdit;
-                IPointListEdit listValidatesP = curve2.Points as IPointListEdit;
-                IPointListEdit listValidates = curve3.Points as IPointListEdit;
-
-                if (listErrors == null)
-                    return;
-                if (listValidates == null)
-                    return;
-                if (listValidatesP == null)
-                    return;
-
-                listErrors.Add(this.iterations, error);
                 listValidates.Add(this.iterations, moduleValidateError);
                 listValidatesP.Add(this.iterations, probabilisticValidateError);
 
@@ -624,8 +565,8 @@ namespace Neural
                 // set current iteration's info
                 currentIterationBox.Invoke(new Action<string>((s) => currentIterationBox.Text = s), this.iterations.ToString());
                
-                moduleValidBox.Invoke(new Action<string>((s) => moduleValidBox.Text = s), moduleValidateError.ToString("F14"));
-                probabilisticValidBox.Invoke(new Action<string>((s) => probabilisticValidBox.Text = s), probabilisticValidateError.ToString("F14"));
+                moduleValidBox.Invoke(new Action<string>((s) => moduleValidBox.Text = s), this.moduleValidateError.ToString("F14"));
+                probabilisticValidBox.Invoke(new Action<string>((s) => probabilisticValidBox.Text = s), this.probabilisticValidateError.ToString("F14"));
 
 
                 // increase current iteration
@@ -635,7 +576,6 @@ namespace Neural
             EnableControls(true);
 
         }
-
 
         private List<String> sortByLayers(List<String> weights, Network network)
         {
@@ -722,7 +662,7 @@ namespace Neural
         }
 
         //create list of weights for changes
-        private List<String> createListWeights(List<String> weights = null)
+        private List<String> createListWeights(ActivationNetwork network, List<String> weights = null)
         {
             List<String> trainingWeights = new List<String>();
             List<String> list = ANNUtils.getAvailableWeights(network);
@@ -757,41 +697,23 @@ namespace Neural
 
             
         }
-
-        //валидация по модулю
-        private double moduleValidation()
+        private double[] Validation(ActivationNetwork network, double[][] input, int[] trainClasses, List<int> classesList)
         {
-            double testQuality = 0.0;
-            double validate = 0.0;
+
             double[] res;
-            for (int count = 0; count < input.Length; count++)
+            int count = 0;
+            int len = 0;
+            double moduleValue = 0;
+            double probValue = 0;
+
+            for (count = 0, len = input.Length; count < len; count++)
             {
                 res = network.Compute(input[count]);
-                double value = Math.Abs(trainClasses[count] - classesList[ANNUtils.max(res)]);
-
-                validate += value;
-
-            }
-            testQuality = (1 - (validate / input.Length)) * 100;
-            return testQuality;
-        }
-
-        //валидация по вероятности
-        private double probabilisticValidation()
-        {
-            double testQuality = 0.0;
-            double validate = 0.0;
-            double[] res;
-            for (int count = 0; count < input.Length; count++)
-            {
-                res = network.Compute(input[count]);
-                double value = 1 - res[classesList.IndexOf(trainClasses[count])];
-
-                validate += value;
+                moduleValue += Math.Abs(trainClasses[count] - classesList[ANNUtils.max(res)]);
+                probValue += 1 - res[classesList.IndexOf(trainClasses[count])];
 
             }
-            testQuality = (1 - (validate / input.Length)) * 100;
-            return testQuality;
+            return new double[2] { ((1 - (moduleValue / input.Length)) * 100), ((1 - (probValue / input.Length)) * 100) };
         }
 
         //Сохранение нейронной сети по указанному пути
@@ -810,12 +732,17 @@ namespace Neural
         //тестирование сети с записью результата в файл
         private void TestNetToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            this.testNet(this.network, this.data, this.classesList, this.colCountData);
+        }
+
+        private void testNet(ActivationNetwork betterNet, double[,] data, List<int> classesList, int colCountData)
+        {
             double[] res = new double[classesList.Count];
             double[] input = new double[colCountData - 1];
 
-            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Тестирование-" + LogHelper.getTime() + ".xlsx");
+            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ-" + LogHelper.getTime() + ".xlsx");
             ExcelPackage book = new ExcelPackage(file);
-            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Тестирование всей обучающей выборки");
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ РЅР° С‚РµСЃС‚РёСЂСѓСЋС‰РµР№ (80%) РїРѕРґРІС‹Р±РѕСЂРєРµ");
 
             for (int i = 0; i < data.GetLength(0); i++)
             {
@@ -825,27 +752,27 @@ namespace Neural
                     input[k] = data[i, k];
                 }
 
-                res = network.Compute(input);
+                res = betterNet.Compute(input);
 
                 int classificator = classesList[ANNUtils.max(res)];
                 sheet.Cells[i + 1, 1].Value = classes[i];
                 sheet.Cells[i + 1, 2].Value = classificator;
 
             }
-            MessageBox.Show("Тестирование пройдено");
+            MessageBox.Show("РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРѕ!");
             book.Save();
             return;
         }
 
-        //кросс-валидация(20%) сети с записью результата в файл
-        private void crossValid()
+        //incapsulate private method for crossValidToolStripMenuItem Event
+        private void crossValid(ActivationNetwork betterNet, double[][] validateInput, List<int> classesList, int colCountData, int[] validClasses)
         {
             double[] res = new double[classesList.Count];
             double[] input = new double[colCountData - 1];
 
-            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Валидация-" + LogHelper.getTime() + ".xlsx");
+            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Р’Р°Р»РёРґР°С†РёСЏ-" + LogHelper.getTime() + ".xlsx");
             ExcelPackage book = new ExcelPackage(file);
-            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Тестирование 20% валидационной выборки");
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Р’Р°Р»РёРґР°С†РёСЏ РЅР° РІР°Р»РёРґР°С†РёРѕРЅРЅРѕР№ (20%) РїРѕРґРІС‹Р±РѕСЂРєРµ");
 
             for (int i = 0; i < validateInput.GetLength(0) - 1; i++)
             {
@@ -855,13 +782,13 @@ namespace Neural
                     input[k] = validateInput[i][k];
                 }
 
-                res = network.Compute(input);
+                res = betterNet.Compute(input);
 
                 int classificator = classesList[ANNUtils.max(res)];
                 sheet.Cells[i + 1, 1].Value = validClasses[i];
                 sheet.Cells[i + 1, 2].Value = classificator;
             }
-            MessageBox.Show("Кросс-валидация пройдена.");
+            MessageBox.Show("Р’Р°Р»РёРґР°С†РёСЏ Р·Р°РІРµСЂС€РµРЅР°!");
             book.Save();
             return;
         }
@@ -869,32 +796,38 @@ namespace Neural
         //сохранение весов текущей ИНС в файл
         private void SaveWeightsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Веса-" + LogHelper.getTime() + ".xlsx");
-            ExcelPackage book = new ExcelPackage(file);
-            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Значения весов всей обученной сети");
+            this.saveWeights(this.network);
+        }
 
-            sheet.Cells[1, 1].Value = "Слой";
-            sheet.Cells[1, 2].Value = "Нейрон";
-            sheet.Cells[1, 3].Value = "Вес";
-            sheet.Cells[1, 4].Value = "Значение";
+        //incapsulate private method for saveWeights Event
+        private void saveWeights(ActivationNetwork betterNet)
+        {
+            FileInfo file = new FileInfo(LogHelper.getPath("Learn") + "\\Р’РµСЃР°-" + LogHelper.getTime() + ".xlsx");
+            ExcelPackage book = new ExcelPackage(file);
+            ExcelWorksheet sheet = book.Workbook.Worksheets.Add("Р’РµСЃРѕРІС‹Рµ РєРѕСЌС„С„РёС†РёРµРЅС‚С‹");
+
+            sheet.Cells[1, 1].Value = "РРЅРґРµРєСЃ";
+            sheet.Cells[1, 2].Value = "РЎР»РѕР№";
+            sheet.Cells[1, 3].Value = "РќРµР№СЂРѕРЅ";
+            sheet.Cells[1, 4].Value = "Р’РµСЃ";
 
             int row = 2;
-            for (int i = 0; i < network.Layers.Length; i++)
+            for (int i = 0; i < betterNet.Layers.Length; i++)
             {
-                for (int j = 0; j < network.Layers[i].Neurons.Length; j++)
+                for (int j = 0; j < betterNet.Layers[i].Neurons.Length; j++)
                 {
-                    for (int k = 0; k < network.Layers[i].Neurons[j].Weights.Length; k++)
+                    for (int k = 0; k < betterNet.Layers[i].Neurons[j].Weights.Length; k++)
                     {
                         sheet.Cells[row, 1].Value = i;
                         sheet.Cells[row, 2].Value = j;
                         sheet.Cells[row, 3].Value = k;
-                        sheet.Cells[row, 4].Value = network.Layers[i].Neurons[j].Weights[k];
+                        sheet.Cells[row, 4].Value = betterNet.Layers[i].Neurons[j].Weights[k];
 
                         row++;
                     }
                 }
             }
-            MessageBox.Show("Веса сохранены");
+            MessageBox.Show("Р’РµСЃРѕРІС‹Рµ РєРѕСЌС„С„РёС†РёРµРЅС‚С‹ СЃРѕС…СЂР°РЅРµРЅС‹!");
             book.Save();
             return;
         }
@@ -902,15 +835,13 @@ namespace Neural
         //запуск кросс-валидации
         private void crossValidToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.crossValid();
+            this.crossValid(this.network, this.validateInput, this.classesList, this.colCountData, this.validClasses);
         }
 
         //загрузка обучающей выборки
         private void loadTrainDataButton_Click(object sender, EventArgs e)
         {
-
             this.getTrainDataForClass();
-
         }
 
         private void allWeightsBox_CheckedChanged(object sender, EventArgs e)
